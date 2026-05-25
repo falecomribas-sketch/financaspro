@@ -3507,14 +3507,20 @@ input:focus,select:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px 
 
 <script>
 // GRÁFICO FLUXO DE CAIXA
-var ctxFluxo = document.getElementById('chartFluxo').getContext('2d');
+var ctxFluxo = (function(){ var _el = document.getElementById('chartFluxo'); return _el ? _el.getContext('2d') : null; })();
 var dadosFluxo = {
   '3m': { labels:['Mar','Abr','Mai'], rec:[5800,6200,6500], desp:[3100,3050,3240] },
   '6m': { labels:['Dez','Jan','Fev','Mar','Abr','Mai'], rec:[5200,5500,5800,5800,6200,6500], desp:[2800,3200,2900,3100,3050,3240] },
   '12m': { labels:['Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'], rec:[4800,5000,5100,5200,5300,5400,5200,5500,5800,5800,6200,6500], desp:[2600,2700,2800,2900,2800,3000,2800,3200,2900,3100,3050,3240] }
 };
 
-var chartFluxo = new Chart(ctxFluxo, {
+(function(){
+  var _el = document.getElementById('chartFluxo');
+  if (_el && Chart.getChart(_el)) Chart.getChart(_el).destroy();
+})();
+var chartFluxo;
+if (ctxFluxo) {
+  chartFluxo = new Chart(ctxFluxo, {
   type: 'bar',
   data: {
     labels: dadosFluxo['3m'].labels,
@@ -3533,6 +3539,7 @@ var chartFluxo = new Chart(ctxFluxo, {
     }
   }
 });
+}
 
 function trocarGrafico(periodo, el) {
   document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
@@ -3553,8 +3560,12 @@ var cats = [
   { nome:'Lazer', val:293, pct:9.1, cor:'#0891B2' },
 ];
 
-var ctxCat = document.getElementById('chartCat').getContext('2d');
-new Chart(ctxCat, {
+var ctxCat = (function(){ var _el = document.getElementById('chartCat'); return _el ? _el.getContext('2d') : null; })();
+(function(){
+  var _el = document.getElementById('chartCat');
+  if (_el && Chart.getChart(_el)) Chart.getChart(_el).destroy();
+})();
+if (ctxCat) new Chart(ctxCat, {
   type: 'doughnut',
   data: {
     labels: cats.map(c => c.nome),
@@ -3778,7 +3789,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(
                 <div class="conta-card-bank">Itaú Unibanco</div>
               </div>
             </div>
-            <button class="conta-card-menu" onclick="event.stopPropagation();menuConta('itau')">⋮</button>
+            <button class="conta-card-menu" onclick="event.stopPropagation();menuConta('itau',this)">⋮</button>
           </div>
           <div><span class="conta-card-type type-corrente">Conta corrente</span></div>
           <div class="conta-card-balance">R$ 5.200,00</div>
@@ -3800,7 +3811,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(
                 <div class="conta-card-bank">Bradesco S.A.</div>
               </div>
             </div>
-            <button class="conta-card-menu" onclick="event.stopPropagation()">⋮</button>
+            <button class="conta-card-menu" onclick="event.stopPropagation();menuConta('bradesco',this)">⋮</button>
           </div>
           <div><span class="conta-card-type type-corrente">Conta corrente</span></div>
           <div class="conta-card-balance">R$ 3.220,00</div>
@@ -3822,7 +3833,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(
                 <div class="conta-card-bank">Caixa Econômica Federal</div>
               </div>
             </div>
-            <button class="conta-card-menu" onclick="event.stopPropagation()">⋮</button>
+            <button class="conta-card-menu" onclick="event.stopPropagation();menuConta('poupanca',this)">⋮</button>
           </div>
           <div><span class="conta-card-type type-poupanca">Conta poupança</span></div>
           <div class="conta-card-balance">R$ 5.200,00</div>
@@ -3844,7 +3855,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(
                 <div class="conta-card-bank">Itaú Unibanco</div>
               </div>
             </div>
-            <button class="conta-card-menu" onclick="event.stopPropagation()">⋮</button>
+            <button class="conta-card-menu" onclick="event.stopPropagation();menuConta('cartao',this)">⋮</button>
           </div>
           <div><span class="conta-card-type type-cartao">Cartão de crédito</span></div>
           <div class="conta-card-balance neg">- R$ 1.840,00</div>
@@ -3873,7 +3884,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(
                 <div class="conta-card-bank">XP Investimentos</div>
               </div>
             </div>
-            <button class="conta-card-menu" onclick="event.stopPropagation()">⋮</button>
+            <button class="conta-card-menu" onclick="event.stopPropagation();menuConta('investimento',this)">⋮</button>
           </div>
           <div><span class="conta-card-type type-investimento">Investimento · CDB</span></div>
           <div class="conta-card-balance">R$ 10.500,00</div>
@@ -3895,7 +3906,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(
                 <div class="conta-card-bank">Carteira digital e física</div>
               </div>
             </div>
-            <button class="conta-card-menu" onclick="event.stopPropagation()">⋮</button>
+            <button class="conta-card-menu" onclick="event.stopPropagation();menuConta('digital',this)">⋮</button>
           </div>
           <div><span class="conta-card-type type-digital">Carteira digital</span></div>
           <div class="conta-card-balance">R$ 550,00</div>
@@ -3943,10 +3954,10 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(
         <div class="detalhe-chart-title" style="margin-bottom:10px">Últimas transações</div>
         <div id="det-txlist"></div>
         <div class="detalhe-actions">
-          <button class="btn-detalhe">✏️ Editar conta</button>
-          <button class="btn-detalhe">↕️ Ver lançamentos</button>
-          <button class="btn-detalhe">💸 Transferir</button>
-          <button class="btn-detalhe danger">🗃️ Arquivar</button>
+          <button class="btn-detalhe" onclick="editarConta(window._detalheConta||'itau')">✏️ Editar conta</button>
+          <button class="btn-detalhe" onclick="navegarPara('lancamentos')">↕️ Ver lançamentos</button>
+          <button class="btn-detalhe" onclick="transferirConta(window._detalheConta||'itau')">💸 Transferir</button>
+          <button class="btn-detalhe danger" onclick="arquivarConta(window._detalheConta||'itau');fecharDetalhe()">🗃️ Arquivar</button>
         </div>
       </div>
     </div>
@@ -4102,8 +4113,12 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(
 
 <script>
 // GRAFICO PATRIMÔNIO (donut)
-var ctxPat = document.getElementById('chartPatrimonio').getContext('2d');
-new Chart(ctxPat, {
+var ctxPat = (function(){ var _el = document.getElementById('chartPatrimonio'); return _el ? _el.getContext('2d') : null; })();
+(function(){
+  var _el = document.getElementById('chartPatrimonio');
+  if (_el && Chart.getChart(_el)) Chart.getChart(_el).destroy();
+})();
+if (ctxPat) new Chart(ctxPat, {
   type: 'doughnut',
   data: {
     labels: ['Correntes','Poupança','Cartão','Investimento','Digital/Espécie'],
@@ -4195,6 +4210,7 @@ var chartDetalhe = null;
 
 function abrirDetalhe(id) {
   var c = contas[id];
+  window._detalheConta = id;
   document.querySelectorAll('.conta-card').forEach(el => el.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
 
@@ -4220,8 +4236,8 @@ function abrirDetalhe(id) {
 
   // Gráfico
   if (chartDetalhe) chartDetalhe.destroy();
-  var ctx = document.getElementById('chartDetalhe').getContext('2d');
-  chartDetalhe = new Chart(ctx, {
+  var ctx = (function(){ var _e=document.getElementById('chartDetalhe'); return _e?_e.getContext('2d'):null; })();
+  if (ctx) chartDetalhe = new Chart(ctx, {
     type: 'line',
     data: {
       labels: ['Dez','Jan','Fev','Mar','Abr','Mai'],
@@ -4282,10 +4298,300 @@ function salvarConta() { fecharModal(); }
 function abrirModalInstituicao() { document.getElementById('modal-inst').classList.add('open'); }
 function fecharModalInst() { document.getElementById('modal-inst').classList.remove('open'); }
 
-function menuConta(id) { alert('Menu de opções: Editar · Ajustar saldo · Transferir · Arquivar'); }
+// ===== DROPDOWN MENU CONTAS =====
+var _menuContaAberto = null;
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { fecharModal(); fecharDetalhe(); fecharModalInst(); } });
+var _contasData = {
+  itau:       { nome: 'Conta Itaú',       banco: 'Itaú Unibanco',          tipo: 'corrente',    saldo: 'R$ 5.200,00',  icone: '🏦', cor: '#1B4B8A' },
+  bradesco:   { nome: 'Conta Bradesco',   banco: 'Bradesco S.A.',           tipo: 'corrente',    saldo: 'R$ 3.220,00',  icone: '🏦', cor: '#DC2626' },
+  poupanca:   { nome: 'Poupança Caixa',   banco: 'Caixa Econômica Federal', tipo: 'poupanca',    saldo: 'R$ 5.200,00',  icone: '🐷', cor: '#059669' },
+  cartao:     { nome: 'Cartão Itaú',      banco: 'Itaú Unibanco',           tipo: 'cartao',      saldo: '-R$ 1.840,00', icone: '💳', cor: '#D97706' },
+  investimento:{ nome: 'Renda Fixa XP',  banco: 'XP Investimentos',        tipo: 'investimento', saldo: 'R$ 10.500,00', icone: '📈', cor: '#7C3AED' },
+  digital:    { nome: 'PicPay + Espécie', banco: 'Carteira digital e física',tipo: 'digital',    saldo: 'R$ 550,00',    icone: '📱', cor: '#0369A1' }
+};
+
+function menuConta(id, btn) {
+  // Fecha qualquer dropdown aberto
+  fecharMenuConta();
+
+  var conta = _contasData[id];
+  if (!conta) return;
+
+  var dropdown = document.createElement('div');
+  dropdown.id = 'conta-dropdown';
+  dropdown.className = 'conta-dropdown';
+  dropdown.innerHTML = `
+    <div class="conta-dropdown-header">
+      <span style="font-weight:700;color:var(--text)">${conta.nome}</span>
+      <span style="font-size:12px;color:var(--text3)">${conta.saldo}</span>
+    </div>
+    <button class="conta-dropdown-item" onclick="editarConta('${id}')">
+      <span class="cdi-icon">✏️</span> Editar conta
+    </button>
+    <button class="conta-dropdown-item" onclick="ajustarSaldo('${id}')">
+      <span class="cdi-icon">⚖️</span> Ajustar saldo
+    </button>
+    <button class="conta-dropdown-item" onclick="transferirConta('${id}')">
+      <span class="cdi-icon">↔️</span> Transferir
+    </button>
+    <div class="conta-dropdown-sep"></div>
+    <button class="conta-dropdown-item danger" onclick="arquivarConta('${id}')">
+      <span class="cdi-icon">🗃️</span> Arquivar conta
+    </button>
+    <button class="conta-dropdown-item danger" onclick="excluirConta('${id}')">
+      <span class="cdi-icon">🗑️</span> Excluir conta
+    </button>
+  `;
+
+  // Posiciona o dropdown
+  document.body.appendChild(dropdown);
+  var rect = btn.getBoundingClientRect();
+  var ddW = 220;
+  var left = rect.right - ddW;
+  if (left < 8) left = 8;
+  dropdown.style.position = 'fixed';
+  dropdown.style.top = (rect.bottom + 6) + 'px';
+  dropdown.style.left = left + 'px';
+  dropdown.style.width = ddW + 'px';
+  dropdown.style.zIndex = '9999';
+
+  _menuContaAberto = id;
+
+  // Fecha ao clicar fora
+  setTimeout(() => {
+    document.addEventListener('click', _fecharMenuContaFora, { once: true });
+  }, 0);
+}
+
+function _fecharMenuContaFora(e) {
+  var dd = document.getElementById('conta-dropdown');
+  if (dd && !dd.contains(e.target)) fecharMenuConta();
+}
+
+function fecharMenuConta() {
+  var dd = document.getElementById('conta-dropdown');
+  if (dd) dd.remove();
+  _menuContaAberto = null;
+}
+
+function editarConta(id) {
+  fecharMenuConta();
+  var conta = _contasData[id];
+  if (!conta) return;
+  // Preenche o modal com dados da conta
+  var modal = document.getElementById('modal');
+  modal.querySelector('.modal-title').textContent = 'Editar conta — ' + conta.nome;
+  var inputs = modal.querySelectorAll('input[type=text]');
+  if (inputs[0]) inputs[0].value = conta.nome;
+  // Seleciona instituição no select
+  var sel = modal.querySelector('select');
+  if (sel) {
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].text === conta.banco) { sel.selectedIndex = i; break; }
+    }
+  }
+  // Destaca tipo de conta
+  modal.querySelectorAll('.tipo-card').forEach(function(c) {
+    var nm = c.querySelector('.tipo-card-name');
+    var tipoMap = { corrente:'Corrente', poupanca:'Poupança', poupança:'Poupança', cartao:'Cartão', investimento:'Investimento', digital:'Carteira digital' };
+    c.classList.toggle('selected', nm && nm.textContent.trim() === (tipoMap[conta.tipo] || ''));
+  });
+  // Destaca cor
+  modal.querySelectorAll('.cor-item').forEach(function(c) {
+    c.classList.toggle('selected', c.style.background === conta.cor || c.style.backgroundColor === conta.cor);
+  });
+  // Altera botão para salvar edição
+  var btnSave = modal.querySelector('.btn-save');
+  if (btnSave) {
+    btnSave.textContent = 'Salvar alterações';
+    btnSave.onclick = function() { salvarEdicaoConta(id); };
+  }
+  modal.classList.add('open');
+}
+
+function salvarEdicaoConta(id) {
+  var modal = document.getElementById('modal');
+  var nomeInput = modal.querySelector('input[type=text]');
+  var novoNome = nomeInput ? nomeInput.value.trim() : '';
+  if (novoNome && _contasData[id]) {
+    _contasData[id].nome = novoNome;
+    // Atualiza o card visualmente
+    var card = document.querySelector('.conta-card[data-id="' + id + '"] .conta-card-name');
+    if (!card) {
+      document.querySelectorAll('.conta-card').forEach(function(c) {
+        var btn = c.querySelector('.conta-card-menu');
+        if (btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + id + "'")) {
+          var nm = c.querySelector('.conta-card-name');
+          if (nm) nm.textContent = novoNome;
+        }
+      });
+    }
+    // Notificação
+    mostrarToast('Conta "' + novoNome + '" atualizada com sucesso!', 'success');
+  }
+  // Restaura botão
+  var btnSave = modal.querySelector('.btn-save');
+  if (btnSave) { btnSave.textContent = 'Salvar conta'; btnSave.onclick = salvarConta; }
+  modal.querySelector('.modal-title').textContent = 'Nova conta bancária';
+  fecharModal();
+}
+
+function ajustarSaldo(id) {
+  fecharMenuConta();
+  var conta = _contasData[id];
+  if (!conta) return;
+  // Modal de ajuste de saldo
+  var overlay = document.createElement('div');
+  overlay.id = 'modal-ajuste';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px';
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:28px 28px 24px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font-size:16px;font-weight:700">Ajustar saldo — ${conta.nome}</div>
+        <button onclick="document.getElementById('modal-ajuste').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#9CA3AF">✕</button>
+      </div>
+      <div style="margin-bottom:8px;font-size:13px;font-weight:600;color:#4B5563">Saldo atual</div>
+      <div style="font-size:22px;font-weight:800;color:#111827;margin-bottom:20px">${conta.saldo}</div>
+      <div style="margin-bottom:8px;font-size:13px;font-weight:600;color:#4B5563">Novo saldo (R$)</div>
+      <input id="ajuste-valor" type="number" step="0.01" placeholder="0,00"
+        style="width:100%;border:1.5px solid #E5E7EB;border-radius:10px;padding:10px 14px;font-size:15px;font-family:inherit;margin-bottom:8px;outline:none"
+        onfocus="this.style.borderColor='#2563EB'" onblur="this.style.borderColor='#E5E7EB'">
+      <div style="margin-bottom:8px;font-size:13px;font-weight:600;color:#4B5563;margin-top:12px">Data do ajuste</div>
+      <input type="date" value="${new Date().toISOString().split('T')[0]}"
+        style="width:100%;border:1.5px solid #E5E7EB;border-radius:10px;padding:10px 14px;font-size:14px;font-family:inherit;margin-bottom:20px;outline:none">
+      <button onclick="confirmarAjuste('${id}')"
+        style="width:100%;background:#1B4B8A;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+        Confirmar ajuste
+      </button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.getElementById('ajuste-valor').focus();
+}
+
+function confirmarAjuste(id) {
+  var val = document.getElementById('ajuste-valor').value;
+  if (!val) return;
+  var num = parseFloat(val);
+  var fmt = 'R$ ' + num.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  if (_contasData[id]) _contasData[id].saldo = fmt;
+  // Atualiza card visualmente
+  document.querySelectorAll('.conta-card').forEach(function(c) {
+    var btn = c.querySelector('.conta-card-menu');
+    if (btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + id + "'")) {
+      var bal = c.querySelector('.conta-card-balance');
+      if (bal) bal.textContent = fmt;
+    }
+  });
+  document.getElementById('modal-ajuste').remove();
+  mostrarToast('Saldo ajustado para ' + fmt, 'success');
+}
+
+function transferirConta(id) {
+  fecharMenuConta();
+  mostrarToast('Abra a tela de Lançamentos e use "Transferência" para mover valores entre contas.', 'info');
+}
+
+function arquivarConta(id) {
+  fecharMenuConta();
+  var conta = _contasData[id];
+  if (!conta) return;
+  if (!confirm('Arquivar a conta "' + conta.nome + '"?\nEla ficará oculta mas os lançamentos serão mantidos.')) return;
+  // Esconde o card
+  document.querySelectorAll('.conta-card').forEach(function(c) {
+    var btn = c.querySelector('.conta-card-menu');
+    if (btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + id + "'")) {
+      c.style.opacity = '0.4';
+      c.style.pointerEvents = 'none';
+    }
+  });
+  mostrarToast('Conta "' + conta.nome + '" arquivada.', 'success');
+}
+
+function excluirConta(id) {
+  fecharMenuConta();
+  var conta = _contasData[id];
+  if (!conta) return;
+  if (!confirm('Excluir permanentemente a conta "' + conta.nome + '"?\nEsta ação não pode ser desfeita.')) return;
+  // Remove o card do DOM
+  document.querySelectorAll('.conta-card').forEach(function(c) {
+    var btn = c.querySelector('.conta-card-menu');
+    if (btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + id + "'")) {
+      c.remove();
+    }
+  });
+  mostrarToast('Conta "' + conta.nome + '" excluída.', 'error');
+}
+
+// Toast de notificação
+function mostrarToast(msg, tipo) {
+  var t = document.getElementById('fpro-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'fpro-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  var item = document.createElement('div');
+  var bg = tipo==='success'?'#059669':tipo==='error'?'#DC2626':'#1B4B8A';
+  item.style.cssText = 'background:'+bg+';color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,0.18);opacity:0;transform:translateY(10px);transition:all 0.25s ease;pointer-events:none;max-width:320px';
+  item.textContent = msg;
+  t.appendChild(item);
+  requestAnimationFrame(function(){ item.style.opacity='1'; item.style.transform='translateY(0)'; });
+  setTimeout(function(){ item.style.opacity='0'; item.style.transform='translateY(10px)'; setTimeout(function(){ item.remove(); }, 300); }, 3500);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    fecharModal(); fecharDetalhe(); fecharModalInst(); fecharMenuConta();
+  }
+});
 </script>
+
+<style>
+.conta-dropdown {
+  background: var(--white, #fff);
+  border: 1px solid var(--border, #E5E7EB);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+  animation: ddFadeIn 0.15s ease;
+}
+@keyframes ddFadeIn {
+  from { opacity:0; transform:translateY(-6px) scale(0.97); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+.conta-dropdown-header {
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid var(--border, #E5E7EB);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.conta-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text, #111827);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.conta-dropdown-item:hover { background: var(--bg, #F5F4F0); }
+.conta-dropdown-item.danger { color: var(--red, #DC2626); }
+.conta-dropdown-item.danger:hover { background: var(--red-bg, #FEF2F2); }
+.cdi-icon { font-size: 15px; width: 20px; text-align: center; }
+.conta-dropdown-sep { height: 1px; background: var(--border, #E5E7EB); margin: 4px 0; }
+</style>
+
 </div>
 <div id="tela-lancamentos" class="tela">
 
@@ -6707,9 +7013,9 @@ var chartMain = null;
 
 function initChart(periodo) {
   var d = dadosPeriodo[periodo];
-  var ctx = document.getElementById('chartMain').getContext('2d');
+  var ctx = (function(){ var _e=document.getElementById('chartMain'); return _e?_e.getContext('2d'):null; })();
   if (chartMain) chartMain.destroy();
-  chartMain = new Chart(ctx, {
+  if (ctx) chartMain = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: d.labels,
@@ -6932,12 +7238,38 @@ initChart('3m');
 </div>
 
 <script>
+
+// ── Chart safety helpers ─────────────────────────────────────────────────
+window._charts = {};          // registry: canvasId → Chart instance
+
+window._safeChart = function(canvasId, config) {
+  var el = document.getElementById(canvasId);
+  if (!el) return null;
+  if (window._charts[canvasId]) {
+    try { window._charts[canvasId].destroy(); } catch(e) {}
+  }
+  var instance = new Chart(el.getContext('2d'), config);
+  window._charts[canvasId] = instance;
+  return instance;
+};
+
+// Per-screen init registry
+window._screenInits = {};
+
+window._runScreenInit = function(tela) {
+  if (window._screenInits[tela]) {
+    try { window._screenInits[tela](); } catch(e) { console.warn('Chart init error on', tela, e); }
+  }
+};
+// ─────────────────────────────────────────────────────────────────────────
+
 window._telaAtiva='login';
 window.navegarPara=function(tela){
   document.querySelectorAll('.tela').forEach(function(el){el.classList.remove('ativa');});
   var t=document.getElementById('tela-'+tela);
   if(t){t.classList.add('ativa');window._telaAtiva=tela;window.scrollTo(0,0);}
   document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+  window._runScreenInit(tela);
 };
 document.addEventListener('click',function(e){
   var link=e.target.closest('a[href]');
@@ -7100,15 +7432,27 @@ document.addEventListener('click',function(e){
   }
 </script>
 <script>
-// GRÁFICO FLUXO DE CAIXA
-var _ctxFluxo_dashboard = document.getElementById('_chartFluxo_dashboard').getContext('2d');
+// GRÁFICO FLUXO DE CAIXA — lazy init via navegarPara('dashboard')
+window._screenInits['dashboard'] = window._screenInits['dashboard'] || function(){};
+(function(){
+var _ctxFluxo_dashboard_UNUSED = null; // placeholder — real init below
+})();
+window._screenInits['dashboard'] = function _initDashboardCharts() {
+var _dashEl = document.getElementById('_chartFluxo_dashboard'); if(!_dashEl) return;
+var _ctxFluxo_dashboard = _dashEl.getContext('2d');
 var _dadosFluxo_dashboard = {
   '3m': { labels:['Mar','Abr','Mai'], rec:[5800,6200,6500], desp:[3100,3050,3240] },
   '6m': { labels:['Dez','Jan','Fev','Mar','Abr','Mai'], rec:[5200,5500,5800,5800,6200,6500], desp:[2800,3200,2900,3100,3050,3240] },
   '12m': { labels:['Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'], rec:[4800,5000,5100,5200,5300,5400,5200,5500,5800,5800,6200,6500], desp:[2600,2700,2800,2900,2800,3000,2800,3200,2900,3100,3050,3240] }
 };
 
-var _chartFluxo_dashboard = new Chart(_ctxFluxo_dashboard, {
+(function(){
+  var _el = document.getElementById('_chartFluxo_dashboard');
+  if (_el && Chart.getChart(_el)) Chart.getChart(_el).destroy();
+})();
+var _chartFluxo_dashboard;
+if (_ctxFluxo_dashboard) {
+  _chartFluxo_dashboard = new Chart(_ctxFluxo_dashboard, {
   type: 'bar',
   data: {
     labels: _dadosFluxo_dashboard['3m'].labels,
@@ -7127,6 +7471,7 @@ var _chartFluxo_dashboard = new Chart(_ctxFluxo_dashboard, {
     }
   }
 });
+}
 
 function trocarGrafico(periodo, el) {
   document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
@@ -7147,8 +7492,12 @@ var cats = [
   { nome:'Lazer', val:293, pct:9.1, cor:'#0891B2' },
 ];
 
-var ctxCat = document.getElementById('chartCat').getContext('2d');
-new Chart(ctxCat, {
+var ctxCat = (function(){ var _e=document.getElementById('chartCat'); return _e?_e.getContext('2d'):null; })();
+(function(){
+  var _el = document.getElementById('chartCat');
+  if (_el && Chart.getChart(_el)) Chart.getChart(_el).destroy();
+})();
+if (ctxCat) new Chart(ctxCat, {
   type: 'doughnut',
   data: {
     labels: cats.map(c => c.nome),
@@ -7265,12 +7614,18 @@ function onPeriodoMudou(start, end, label) {
   // Aqui integrará com Firebase para filtrar os _dados_dashboard
 }
 
+}; // end _initDashboardCharts
+
 document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); if (e.key === 'n' || e.key === 'N') abrirModal(); });
 </script>
 <script>
 // GRAFICO PATRIMÔNIO (donut)
-var ctxPat = document.getElementById('chartPatrimonio').getContext('2d');
-new Chart(ctxPat, {
+var ctxPat = (function(){ var _e=document.getElementById('chartPatrimonio'); return _e?_e.getContext('2d'):null; })();
+(function(){
+  var _el = document.getElementById('chartPatrimonio');
+  if (_el && Chart.getChart(_el)) Chart.getChart(_el).destroy();
+})();
+if (ctxPat) new Chart(ctxPat, {
   type: 'doughnut',
   data: {
     labels: ['Correntes','Poupança','Cartão','Investimento','Digital/Espécie'],
@@ -7362,6 +7717,7 @@ var _chart_contas = null;
 
 function abrirDetalhe(id) {
   var c = contas[id];
+  window._detalheConta = id;
   document.querySelectorAll('.conta-card').forEach(el => el.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
 
@@ -7387,8 +7743,8 @@ function abrirDetalhe(id) {
 
   // Gráfico
   if (_chart_contas) _chart_contas.destroy();
-  var ctx = document.getElementById('_chart_contas').getContext('2d');
-  _chart_contas = new Chart(ctx, {
+  var ctx = (function(){ var _e=document.getElementById('_chart_contas'); return _e?_e.getContext('2d'):null; })();
+  if (ctx) _chart_contas = new Chart(ctx, {
     type: 'line',
     data: {
       labels: ['Dez','Jan','Fev','Mar','Abr','Mai'],
@@ -7449,7 +7805,7 @@ function salvarConta() { fecharModal(); }
 function abrirModalInstituicao() { document.getElementById('modal-inst').classList.add('open'); }
 function fecharModalInst() { document.getElementById('modal-inst').classList.remove('open'); }
 
-function menuConta(id) { alert('Menu de opções: Editar · Ajustar saldo · Transferir · Arquivar'); }
+// menuConta: defined above in tela-contas
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { fecharModal(); fecharDetalhe(); fecharModalInst(); } });
 </script>
@@ -7916,9 +8272,9 @@ var _chartMain_relatorios = null;
 
 function initChart(periodo) {
   var d = dadosPeriodo[periodo];
-  var ctx = document.getElementById('_chartMain_relatorios').getContext('2d');
+  var ctx = (function(){ var _e=document.getElementById('_chartMain_relatorios'); return _e?_e.getContext('2d'):null; })();
   if (_chartMain_relatorios) _chartMain_relatorios.destroy();
-  _chartMain_relatorios = new Chart(ctx, {
+  if (ctx) _chartMain_relatorios = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: d.labels,
