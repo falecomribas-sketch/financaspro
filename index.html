@@ -33,7 +33,7 @@ window._fbSignUp = async (email,pass,nome) => {
   const cred = await createUserWithEmailAndPassword(auth,email,pass);
   await sendEmailVerification(cred.user);
   const tf = new Date(); tf.setDate(tf.getDate()+14);
-  await setDoc(doc(db,'users',cred.user.uid),{uid:cred.user.uid,nome,email,criadoEm:serverTimestamp(),trialFim:tf,plano:'trial',configuracoes:{moeda:'BRL',diaFechamento:10}});
+  await setDoc(doc(db,'users',cred.user.uid),{uid:cred.user.uid,nome,email,criadoEm:serverTimestamp(),plano:'ativo',configuracoes:{moeda:'BRL',diaFechamento:10}});
   return cred;
 };
 window.FBCRUD = {
@@ -2539,7 +2539,7 @@ input:focus,select:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px 
     </div>
     <div class="left-stat">
       <div class="left-stat-value">14 <span>dias</span></div>
-      <div class="left-stat-label">Trial gratuito</div>
+      <div class="left-stat-label">Uso gratuito</div>
     </div>
     <div class="left-stat">
       <div class="left-stat-value">R$<span>0</span></div>
@@ -2603,9 +2603,7 @@ input:focus,select:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px 
 
       <!-- CADASTRO -->
       <div id="tab-cadastro" class="screen">
-        <div class="trial-badge">
-          <div class="trial-badge-dot"></div>
-          <div><strong>14 dias grátis</strong> — sem cartão de crédito necessário</div>
+
         </div>
 
         <div class="form-header">
@@ -2833,7 +2831,7 @@ input:focus,select:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px 
         <div style="font-size:56px;margin-bottom:16px">✉️</div>
         <div class="form-title" style="margin-bottom:8px">Verifique seu e-mail</div>
         <p style="font-size:14px;color:var(--text2);margin-bottom:8px;line-height:1.6">Enviamos um link de ativação para <strong id="cad-email-dest"></strong>.</p>
-        <p style="font-size:13px;color:var(--text3);margin-bottom:24px">Clique no link do e-mail para ativar sua conta e começar o trial de 14 dias.</p>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:24px">Clique no link do e-mail para ativar sua conta e acessar o sistema.</p>
         <div class="alert success" style="display:flex;margin-bottom:16px">
           ✓ Para fins de demonstração, clique abaixo para simular a ativação
         </div>
@@ -3006,8 +3004,7 @@ input:focus,select:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px 
 
   <div class="sidebar-trial">
     <div class="trial-dot"></div>
-    Trial: <strong>11 dias</strong> restantes
-  </div>
+    </div>
 
   <div class="nav-section">Principal</div>
   <a class="nav-item active" href="02_dashboard.html"><span class="nav-item-icon">📊</span> Dashboard</a>
@@ -3015,12 +3012,12 @@ input:focus,select:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px 
   <a class="nav-item" href="04_lancamentos.html"><span class="nav-item-icon">↕️</span> Lançamentos <span class="nav-item-badge">3</span></a>
 
   <div class="nav-section">Gestão</div>
-  <a class="nav-item" href="#"><span class="nav-item-icon">🏷️</span> Categorias</a>
-  <a class="nav-item" href="#"><span class="nav-item-icon">👥</span> Fornec. / Clientes</a>
-  <a class="nav-item" href="#"><span class="nav-item-icon">📈</span> Relatórios</a>
+  <a class="nav-item" href="05_categorias.html"><span class="nav-item-icon">🏷️</span> Categorias</a>
+  <a class="nav-item" href="06_pessoas.html"><span class="nav-item-icon">👥</span> Fornec. / Clientes</a>
+  <a class="nav-item" href="07_relatorios.html"><span class="nav-item-icon">📈</span> Relatórios</a>
 
   <div class="nav-section">Sistema</div>
-  <a class="nav-item" href="#"><span class="nav-item-icon">⚙️</span> Configurações</a>
+  <a class="nav-item" href="08_configuracoes.html"><span class="nav-item-icon">⚙️</span> Configurações</a>
   <a class="nav-item" href="01_login.html"><span class="nav-item-icon">🚪</span> Sair</a>
 
   <div class="sidebar-footer">
@@ -3369,10 +3366,7 @@ input:focus,select:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px 
             <div class="alert-icon">⏰</div>
             <div class="alert-text"><strong>Vencimento próximo</strong>Aluguel vence em 2 dias — R$ 1.200</div>
           </div>
-          <div class="alert-item info">
-            <div class="alert-icon">💡</div>
-            <div class="alert-text"><strong>Trial expira em 11 dias</strong>Assine o plano Pro para continuar</div>
-          </div>
+          
         </div>
 
         <div class="panel">
@@ -3692,18 +3686,17 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(
   <div class="sidebar-logo">
     <div class="sidebar-logo-icon">💰</div>
     <div class="sidebar-logo-name">FinançasPRO</div>
-  </div>
-  <div class="sidebar-trial"><div class="trial-dot"></div>Trial: <strong>11 dias</strong> restantes</div>
+  </div></div>
   <div class="nav-section">Principal</div>
   <a class="nav-item" href="02_dashboard.html"><span class="nav-item-icon">📊</span> Dashboard</a>
   <a class="nav-item active" href="03_contas.html"><span class="nav-item-icon">🏦</span> Contas bancárias</a>
   <a class="nav-item" href="04_lancamentos.html"><span class="nav-item-icon">↕️</span> Lançamentos <span class="nav-item-badge">3</span></a>
   <div class="nav-section">Gestão</div>
-  <a class="nav-item" href="#"><span class="nav-item-icon">🏷️</span> Categorias</a>
-  <a class="nav-item" href="#"><span class="nav-item-icon">👥</span> Fornec. / Clientes</a>
-  <a class="nav-item" href="#"><span class="nav-item-icon">📈</span> Relatórios</a>
+  <a class="nav-item" href="05_categorias.html"><span class="nav-item-icon">🏷️</span> Categorias</a>
+  <a class="nav-item" href="06_pessoas.html"><span class="nav-item-icon">👥</span> Fornec. / Clientes</a>
+  <a class="nav-item" href="07_relatorios.html"><span class="nav-item-icon">📈</span> Relatórios</a>
   <div class="nav-section">Sistema</div>
-  <a class="nav-item" href="#"><span class="nav-item-icon">⚙️</span> Configurações</a>
+  <a class="nav-item" href="08_configuracoes.html"><span class="nav-item-icon">⚙️</span> Configurações</a>
   <a class="nav-item" href="01_login.html"><span class="nav-item-icon">🚪</span> Sair</a>
   <div class="sidebar-footer">
     <div class="user-card">
@@ -4061,7 +4054,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(
       <input type="text" placeholder="Ex: Conta principal do dia a dia">
     </div>
 
-    <button class="btn-save" onclick="salvarConta()">Salvar conta</button>
+    <button class="btn-save" onclick="salvarContaComFirebase()">Salvar conta</button>
   </div>
 </div>
 
@@ -4208,7 +4201,9 @@ var contas = {
 
 var chartDetalhe = null;
 
+var _currentPessoaId = null;
 function abrirDetalhe(id) {
+  _currentPessoaId = id;
   var c = contas[id];
   window._detalheConta = id;
   document.querySelectorAll('.conta-card').forEach(el => el.classList.remove('selected'));
@@ -4338,7 +4333,7 @@ function menuConta(id, btn) {
     <button class="conta-dropdown-item danger" onclick="arquivarConta('${id}')">
       <span class="cdi-icon">🗃️</span> Arquivar conta
     </button>
-    <button class="conta-dropdown-item danger" onclick="excluirConta('${id}')">
+    <button class="conta-dropdown-item danger" onclick="excluirContaComFirebase('${id}')">
       <span class="cdi-icon">🗑️</span> Excluir conta
     </button>
   `;
@@ -4415,6 +4410,8 @@ function salvarEdicaoConta(id) {
   var novoNome = nomeInput ? nomeInput.value.trim() : '';
   if (novoNome && _contasData[id]) {
     _contasData[id].nome = novoNome;
+    // Salva no Firebase
+    if (window.salvarContaFirebase) window.salvarContaFirebase({id: id, nome: novoNome}).catch(function(e){ console.warn(e); });
     // Atualiza o card visualmente
     var card = document.querySelector('.conta-card[data-id="' + id + '"] .conta-card-name');
     if (!card) {
@@ -4514,6 +4511,8 @@ function excluirConta(id) {
   var conta = _contasData[id];
   if (!conta) return;
   if (!confirm('Excluir permanentemente a conta "' + conta.nome + '"?\nEsta ação não pode ser desfeita.')) return;
+  // Remove do Firebase
+  if (window.excluirContaFirebase) window.excluirContaFirebase(id).catch(function(e){ console.warn(e); });
   // Remove o card do DOM
   document.querySelectorAll('.conta-card').forEach(function(c) {
     var btn = c.querySelector('.conta-card-menu');
@@ -4600,18 +4599,17 @@ document.addEventListener('keydown', e => {
   <div class="sidebar-logo">
     <div class="sidebar-logo-icon">💰</div>
     <div class="sidebar-logo-name">FinançasPRO</div>
-  </div>
-  <div class="sidebar-trial"><div class="trial-dot"></div>Trial: <strong>11 dias</strong> restantes</div>
+  </div></div>
   <div class="nav-section">Principal</div>
   <a class="nav-item" href="02_dashboard.html"><span class="nav-item-icon">📊</span> Dashboard</a>
   <a class="nav-item" href="03_contas.html"><span class="nav-item-icon">🏦</span> Contas bancárias</a>
   <a class="nav-item active" href="04_lancamentos.html"><span class="nav-item-icon">↕️</span> Lançamentos <span class="nav-item-badge">3</span></a>
   <div class="nav-section">Gestão</div>
-  <a class="nav-item" href="#"><span class="nav-item-icon">🏷️</span> Categorias</a>
-  <a class="nav-item" href="#"><span class="nav-item-icon">👥</span> Fornec. / Clientes</a>
-  <a class="nav-item" href="#"><span class="nav-item-icon">📈</span> Relatórios</a>
+  <a class="nav-item" href="05_categorias.html"><span class="nav-item-icon">🏷️</span> Categorias</a>
+  <a class="nav-item" href="06_pessoas.html"><span class="nav-item-icon">👥</span> Fornec. / Clientes</a>
+  <a class="nav-item" href="07_relatorios.html"><span class="nav-item-icon">📈</span> Relatórios</a>
   <div class="nav-section">Sistema</div>
-  <a class="nav-item" href="#"><span class="nav-item-icon">⚙️</span> Configurações</a>
+  <a class="nav-item" href="08_configuracoes.html"><span class="nav-item-icon">⚙️</span> Configurações</a>
   <a class="nav-item" href="01_login.html"><span class="nav-item-icon">🚪</span> Sair</a>
   <div class="sidebar-footer">
     <div class="user-card">
@@ -5350,7 +5348,13 @@ function salvarLancamento() {
   fecharModal();
 }
 
-function editarLancamento(idx, btn) { abrirModal(idx); }
+function editarLancamento(idx, btn) {
+  var d = txDados[idx]; if(!d) return;
+  abrirModal(idx);
+  // Set edit ID if Firebase ID available
+  var modalEl = document.getElementById('modal');
+  if (modalEl && d.fbId) { modalEl.dataset.editLancId = d.fbId; }
+}
 
 function duplicarLancamento(idx, btn) {
   var d = txDados[idx]; if(!d) return;
@@ -5383,6 +5387,8 @@ function duplicarLancamento(idx, btn) {
 function excluirLancamento(idx, btn) {
   var d = txDados[idx]; if(!d) return;
   if (!confirm('Excluir "' + d.title + '"?\nEsta ação não pode ser desfeita.')) return;
+  // Deleta do Firebase
+  if (d.fbId && window.excluirLancamentoFirebase) window.excluirLancamentoFirebase(d.fbId).catch(function(e){ console.warn(e); });
   var row = btn ? btn.closest('.tx-row') : null;
   if (row) {
     row.style.transition='all 0.25s ease'; row.style.opacity='0'; row.style.transform='translateX(30px)';
@@ -5525,18 +5531,17 @@ document.addEventListener('keydown', e => {
   <div class="sidebar-logo">
     <div class="sidebar-logo-icon">💰</div>
     <div class="sidebar-logo-name">FinançasPRO</div>
-  </div>
-  <div class="sidebar-trial"><div class="trial-dot"></div>Trial: <strong>11 dias</strong> restantes</div>
+  </div></div>
   <div class="nav-section">Principal</div>
   <a class="nav-item" href="02_dashboard.html"><span class="nav-item-icon">📊</span> Dashboard</a>
   <a class="nav-item" href="03_contas.html"><span class="nav-item-icon">🏦</span> Contas bancárias</a>
   <a class="nav-item" href="04_lancamentos.html"><span class="nav-item-icon">↕️</span> Lançamentos <span class="nav-item-badge">3</span></a>
   <div class="nav-section">Gestão</div>
   <a class="nav-item active" href="#"><span class="nav-item-icon">🏷️</span> Categorias</a>
-  <a class="nav-item" href="#"><span class="nav-item-icon">👥</span> Fornec. / Clientes</a>
-  <a class="nav-item" href="#"><span class="nav-item-icon">📈</span> Relatórios</a>
+  <a class="nav-item" href="06_pessoas.html"><span class="nav-item-icon">👥</span> Fornec. / Clientes</a>
+  <a class="nav-item" href="07_relatorios.html"><span class="nav-item-icon">📈</span> Relatórios</a>
   <div class="nav-section">Sistema</div>
-  <a class="nav-item" href="#"><span class="nav-item-icon">⚙️</span> Configurações</a>
+  <a class="nav-item" href="08_configuracoes.html"><span class="nav-item-icon">⚙️</span> Configurações</a>
   <a class="nav-item" href="01_login.html"><span class="nav-item-icon">🚪</span> Sair</a>
   <div class="sidebar-footer">
     <div class="user-card">
@@ -5694,8 +5699,8 @@ document.addEventListener('keydown', e => {
           </div>
           <div class="cat-actions">
             <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('Alimentação')">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">🗃️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
           </div>
           <button class="cat-toggle-btn" id="toggle-alimentacao">▾</button>
         </div>
@@ -5706,21 +5711,21 @@ document.addEventListener('keydown', e => {
             <div class="subcat-name">Supermercado</div>
             <div class="subcat-count">2 lanç.</div>
             <div class="subcat-val">R$ 640</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="subcat-item">
             <div class="subcat-dot" style="background:#059669"></div>
             <div class="subcat-name">Restaurante</div>
             <div class="subcat-count">1 lanç.</div>
             <div class="subcat-val">R$ 136</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="subcat-item">
             <div class="subcat-dot" style="background:#059669"></div>
             <div class="subcat-name">Delivery</div>
             <div class="subcat-count">0 lanç.</div>
             <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="add-subcat" onclick="abrirModalSub('Alimentação')">+ Adicionar subcategoria</div>
         </div>
@@ -5740,8 +5745,8 @@ document.addEventListener('keydown', e => {
           </div>
           <div class="cat-actions">
             <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('Transporte')">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">🗃️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
           </div>
           <button class="cat-toggle-btn" id="toggle-transporte">▾</button>
         </div>
@@ -5752,21 +5757,21 @@ document.addEventListener('keydown', e => {
             <div class="subcat-name">Combustível</div>
             <div class="subcat-count">1 lanç.</div>
             <div class="subcat-val">R$ 210</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="subcat-item">
             <div class="subcat-dot" style="background:#1B4B8A"></div>
             <div class="subcat-name">Uber / Apps</div>
             <div class="subcat-count">1 lanç.</div>
             <div class="subcat-val">R$ 274</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="subcat-item">
             <div class="subcat-dot" style="background:#1B4B8A"></div>
             <div class="subcat-name">Estacionamento</div>
             <div class="subcat-count">0 lanç.</div>
             <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="add-subcat" onclick="abrirModalSub('Transporte')">+ Adicionar subcategoria</div>
         </div>
@@ -5786,8 +5791,8 @@ document.addEventListener('keydown', e => {
           </div>
           <div class="cat-actions">
             <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('Saúde')">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">🗃️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
           </div>
           <button class="cat-toggle-btn" id="toggle-saude">▾</button>
         </div>
@@ -5798,21 +5803,21 @@ document.addEventListener('keydown', e => {
             <div class="subcat-name">Plano de saúde</div>
             <div class="subcat-count">1 lanç.</div>
             <div class="subcat-val">R$ 380 <span style="font-size:10px;color:var(--amber)">(pendente)</span></div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="subcat-item">
             <div class="subcat-dot" style="background:#DC2626"></div>
             <div class="subcat-name">Farmácia</div>
             <div class="subcat-count">1 lanç.</div>
             <div class="subcat-val">R$ 87</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="subcat-item">
             <div class="subcat-dot" style="background:#DC2626"></div>
             <div class="subcat-name">Consultas</div>
             <div class="subcat-count">0 lanç.</div>
             <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="add-subcat" onclick="abrirModalSub('Saúde')">+ Adicionar subcategoria</div>
         </div>
@@ -5832,8 +5837,8 @@ document.addEventListener('keydown', e => {
           </div>
           <div class="cat-actions">
             <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('Assinaturas')">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">🗃️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
           </div>
           <button class="cat-toggle-btn" id="toggle-assinaturas">▾</button>
         </div>
@@ -5844,14 +5849,14 @@ document.addEventListener('keydown', e => {
             <div class="subcat-name">Streaming</div>
             <div class="subcat-count">1 lanç.</div>
             <div class="subcat-val">R$ 55,90</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="subcat-item">
             <div class="subcat-dot" style="background:#7C3AED"></div>
             <div class="subcat-name">Software / Apps</div>
             <div class="subcat-count">0 lanç.</div>
             <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="add-subcat" onclick="abrirModalSub('Assinaturas')">+ Adicionar subcategoria</div>
         </div>
@@ -5883,8 +5888,8 @@ document.addEventListener('keydown', e => {
           </div>
           <div class="cat-actions">
             <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('Salário')">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">🗃️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
           </div>
           <button class="cat-toggle-btn" id="toggle-salario">▾</button>
         </div>
@@ -5895,21 +5900,21 @@ document.addEventListener('keydown', e => {
             <div class="subcat-name">CLT</div>
             <div class="subcat-count">1 lanç.</div>
             <div class="subcat-val">R$ 6.500</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="subcat-item">
             <div class="subcat-dot" style="background:#059669"></div>
             <div class="subcat-name">Freelance</div>
             <div class="subcat-count">0 lanç.</div>
             <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="subcat-item">
             <div class="subcat-dot" style="background:#059669"></div>
             <div class="subcat-name">Autônomo</div>
             <div class="subcat-count">0 lanç.</div>
             <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="add-subcat" onclick="abrirModalSub('Salário')">+ Adicionar subcategoria</div>
         </div>
@@ -5929,8 +5934,8 @@ document.addEventListener('keydown', e => {
           </div>
           <div class="cat-actions">
             <button class="cat-action-btn" onclick="event.stopPropagation()">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()">🗃️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
+            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
           </div>
           <button class="cat-toggle-btn" id="toggle-investrec">▾</button>
         </div>
@@ -5941,14 +5946,14 @@ document.addEventListener('keydown', e => {
             <div class="subcat-name">Rendimentos</div>
             <div class="subcat-count">1 lanç.</div>
             <div class="subcat-val">R$ 109</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="subcat-item">
             <div class="subcat-dot" style="background:#7C3AED"></div>
             <div class="subcat-name">Dividendos</div>
             <div class="subcat-count">0 lanç.</div>
             <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn">✏️</button><button class="cat-action-btn">🗑️</button></div>
+            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
           </div>
           <div class="add-subcat">+ Adicionar subcategoria</div>
         </div>
@@ -6038,7 +6043,7 @@ document.addEventListener('keydown', e => {
       <input type="text" placeholder="Ex: Gastos com moradia e habitação">
     </div>
 
-    <button class="btn-save" onclick="salvarCategoria()">Salvar categoria</button>
+    <button class="btn-save" onclick="salvarCategoriaComFirebase()">Salvar categoria</button>
   </div>
 </div>
 
@@ -6083,7 +6088,7 @@ document.addEventListener('keydown', e => {
       <input type="text" placeholder="Ex: Pagamento mensal do condomínio">
     </div>
 
-    <button class="btn-save" onclick="fecharModalSub()">Salvar subcategoria</button>
+    <button class="btn-save" onclick="salvarSubcategoriaComFirebase()">Salvar subcategoria</button>
   </div>
 </div>
 
@@ -6150,6 +6155,35 @@ function abrirModalSub(catPai) {
 
 function fecharModalSub() { document.getElementById('modal-sub').classList.remove('open'); }
 
+// ---- Categorias CRUD ----
+function excluirCategoriaDOM(cardEl) {
+  if (!cardEl) return;
+  var nome = cardEl.querySelector('.cat-name') ? cardEl.querySelector('.cat-name').textContent.trim() : 'esta categoria';
+  if (!confirm('Excluir a categoria "' + nome + '"?\nEsta ação não pode ser desfeita.')) return;
+  // Try to find Firebase ID
+  var fbId = cardEl.dataset.fbId;
+  if (fbId && window.excluirCategoriaFirebase) window.excluirCategoriaFirebase(fbId).catch(function(e){ console.warn(e); });
+  cardEl.style.transition = 'all 0.25s ease';
+  cardEl.style.opacity = '0';
+  cardEl.style.transform = 'scale(0.95)';
+  setTimeout(function(){ cardEl.remove(); }, 270);
+  if(window.mostrarToast) mostrarToast('Categoria "' + nome + '" excluída.', 'error');
+}
+
+function editarCategoriaDOM(cardEl) {
+  if (!cardEl) return;
+  var nome = cardEl.querySelector('.cat-name') ? cardEl.querySelector('.cat-name').textContent.trim() : '';
+  abrirModal();
+  var modal = document.getElementById('modal');
+  if (modal && nome) {
+    var inputs = modal.querySelectorAll('input[type=text]');
+    if (inputs[0]) inputs[0].value = nome;
+    if (cardEl.dataset.fbId) modal.dataset.editCatId = cardEl.dataset.fbId;
+    var title = modal.querySelector('.modal-title'); if(title) title.textContent = 'Editar categoria';
+    var btn = modal.querySelector('.btn-save'); if(btn) btn.textContent = 'Salvar alterações';
+  }
+}
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { fecharModal(); fecharModalSub(); }
   if ((e.key === 'n' || e.key === 'N') && !e.target.matches('input,select')) abrirModal();
@@ -6163,8 +6197,7 @@ document.addEventListener('keydown', e => {
   <div class="sidebar-logo">
     <div class="sidebar-logo-icon">💰</div>
     <div class="sidebar-logo-name">FinançasPRO</div>
-  </div>
-  <div class="sidebar-trial"><div class="trial-dot"></div>Trial: <strong>11 dias</strong> restantes</div>
+  </div></div>
   <div class="nav-section">Principal</div>
   <a class="nav-item" href="02_dashboard.html"><span class="nav-item-icon">📊</span> Dashboard</a>
   <a class="nav-item" href="03_contas.html"><span class="nav-item-icon">🏦</span> Contas bancárias</a>
@@ -6172,9 +6205,9 @@ document.addEventListener('keydown', e => {
   <div class="nav-section">Gestão</div>
   <a class="nav-item" href="05_categorias.html"><span class="nav-item-icon">🏷️</span> Categorias</a>
   <a class="nav-item active" href="#"><span class="nav-item-icon">👥</span> Fornec. / Clientes</a>
-  <a class="nav-item" href="#"><span class="nav-item-icon">📈</span> Relatórios</a>
+  <a class="nav-item" href="07_relatorios.html"><span class="nav-item-icon">📈</span> Relatórios</a>
   <div class="nav-section">Sistema</div>
-  <a class="nav-item" href="#"><span class="nav-item-icon">⚙️</span> Configurações</a>
+  <a class="nav-item" href="08_configuracoes.html"><span class="nav-item-icon">⚙️</span> Configurações</a>
   <a class="nav-item" href="01_login.html"><span class="nav-item-icon">🚪</span> Sair</a>
   <div class="sidebar-footer">
     <div class="user-card">
@@ -6541,7 +6574,7 @@ document.addEventListener('keydown', e => {
       <input type="text" placeholder="Ex: Contrato até dez/2026">
     </div>
 
-    <button class="btn-save" onclick="salvarCadastro()">Salvar cadastro</button>
+    <button class="btn-save" onclick="salvarCadastroComFirebase()">Salvar cadastro</button>
   </div>
 </div>
 
@@ -6663,9 +6696,9 @@ function abrirDetalhe(id) {
       <div class="info-row"><span class="info-label">Cidade</span><span class="info-val">${d.cidade}</span></div>
     </div>
     <div class="detalhe-actions">
-      <button class="btn-det" onclick="abrirModal()">✏️ Editar</button>
-      <button class="btn-det">↕️ Lançamentos</button>
-      <button class="btn-det danger">🗃️ Inativar</button>
+      <button class="btn-det" onclick="editarPessoa(_currentPessoaId)">✏️ Editar</button>
+      <button class="btn-det" onclick="window.navegarPara('lancamentos')">↕️ Lançamentos</button>
+      <button class="btn-det danger" onclick="excluirPessoaComFirebase(_currentPessoaId)">🗑️ Excluir</button>
     </div>
   `;
 
@@ -6689,6 +6722,46 @@ function abrirDetalhe(id) {
       }
     });
   }, 50);
+}
+
+function editarPessoa(id) {
+  var p = _pessoasData ? _pessoasData[id] : null;
+  if (!p) { abrirModal(); return; }
+  var modal = document.getElementById('modal');
+  if (!modal) { abrirModal(); return; }
+  abrirModal();
+  if (modal) {
+    modal.dataset.editId = id;
+    var nomeEl = document.getElementById('p-nome'); if(nomeEl) nomeEl.value = p.nome || '';
+    var docEl = document.getElementById('p-doc'); if(docEl) docEl.value = p.doc || '';
+    var emailEl = document.getElementById('p-email'); if(emailEl) emailEl.value = p.email || '';
+    var telEl = document.getElementById('p-tel'); if(telEl) telEl.value = p.tel || '';
+    // Selects papel
+    var papelLabel = {fornecedor:'Fornecedor', cliente:'Cliente', ambos:'Ambos'}[p.papel?.toLowerCase()] || p.papel;
+    document.querySelectorAll('.papel-opt').forEach(function(o) {
+      var lbl = o.querySelector('.papel-opt-label');
+      o.classList.toggle('selected', lbl && lbl.textContent.trim() === papelLabel);
+    });
+    var title = modal.querySelector('.modal-title'); if(title) title.textContent = 'Editar — ' + p.nome;
+    var btnSave = modal.querySelector('.btn-save'); if(btnSave) { btnSave.textContent = 'Salvar alterações'; }
+  }
+}
+
+function excluirPessoaComFirebase(id) {
+  var p = _pessoasData ? _pessoasData[id] : null;
+  var nome = p ? p.nome : 'este cadastro';
+  if (!confirm('Excluir "' + nome + '" permanentemente?\nEsta ação não pode ser desfeita.')) return;
+  if (window.excluirPessoaFirebase) window.excluirPessoaFirebase(id).catch(function(e){ console.warn(e); });
+  if (window._appData) window._appData.pessoas = (window._appData.pessoas||[]).filter(function(x){ return x.id !== id; });
+  // Remove from DOM
+  document.querySelectorAll('.pessoa-item').forEach(function(item) {
+    if (item.dataset.id === id) {
+      item.style.transition='all 0.25s ease'; item.style.opacity='0'; item.style.transform='translateX(20px)';
+      setTimeout(function(){ item.remove(); }, 270);
+    }
+  });
+  fecharDetalhe();
+  mostrarToast('Cadastro "' + nome + '" excluído.', 'error');
 }
 
 function filtrarTab(tipo, el) {
@@ -6743,6 +6816,49 @@ function buscarCEP(el) { /* integração ViaCEP */ }
 
 function abrirModal() { document.getElementById('modal').classList.add('open'); }
 function fecharModal() { document.getElementById('modal').classList.remove('open'); }
+window.salvarCadastroComFirebase = async function() {
+  var modal = document.getElementById('modal');
+  if (!modal) return;
+  var nomeEl = document.getElementById('p-nome') || modal.querySelector('#p-nome');
+  var nome = nomeEl ? nomeEl.value.trim() : '';
+  if (!nome) { if(window.mostrarToast) mostrarToast('Informe o nome.', 'error'); return; }
+  var docEl = document.getElementById('p-doc');
+  var emailEl = document.getElementById('p-email');
+  var telEl = document.getElementById('p-tel');
+  var papelSel = modal.querySelector('.papel-opt.selected .papel-opt-label');
+  var papel = papelSel ? papelSel.textContent.trim() : 'Fornecedor';
+  var uid = window._currentUser?.uid;
+  if (uid) {
+    try {
+      var dados = {
+        nome,
+        doc: docEl ? docEl.value.trim() : '',
+        email: emailEl ? emailEl.value.trim() : '',
+        tel: telEl ? telEl.value.trim() : '',
+        papel,
+        ativo: true
+      };
+      // Check if editing
+      var editId = modal.dataset.editId;
+      if (editId) {
+        dados.id = editId;
+        await window.FBCRUD.update(uid, 'pessoas', editId, dados);
+        // Update in local data
+        var idx = window._appData.pessoas.findIndex(function(p){ return p.id === editId; });
+        if (idx >= 0) window._appData.pessoas[idx] = dados;
+        mostrarToast('Cadastro atualizado na nuvem!', 'success');
+        delete modal.dataset.editId;
+      } else {
+        var id = await window.FBCRUD.add(uid, 'pessoas', dados);
+        dados.id = id;
+        window._appData.pessoas.push(dados);
+        mostrarToast('Cadastro de "' + nome + '" salvo na nuvem!', 'success');
+      }
+    } catch(e) { mostrarToast('Erro ao salvar na nuvem.', 'error'); console.error(e); }
+  }
+  salvarCadastro();
+};
+
 function salvarCadastro() { fecharModal(); }
 function exportarCSV() { alert('Exportando lista de fornecedores e clientes em CSV...'); }
 
@@ -6759,8 +6875,7 @@ document.addEventListener('keydown', e => {
   <div class="sidebar-logo">
     <div class="sidebar-logo-icon">💰</div>
     <div class="sidebar-logo-name">FinançasPRO</div>
-  </div>
-  <div class="sidebar-trial"><div class="trial-dot"></div>Trial: <strong>11 dias</strong> restantes</div>
+  </div></div>
   <div class="nav-section">Principal</div>
   <a class="nav-item" href="02_dashboard.html"><span class="nav-item-icon">📊</span> Dashboard</a>
   <a class="nav-item" href="03_contas.html"><span class="nav-item-icon">🏦</span> Contas bancárias</a>
@@ -6770,7 +6885,7 @@ document.addEventListener('keydown', e => {
   <a class="nav-item" href="06_pessoas.html"><span class="nav-item-icon">👥</span> Fornec. / Clientes</a>
   <a class="nav-item active" href="#"><span class="nav-item-icon">📈</span> Relatórios</a>
   <div class="nav-section">Sistema</div>
-  <a class="nav-item" href="#"><span class="nav-item-icon">⚙️</span> Configurações</a>
+  <a class="nav-item" href="08_configuracoes.html"><span class="nav-item-icon">⚙️</span> Configurações</a>
   <a class="nav-item" href="01_login.html"><span class="nav-item-icon">🚪</span> Sair</a>
   <div class="sidebar-footer">
     <div class="user-card">
@@ -7442,7 +7557,7 @@ document.addEventListener('click',function(e){
   var href=link.getAttribute('href');
   var mapa={'01_login.html':'login','02_dashboard.html':'dashboard','03_contas.html':'contas',
     '04_lancamentos.html':'lancamentos','05_categorias.html':'categorias',
-    '06_pessoas.html':'pessoas','07_relatorios.html':'relatorios'};
+    '06_pessoas.html':'pessoas','07_relatorios.html':'relatorios','08_configuracoes.html':'configuracoes'};
   if(mapa[href]){e.preventDefault();window.navegarPara(mapa[href]);}
 });
 </script>
@@ -8136,7 +8251,13 @@ function salvarLancamento() {
   fecharModal();
 }
 
-function editarLancamento(idx, btn) { abrirModal(idx); }
+function editarLancamento(idx, btn) {
+  var d = txDados[idx]; if(!d) return;
+  abrirModal(idx);
+  // Set edit ID if Firebase ID available
+  var modalEl = document.getElementById('modal');
+  if (modalEl && d.fbId) { modalEl.dataset.editLancId = d.fbId; }
+}
 
 function duplicarLancamento(idx, btn) {
   var d = txDados[idx]; if(!d) return;
@@ -8169,6 +8290,8 @@ function duplicarLancamento(idx, btn) {
 function excluirLancamento(idx, btn) {
   var d = txDados[idx]; if(!d) return;
   if (!confirm('Excluir "' + d.title + '"?\nEsta ação não pode ser desfeita.')) return;
+  // Deleta do Firebase
+  if (d.fbId && window.excluirLancamentoFirebase) window.excluirLancamentoFirebase(d.fbId).catch(function(e){ console.warn(e); });
   var row = btn ? btn.closest('.tx-row') : null;
   if (row) {
     row.style.transition='all 0.25s ease'; row.style.opacity='0'; row.style.transform='translateX(30px)';
@@ -8489,9 +8612,9 @@ function abrirDetalhe(id) {
       <div class="info-row"><span class="info-label">Cidade</span><span class="info-val">${d.cidade}</span></div>
     </div>
     <div class="detalhe-actions">
-      <button class="btn-det" onclick="abrirModal()">✏️ Editar</button>
-      <button class="btn-det">↕️ Lançamentos</button>
-      <button class="btn-det danger">🗃️ Inativar</button>
+      <button class="btn-det" onclick="editarPessoa(_currentPessoaId)">✏️ Editar</button>
+      <button class="btn-det" onclick="window.navegarPara('lancamentos')">↕️ Lançamentos</button>
+      <button class="btn-det danger" onclick="excluirPessoaComFirebase(_currentPessoaId)">🗑️ Excluir</button>
     </div>
   `;
 
@@ -8870,6 +8993,581 @@ window.recuperarSenha=async function(){
 };
 window.finalizarOnboarding=function(){window.navegarPara('dashboard');};
 console.log('✅ FinançasPRO ok!');
+</script>
+
+<div id="tela-configuracoes" class="tela">
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">💰</div>
+    <div class="sidebar-logo-name">FinançasPRO</div>
+  </div>
+  <div class="nav-section">Principal</div>
+  <a class="nav-item" href="02_dashboard.html"><span class="nav-item-icon">📊</span> Dashboard</a>
+  <a class="nav-item" href="03_contas.html"><span class="nav-item-icon">🏦</span> Contas bancárias</a>
+  <a class="nav-item" href="04_lancamentos.html"><span class="nav-item-icon">↕️</span> Lançamentos</a>
+  <div class="nav-section">Gestão</div>
+  <a class="nav-item" href="05_categorias.html"><span class="nav-item-icon">🏷️</span> Categorias</a>
+  <a class="nav-item" href="06_pessoas.html"><span class="nav-item-icon">👥</span> Fornec. / Clientes</a>
+  <a class="nav-item" href="07_relatorios.html"><span class="nav-item-icon">📈</span> Relatórios</a>
+  <div class="nav-section">Sistema</div>
+  <a class="nav-item active" href="08_configuracoes.html"><span class="nav-item-icon">⚙️</span> Configurações</a>
+  <a class="nav-item" href="01_login.html"><span class="nav-item-icon">🚪</span> Sair</a>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar user-avatar">JS</div>
+      <div><div class="user-name">Usuário</div><div class="user-email">email@email.com</div></div>
+    </div>
+  </div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title">⚙️ Configurações</div>
+      <div class="topbar-sub">Preferências e dados da conta</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-new" onclick="salvarConfigs()">💾 Salvar alterações</button>
+    </div>
+  </div>
+  <div class="content" style="max-width:800px">
+
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:0">
+      <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)">👤 Dados da conta</div>
+      <div class="form-row" style="margin-bottom:14px">
+        <div class="form-group">
+          <label>Nome completo</label>
+          <input type="text" id="cfg-nome" placeholder="Seu nome">
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="cfg-email" placeholder="seu@email.com" readonly style="background:var(--bg);color:var(--text3)">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Nova senha <span style="color:var(--text3);font-weight:400">(deixe em branco para não alterar)</span></label>
+        <input type="password" id="cfg-senha" placeholder="Nova senha (mín. 8 caracteres)">
+      </div>
+    </div>
+
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:0">
+      <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)">💱 Preferências financeiras</div>
+      <div class="form-row" style="margin-bottom:14px">
+        <div class="form-group">
+          <label>Moeda padrão</label>
+          <select id="cfg-moeda">
+            <option value="BRL">🇧🇷 BRL — Real Brasileiro</option>
+            <option value="USD">🇺🇸 USD — Dólar Americano</option>
+            <option value="EUR">🇪🇺 EUR — Euro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Dia de fechamento do cartão</label>
+          <input type="number" id="cfg-fechamento" min="1" max="31" placeholder="Ex: 10">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Dia de vencimento da fatura</label>
+          <input type="number" id="cfg-vencimento" min="1" max="31" placeholder="Ex: 15">
+        </div>
+        <div class="form-group">
+          <label>Início do mês financeiro</label>
+          <select id="cfg-inicio-mes">
+            <option value="1">Dia 1 (padrão)</option>
+            <option value="5">Dia 5</option>
+            <option value="10">Dia 10</option>
+            <option value="15">Dia 15</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:0">
+      <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)">🔔 Notificações</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Alertas de vencimento</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px">Avisa quando contas estão próximas do vencimento</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="cfg-notif-venc" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Alerta de saldo baixo</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px">Notifica quando o saldo fica abaixo do mínimo</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="cfg-notif-saldo" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Resumo mensal por e-mail</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px">Receba um resumo financeiro todo mês</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="cfg-notif-email"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:0">
+      <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)">🗃️ Dados e exportação</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn-secondary" onclick="exportarDados()">📥 Exportar todos os dados (JSON)</button>
+        <button class="btn-secondary" onclick="exportarCSV()">📊 Exportar lançamentos (CSV)</button>
+        <button style="display:flex;align-items:center;gap:6px;background:var(--red-bg);color:var(--red);border:1.5px solid #FECACA;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all 0.15s" onclick="apagarTodosDados()">🗑️ Apagar todos os dados</button>
+      </div>
+    </div>
+
+    <div id="cfg-alert" style="display:none;padding:12px 16px;border-radius:9px;font-size:13px;font-weight:600;margin-top:0"></div>
+
+  </div>
+</div>
+</div>
+
+<script>
+// ==================== FIREBASE CRUD UNIFICADO ====================
+// Carrega e salva dados do usuário no Firestore em tempo real
+
+window._appData = {
+  contas: [],
+  lancamentos: [],
+  categorias: [],
+  pessoas: [],
+  configuracoes: {}
+};
+
+// ---- HELPER: espera Firebase estar pronto ----
+window._fbReady = false;
+window.addEventListener('fbready', function() { window._fbReady = true; });
+
+function _waitFb(fn) {
+  if (window._fbReady && window._currentUser) { fn(); }
+  else {
+    var tries = 0;
+    var iv = setInterval(function() {
+      tries++;
+      if ((window._fbReady && window._currentUser) || tries > 40) {
+        clearInterval(iv);
+        if (window._currentUser) fn();
+      }
+    }, 150);
+  }
+}
+
+// ==================== CONTAS BANCÁRIAS ====================
+window.salvarContaFirebase = async function(dados) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  if (dados.id) {
+    await window.FBCRUD.update(uid, 'contas', dados.id, dados);
+    return dados.id;
+  } else {
+    return await window.FBCRUD.add(uid, 'contas', dados);
+  }
+};
+
+window.excluirContaFirebase = async function(id) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  await window.FBCRUD.del(uid, 'contas', id);
+};
+
+window.carregarContasFirebase = async function(callback) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  var contas = await window.FBCRUD.get(uid, 'contas');
+  window._appData.contas = contas;
+  if(callback) callback(contas);
+};
+
+// ==================== LANÇAMENTOS ====================
+window.salvarLancamentoFirebase = async function(dados) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  if (dados.id) {
+    await window.FBCRUD.update(uid, 'lancamentos', dados.id, dados);
+    return dados.id;
+  } else {
+    return await window.FBCRUD.add(uid, 'lancamentos', dados);
+  }
+};
+
+window.excluirLancamentoFirebase = async function(id) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  await window.FBCRUD.del(uid, 'lancamentos', id);
+};
+
+window.carregarLancamentosFirebase = async function(callback) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  var lancs = await window.FBCRUD.get(uid, 'lancamentos');
+  window._appData.lancamentos = lancs;
+  if(callback) callback(lancs);
+};
+
+// ==================== CATEGORIAS ====================
+window.salvarCategoriaFirebase = async function(dados) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  if (dados.id) {
+    await window.FBCRUD.update(uid, 'categorias', dados.id, dados);
+    return dados.id;
+  } else {
+    return await window.FBCRUD.add(uid, 'categorias', dados);
+  }
+};
+
+window.excluirCategoriaFirebase = async function(id) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  await window.FBCRUD.del(uid, 'categorias', id);
+};
+
+window.carregarCategoriasFirebase = async function(callback) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  var cats = await window.FBCRUD.get(uid, 'categorias');
+  window._appData.categorias = cats;
+  if(callback) callback(cats);
+};
+
+// ==================== PESSOAS (FORNEC/CLIENTES) ====================
+window.salvarPessoaFirebase = async function(dados) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  if (dados.id) {
+    await window.FBCRUD.update(uid, 'pessoas', dados.id, dados);
+    return dados.id;
+  } else {
+    return await window.FBCRUD.add(uid, 'pessoas', dados);
+  }
+};
+
+window.excluirPessoaFirebase = async function(id) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  await window.FBCRUD.del(uid, 'pessoas', id);
+};
+
+window.carregarPessoasFirebase = async function(callback) {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  var pessoas = await window.FBCRUD.get(uid, 'pessoas');
+  window._appData.pessoas = pessoas;
+  if(callback) callback(pessoas);
+};
+
+// ==================== CONFIGURAÇÕES ====================
+window.carregarConfigsFirebase = async function() {
+  var uid = window._currentUser?.uid; if(!uid) return;
+  try {
+    var cfgs = await window.FBCRUD.get(uid, 'configuracoes');
+    if (cfgs && cfgs.length > 0) {
+      var cfg = cfgs[0];
+      window._appData.configuracoes = cfg;
+      // Preenche os campos na tela
+      if(document.getElementById('cfg-nome')) document.getElementById('cfg-nome').value = cfg.nome || window._currentUser.displayName || '';
+      if(document.getElementById('cfg-email')) document.getElementById('cfg-email').value = window._currentUser.email || '';
+      if(document.getElementById('cfg-moeda')) document.getElementById('cfg-moeda').value = cfg.moeda || 'BRL';
+      if(document.getElementById('cfg-fechamento')) document.getElementById('cfg-fechamento').value = cfg.diaFechamento || '';
+      if(document.getElementById('cfg-vencimento')) document.getElementById('cfg-vencimento').value = cfg.diaVencimento || '';
+      if(document.getElementById('cfg-inicio-mes')) document.getElementById('cfg-inicio-mes').value = cfg.inicioMes || '1';
+      if(document.getElementById('cfg-notif-venc')) document.getElementById('cfg-notif-venc').checked = cfg.notifVenc !== false;
+      if(document.getElementById('cfg-notif-saldo')) document.getElementById('cfg-notif-saldo').checked = cfg.notifSaldo !== false;
+      if(document.getElementById('cfg-notif-email')) document.getElementById('cfg-notif-email').checked = !!cfg.notifEmail;
+    } else {
+      if(document.getElementById('cfg-email')) document.getElementById('cfg-email').value = window._currentUser.email || '';
+    }
+  } catch(e) { console.warn('Erro ao carregar configs:', e); }
+};
+
+window.salvarConfigs = async function() {
+  var uid = window._currentUser?.uid; if(!uid) { mostrarToast('Você precisa estar logado.', 'error'); return; }
+  var cfg = {
+    nome: document.getElementById('cfg-nome')?.value || '',
+    moeda: document.getElementById('cfg-moeda')?.value || 'BRL',
+    diaFechamento: parseInt(document.getElementById('cfg-fechamento')?.value) || 10,
+    diaVencimento: parseInt(document.getElementById('cfg-vencimento')?.value) || 15,
+    inicioMes: document.getElementById('cfg-inicio-mes')?.value || '1',
+    notifVenc: document.getElementById('cfg-notif-venc')?.checked !== false,
+    notifSaldo: document.getElementById('cfg-notif-saldo')?.checked !== false,
+    notifEmail: !!document.getElementById('cfg-notif-email')?.checked
+  };
+  try {
+    var existentes = await window.FBCRUD.get(uid, 'configuracoes');
+    if (existentes && existentes.length > 0) {
+      await window.FBCRUD.update(uid, 'configuracoes', existentes[0].id, cfg);
+    } else {
+      await window.FBCRUD.add(uid, 'configuracoes', cfg);
+    }
+    window._appData.configuracoes = cfg;
+    mostrarToast('Configurações salvas com sucesso!', 'success');
+  } catch(e) { mostrarToast('Erro ao salvar configurações.', 'error'); console.error(e); }
+};
+
+// Exportar dados
+window.exportarDados = function() {
+  var data = {
+    exportadoEm: new Date().toISOString(),
+    contas: window._appData.contas,
+    lancamentos: window._appData.lancamentos,
+    categorias: window._appData.categorias,
+    pessoas: window._appData.pessoas
+  };
+  var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'financaspro-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  mostrarToast('Dados exportados com sucesso!', 'success');
+};
+
+window.exportarCSV = function() {
+  var lancs = window._appData.lancamentos;
+  if (!lancs || !lancs.length) { mostrarToast('Nenhum lançamento para exportar.', 'info'); return; }
+  var header = ['Data','Descrição','Tipo','Categoria','Conta','Valor','Status'];
+  var rows = lancs.map(function(l) {
+    return [l.data||'', l.title||l.descricao||'', l.tipo||'', l.cat||l.categoria||'', l.conta||'', l.val||l.valor||'', l.status||''].join(';');
+  });
+  var csv = [header.join(';')].concat(rows).join('\n');
+  var blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'lancamentos-' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+  mostrarToast('CSV exportado com sucesso!', 'success');
+};
+
+window.apagarTodosDados = async function() {
+  if (!confirm('⚠️ ATENÇÃO: Isso irá apagar TODOS os seus dados (contas, lançamentos, categorias e pessoas). Esta ação NÃO pode ser desfeita.\n\nDeseja continuar?')) return;
+  if (!confirm('Tem absoluta certeza? Todos os dados serão perdidos permanentemente.')) return;
+  var uid = window._currentUser?.uid; if(!uid) return;
+  var colecoes = ['contas', 'lancamentos', 'categorias', 'pessoas', 'configuracoes'];
+  for (var col of colecoes) {
+    try {
+      var items = await window.FBCRUD.get(uid, col);
+      for (var item of items) {
+        await window.FBCRUD.del(uid, col, item.id);
+      }
+    } catch(e) {}
+  }
+  window._appData = { contas: [], lancamentos: [], categorias: [], pessoas: [], configuracoes: {} };
+  mostrarToast('Todos os dados foram apagados.', 'error');
+};
+
+// ==================== INTEGRAÇÃO: SALVAR CONTA NO FIREBASE ====================
+// Intercepta a função salvarConta existente para também salvar no Firebase
+(function() {
+  var _origSalvarConta = window.salvarConta;
+  window.salvarContaComFirebase = async function() {
+    var modal = document.getElementById('modal');
+    if (!modal) { if(_origSalvarConta) _origSalvarConta(); return; }
+    var nomeInput = modal.querySelector('input[type=text]');
+    var nome = nomeInput ? nomeInput.value.trim() : '';
+    if (!nome) { mostrarToast('Informe o nome da conta.', 'error'); return; }
+    var tipoSel = modal.querySelector('.tipo-card.selected .tipo-card-name');
+    var tipo = tipoSel ? tipoSel.textContent.trim().toLowerCase() : 'corrente';
+    var bancoSel = modal.querySelector('select');
+    var banco = bancoSel ? bancoSel.options[bancoSel.selectedIndex]?.text : '';
+    var corSel = modal.querySelector('.cor-item.selected');
+    var cor = corSel ? (corSel.style.background || corSel.style.backgroundColor) : '#1B4B8A';
+    var dados = { nome, tipo, banco, cor, saldo: 'R$ 0,00', ativo: true };
+    var uid = window._currentUser?.uid;
+    if (uid) {
+      try {
+        var id = await window.FBCRUD.add(uid, 'contas', dados);
+        dados.id = id;
+        window._appData.contas.push(dados);
+        mostrarToast('Conta "' + nome + '" salva na nuvem!', 'success');
+      } catch(e) { mostrarToast('Erro ao salvar na nuvem.', 'error'); }
+    }
+    if(_origSalvarConta) _origSalvarConta();
+  };
+})();
+
+// ==================== INTEGRAÇÃO: SALVAR LANÇAMENTO NO FIREBASE ====================
+(function() {
+  var _origSalvarLanc = window.salvarLancamento;
+  window.salvarLancamentoComFirebase = async function() {
+    var modal = document.getElementById('modal-lancamento') || document.getElementById('modal');
+    // Coleta dados do formulário atual
+    var descEl = document.getElementById('tx-descricao') || modal?.querySelector('input[type=text]');
+    var desc = descEl ? descEl.value.trim() : '';
+    var valEl = document.getElementById('tx-valor');
+    var val = valEl ? valEl.value.trim() : '';
+    var dataEl = document.getElementById('tx-data');
+    var data = dataEl ? dataEl.value : '';
+    var catEl = document.getElementById('tx-categoria');
+    var cat = catEl ? catEl.value : '';
+    var contaEl = document.getElementById('tx-conta');
+    var conta = contaEl ? contaEl.value : '';
+    var tipoSel = modal?.querySelector('.tipo-btn.active');
+    var tipo = tipoSel ? tipoSel.textContent.trim() : 'Despesa';
+    var statusSel = modal?.querySelector('.status-btn.active');
+    var status = statusSel ? statusSel.textContent.trim() : 'Efetivado';
+    if (desc && val) {
+      var uid = window._currentUser?.uid;
+      if (uid) {
+        try {
+          var dados = { title: desc, val: 'R$ ' + val, data, venc: data, cat, conta, tipo, status, criadoEm: new Date().toISOString() };
+          var id = await window.FBCRUD.add(uid, 'lancamentos', dados);
+          dados.id = id;
+          window._appData.lancamentos.push(dados);
+          mostrarToast('Lançamento salvo na nuvem!', 'success');
+        } catch(e) { console.warn('Erro Firebase lancamento:', e); }
+      }
+    }
+    if(_origSalvarLanc) _origSalvarLanc();
+  };
+})();
+
+// ==================== INTEGRAÇÃO: SALVAR CATEGORIA NO FIREBASE ====================
+(function() {
+  var _origSalvarCat = window.salvarCategoria;
+  window.salvarCategoriaComFirebase = async function() {
+    var modal = document.getElementById('modal');
+    if (!modal) { return; }
+    var inputs = modal.querySelectorAll('input[type=text]');
+    var nome = inputs[0] ? inputs[0].value.trim() : '';
+    var descricao = inputs[1] ? inputs[1].value.trim() : '';
+    var tipoSel = modal.querySelector('.tipo-opt.selected .tipo-opt-label');
+    var tipo = tipoSel ? tipoSel.textContent.trim().toLowerCase() : 'despesa';
+    var iconeSel = modal.querySelector('.icon-item.selected');
+    var icone = iconeSel ? iconeSel.textContent.trim() : '🏷️';
+    var corSel = modal.querySelector('.cor-item.selected');
+    var cor = corSel ? (corSel.style.background || '#1B4B8A') : '#1B4B8A';
+    if (!nome) { mostrarToast('Informe o nome da categoria.', 'error'); return; }
+    var uid = window._currentUser?.uid;
+    if (uid) {
+      try {
+        var dados = { nome, tipo, icone, cor, descricao };
+        var id = await window.FBCRUD.add(uid, 'categorias', dados);
+        dados.id = id;
+        window._appData.categorias.push(dados);
+        mostrarToast('Categoria "' + nome + '" salva na nuvem!', 'success');
+      } catch(e) { mostrarToast('Erro ao salvar na nuvem.', 'error'); }
+    }
+    fecharModal && fecharModal();
+  };
+})();
+
+// ==================== INTEGRAÇÃO: SALVAR PESSOA NO FIREBASE ====================
+(function() {
+  var _origSalvarPessoa = window.salvarPessoa;
+  window.salvarPessoaComFirebase = async function() {
+    var modal = document.getElementById('modal');
+    if (!modal) { if(_origSalvarPessoa) _origSalvarPessoa(); return; }
+    var nomeEl = document.getElementById('p-nome');
+    var docEl = document.getElementById('p-doc');
+    var emailEl = document.getElementById('p-email');
+    var telEl = document.getElementById('p-tel');
+    var papelSel = modal.querySelector('.papel-opt.selected .papel-opt-label');
+    var nome = nomeEl ? nomeEl.value.trim() : '';
+    var doc = docEl ? docEl.value.trim() : '';
+    var email = emailEl ? emailEl.value.trim() : '';
+    var tel = telEl ? telEl.value.trim() : '';
+    var papel = papelSel ? papelSel.textContent.trim() : 'Fornecedor';
+    if (!nome) { mostrarToast('Informe o nome.', 'error'); return; }
+    var uid = window._currentUser?.uid;
+    if (uid) {
+      try {
+        var dados = { nome, doc, email, tel, papel, ativo: true };
+        var id = await window.FBCRUD.add(uid, 'pessoas', dados);
+        dados.id = id;
+        window._appData.pessoas.push(dados);
+        mostrarToast('Cadastro de "' + nome + '" salvo na nuvem!', 'success');
+      } catch(e) { mostrarToast('Erro ao salvar na nuvem.', 'error'); }
+    }
+    if(_origSalvarPessoa) _origSalvarPessoa();
+  };
+})();
+
+// ==================== EXCLUIR COM FIREBASE ====================
+window.excluirContaComFirebase = async function(id) {
+  var c = window._contasData ? window._contasData[id] : null;
+  var nome = c ? c.nome : 'esta conta';
+  if (!confirm('Excluir permanentemente "' + nome + '"?\nEsta ação não pode ser desfeita.')) return;
+  try { await window.excluirContaFirebase(id); } catch(e) {}
+  // Remove do DOM
+  document.querySelectorAll('.conta-card').forEach(function(card) {
+    var btn = card.querySelector('.conta-card-menu');
+    if (btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + id + "'")) card.remove();
+  });
+  window._appData.contas = window._appData.contas.filter(function(c){ return c.id !== id; });
+  mostrarToast('Conta "' + nome + '" excluída.', 'error');
+};
+
+// ==================== INICIALIZAÇÃO POR TELA ====================
+window.addEventListener('fbready', function() {
+  if(window._currentUser) _carregarDadosIniciais();
+});
+
+// Também tenta quando o usuário logar
+var _origAuthCallback = window._telaAtiva;
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    if(window._currentUser) _carregarDadosIniciais();
+  }, 2000);
+});
+
+function _carregarDadosIniciais() {
+  if (!window._currentUser) return;
+  window.carregarContasFirebase(function(contas) {
+    // Atualiza _contasData se disponível
+    if (window._contasData !== undefined && contas.length > 0) {
+      contas.forEach(function(c) { if(c.id) window._contasData[c.id] = c; });
+    }
+  });
+  window.carregarLancamentosFirebase(function(lancs) {});
+  window.carregarCategoriasFirebase(function(cats) {});
+  window.carregarPessoasFirebase(function(pessoas) {});
+}
+
+// Carrega configs quando navegar para configuracoes
+var _origNavegarPara = window.navegarPara;
+window.navegarPara = function(tela) {
+  _origNavegarPara(tela);
+  if (tela === 'configuracoes') {
+    setTimeout(function() { window.carregarConfigsFirebase(); }, 300);
+  }
+  // Atualiza nav-item active
+  document.querySelectorAll('.nav-item').forEach(function(n) {
+    var href = n.getAttribute('href') || '';
+    var mapa = {'01_login.html':'login','02_dashboard.html':'dashboard','03_contas.html':'contas',
+      '04_lancamentos.html':'lancamentos','05_categorias.html':'categorias',
+      '06_pessoas.html':'pessoas','07_relatorios.html':'relatorios','08_configuracoes.html':'configuracoes'};
+    n.classList.toggle('active', mapa[href] === tela);
+  });
+};
+
+// ==================== HELPER: mostrarToast global ====================
+if (!window.mostrarToast) {
+  window.mostrarToast = function(msg, tipo) {
+    var t = document.getElementById('fpro-toast');
+    if (!t) { t = document.createElement('div'); t.id = 'fpro-toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none'; document.body.appendChild(t); }
+    var item = document.createElement('div');
+    var bg = tipo==='success'?'#059669':tipo==='error'?'#DC2626':'#1B4B8A';
+    item.style.cssText = 'background:'+bg+';color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,0.18);opacity:0;transform:translateY(10px);transition:all 0.25s ease;pointer-events:none;max-width:320px';
+    item.textContent = msg;
+    t.appendChild(item);
+    requestAnimationFrame(function(){ item.style.opacity='1'; item.style.transform='translateY(0)'; });
+    setTimeout(function(){ item.style.opacity='0'; item.style.transform='translateY(10px)'; setTimeout(function(){ item.remove(); }, 300); }, 3500);
+  };
+}
+
+console.log('✅ FinançasPRO CRUD Firebase carregado!');
+</script>
+
+<script>
+window.salvarSubcategoriaComFirebase = async function() {
+  var modal = document.getElementById('modal-sub');
+  if (!modal) { fecharModalSub && fecharModalSub(); return; }
+  var inputs = modal.querySelectorAll('input[type=text]');
+  var nome = inputs[1] ? inputs[1].value.trim() : (inputs[0] ? inputs[0].value.trim() : '');
+  var catPai = document.getElementById('sub-cat-pai')?.value || '';
+  if (!nome) { mostrarToast('Informe o nome da subcategoria.', 'error'); return; }
+  var uid = window._currentUser?.uid;
+  if (uid) {
+    try {
+      var icone = modal.querySelector('.icon-item.selected')?.textContent.trim() || '🏷️';
+      var dados = { nome, catPai, icone, tipo: 'subcategoria' };
+      var id = await window.FBCRUD.add(uid, 'categorias', dados);
+      dados.id = id;
+      if(window._appData) window._appData.categorias.push(dados);
+      mostrarToast('Subcategoria "' + nome + '" salva na nuvem!', 'success');
+    } catch(e) { mostrarToast('Erro ao salvar na nuvem.', 'error'); console.error(e); }
+  }
+  fecharModalSub && fecharModalSub();
+};
 </script>
 </body>
 </html>
