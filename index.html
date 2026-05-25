@@ -4807,9 +4807,9 @@ document.addEventListener('keydown', e => {
           <div class="tx-val neg">- R$ 320,00</div>
           <div></div>
           <div class="tx-actions">
-            <button class="action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="action-btn" onclick="event.stopPropagation()">📋</button>
-            <button class="action-btn" onclick="event.stopPropagation()">🗑️</button>
+            <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento(2,this)">✏️</button>
+            <button class="action-btn" title="Duplicar" onclick="event.stopPropagation();duplicarLancamento(2,this)">📋</button>
+            <button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento(2,this)">🗑️</button>
           </div>
         </div>
 
@@ -4830,8 +4830,8 @@ document.addEventListener('keydown', e => {
           <div><span class="badge badge-pendente">pendente</span></div>
           <div class="tx-actions">
             <button class="action-btn quitar" title="Quitar" onclick="event.stopPropagation();quitarTx(this)">✓</button>
-            <button class="action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="action-btn" onclick="event.stopPropagation()">🗑️</button>
+            <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento(3,this)">✏️</button>
+            <button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento(3,this)">🗑️</button>
           </div>
         </div>
 
@@ -4851,9 +4851,9 @@ document.addEventListener('keydown', e => {
           <div class="tx-val neg">- R$ 55,90</div>
           <div></div>
           <div class="tx-actions">
-            <button class="action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="action-btn" onclick="event.stopPropagation()">📋</button>
-            <button class="action-btn" onclick="event.stopPropagation()">🗑️</button>
+            <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento(4,this)">✏️</button>
+            <button class="action-btn" title="Duplicar" onclick="event.stopPropagation();duplicarLancamento(4,this)">📋</button>
+            <button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento(4,this)">🗑️</button>
           </div>
         </div>
 
@@ -4873,9 +4873,9 @@ document.addEventListener('keydown', e => {
           <div class="tx-val neg">- R$ 187,00</div>
           <div></div>
           <div class="tx-actions">
-            <button class="action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="action-btn" onclick="event.stopPropagation()">📋</button>
-            <button class="action-btn" onclick="event.stopPropagation()">🗑️</button>
+            <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento(5,this)">✏️</button>
+            <button class="action-btn" title="Duplicar" onclick="event.stopPropagation();duplicarLancamento(5,this)">📋</button>
+            <button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento(5,this)">🗑️</button>
           </div>
         </div>
 
@@ -4895,9 +4895,9 @@ document.addEventListener('keydown', e => {
           <div class="tx-val neg">- R$ 210,00</div>
           <div></div>
           <div class="tx-actions">
-            <button class="action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="action-btn" onclick="event.stopPropagation()">📋</button>
-            <button class="action-btn" onclick="event.stopPropagation()">🗑️</button>
+            <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento(6,this)">✏️</button>
+            <button class="action-btn" title="Duplicar" onclick="event.stopPropagation();duplicarLancamento(6,this)">📋</button>
+            <button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento(6,this)">🗑️</button>
           </div>
         </div>
 
@@ -4917,8 +4917,8 @@ document.addEventListener('keydown', e => {
           <div class="tx-val transf">↔ R$ 500,00</div>
           <div></div>
           <div class="tx-actions">
-            <button class="action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="action-btn" onclick="event.stopPropagation()">🗑️</button>
+            <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento(7,this)">✏️</button>
+            <button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento(7,this)">🗑️</button>
           </div>
         </div>
 
@@ -4938,9 +4938,9 @@ document.addEventListener('keydown', e => {
           <div class="tx-val neg">- R$ 87,00</div>
           <div></div>
           <div class="tx-actions">
-            <button class="action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="action-btn" onclick="event.stopPropagation()">📋</button>
-            <button class="action-btn" onclick="event.stopPropagation()">🗑️</button>
+            <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento(8,this)">✏️</button>
+            <button class="action-btn" title="Duplicar" onclick="event.stopPropagation();duplicarLancamento(8,this)">📋</button>
+            <button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento(8,this)">🗑️</button>
           </div>
         </div>
 
@@ -4961,8 +4961,8 @@ document.addEventListener('keydown', e => {
           <div><span class="badge badge-pendente">pendente</span></div>
           <div class="tx-actions">
             <button class="action-btn quitar" title="Quitar" onclick="event.stopPropagation();quitarTx(this)">✓</button>
-            <button class="action-btn" onclick="event.stopPropagation()">✏️</button>
-            <button class="action-btn" onclick="event.stopPropagation()">🗑️</button>
+            <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento(9,this)">✏️</button>
+            <button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento(9,this)">🗑️</button>
           </div>
         </div>
 
@@ -5181,9 +5181,9 @@ document.addEventListener('keydown', e => {
     </div>
     <div id="det-content"></div>
     <div style="display:flex;gap:8px;margin-top:20px">
-      <button style="flex:1;padding:9px;border-radius:8px;border:1.5px solid var(--border2);background:var(--white);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)" onclick="fecharDetalhe();abrirModal()">✏️ Editar</button>
-      <button style="flex:1;padding:9px;border-radius:8px;border:1.5px solid var(--border2);background:var(--white);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)" onclick="event.stopPropagation()">📋 Duplicar</button>
-      <button style="flex:1;padding:9px;border-radius:8px;border:1.5px solid #FECACA;background:var(--red-bg);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--red)" onclick="fecharDetalhe()">🗑️ Excluir</button>
+      <button style="flex:1;padding:9px;border-radius:8px;border:1.5px solid var(--border2);background:var(--white);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)" onclick="fecharDetalhe();editarLancamento(window._detalheIdx)">✏️ Editar</button>
+      <button style="flex:1;padding:9px;border-radius:8px;border:1.5px solid var(--border2);background:var(--white);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)" onclick="duplicarLancamento(window._detalheIdx,null);fecharDetalhe()">📋 Duplicar</button>
+      <button style="flex:1;padding:9px;border-radius:8px;border:1.5px solid #FECACA;background:var(--red-bg);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--red)" onclick="excluirLancamento(window._detalheIdx,null);fecharDetalhe()">🗑️ Excluir</button>
     </div>
   </div>
 </div>
@@ -5202,94 +5202,259 @@ var txDados = [
   { title:'Internet — Vivo Fibra', val:'- R$ 120,00', tipo:'Despesa', cat:'Moradia · Internet', conta:'Conta Itaú', data:'01/06/2026', venc:'01/06/2026', status:'Pendente', pessoa:'Vivo', tags:'moradia, recorrente', obs:'Débito automático' },
 ];
 
+// ── Estado dos lançamentos ────────────────────────────────────────────────
+var _editandoIdx = null;
+
+function _getTxRows() {
+  return Array.from(document.querySelectorAll('#tx-list .tx-row'));
+}
+
+// ── Detalhe ───────────────────────────────────────────────────────────────
 function abrirDetalhe(idx) {
   var d = txDados[idx];
+  if (!d) return;
+  window._detalheIdx = idx;
   document.getElementById('det-title').textContent = d.title;
-  document.getElementById('det-content').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-      ${[['Valor',d.val],['Tipo',d.tipo],['Categoria',d.cat],['Conta',d.conta],['Dt. Evento',d.data],['Dt. Vencimento',d.venc],['Status',d.status],['Fornecedor/Cliente',d.pessoa],['Tags',d.tags]].map(([k,v])=>`
-        <div style="background:var(--bg);border-radius:8px;padding:10px">
-          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:3px">${k}</div>
-          <div style="font-size:13px;font-weight:600;color:var(--text)">${v}</div>
-        </div>`).join('')}
-    </div>
-    ${d.obs !== '—' ? `<div style="background:var(--amber-bg);border-radius:8px;padding:10px;font-size:13px;color:var(--amber)">📝 ${d.obs}</div>` : ''}
-  `;
+  var valCor = d.val.startsWith('+') ? 'var(--green)' : d.val.startsWith('-') ? 'var(--red)' : 'var(--text)';
+  document.getElementById('det-content').innerHTML = '<div style="text-align:center;margin-bottom:18px"><div style="font-size:28px;font-weight:900;color:' + valCor + '">' + d.val + '</div><div style="font-size:12px;color:var(--text3);margin-top:4px">' + d.tipo + ' · ' + d.status + '</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">' +
+    [['Categoria',d.cat],['Conta',d.conta],['Dt. Evento',d.data],['Dt. Vencimento',d.venc],['Fornecedor/Cliente',d.pessoa],['Tags',d.tags]].map(function(kv){ return '<div style="background:var(--bg);border-radius:8px;padding:9px 11px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:2px">' + kv[0] + '</div><div style="font-size:13px;font-weight:600;color:var(--text)">' + kv[1] + '</div></div>'; }).join('') +
+    '</div>' + (d.obs && d.obs !== '—' ? '<div style="background:var(--amber-bg);border-radius:8px;padding:10px;font-size:13px;color:var(--amber);margin-bottom:4px">📝 ' + d.obs + '</div>' : '');
   document.getElementById('detalhe').classList.add('open');
 }
 
 function fecharDetalhe() { document.getElementById('detalhe').classList.remove('open'); }
 
+// ── Abrir modal para NOVO ou EDITAR ──────────────────────────────────────
+function abrirModal(idx) {
+  _editandoIdx = (idx !== undefined && idx !== null) ? idx : null;
+  var modal = document.getElementById('modal');
+  var title = document.getElementById('modal-title');
+
+  if (_editandoIdx !== null) {
+    var d = txDados[_editandoIdx];
+    if (!d) { _editandoIdx = null; }
+    else {
+      title.textContent = 'Editar lançamento';
+      modal.querySelector('.btn-save').textContent = 'Salvar alterações';
+      var tipoMap = { 'Despesa':'despesa','Receita':'receita','Transferência':'transf' };
+      var tipoKey = tipoMap[d.tipo] || 'despesa';
+      modal.querySelectorAll('.tipo-btn').forEach(function(b){ b.classList.remove('active'); });
+      var tipoBtn = modal.querySelector('.tipo-btn.' + tipoKey);
+      if (tipoBtn) tipoBtn.classList.add('active');
+      var inputs = modal.querySelectorAll('input[type=text]');
+      if (inputs[0]) inputs[0].value = d.title;
+      var numInput = modal.querySelector('input[type=number]');
+      if (numInput) { var num = d.val.replace(/[^0-9,.]/g,'').replace(',','.'); numInput.value = parseFloat(num) || ''; }
+      var dateInputs = modal.querySelectorAll('input[type=date]');
+      var toISO = function(s){ return s && s !== '—' ? s.split('/').reverse().join('-') : ''; };
+      if (dateInputs[0]) dateInputs[0].value = toISO(d.data);
+      if (dateInputs[1]) dateInputs[1].value = toISO(d.venc);
+      modal.querySelectorAll('.status-btn').forEach(function(b){ b.classList.toggle('active', b.classList.contains(d.status === 'Efetivado' ? 'efetivado' : 'pendente')); });
+      var selConta = modal.querySelectorAll('select')[0];
+      if (selConta) { for(var i=0;i<selConta.options.length;i++){ if(selConta.options[i].text.trim()===d.conta.trim()){ selConta.selectedIndex=i; break; } } }
+      var tagsInput = modal.querySelectorAll('input[type=text]')[1];
+      if (tagsInput) tagsInput.value = d.tags !== '—' ? d.tags : '';
+      var obsEl = modal.querySelector('textarea');
+      if (obsEl) obsEl.value = d.obs !== '—' ? d.obs : '';
+      var lbl = document.getElementById('lbl-pessoa');
+      if (lbl) lbl.textContent = d.tipo === 'Receita' ? 'Cliente' : d.tipo === 'Despesa' ? 'Fornecedor' : 'Conta destino';
+    }
+  }
+  if (_editandoIdx === null) {
+    title.textContent = 'Novo lançamento';
+    modal.querySelector('.btn-save').textContent = 'Salvar lançamento';
+    modal.querySelectorAll('input[type=text]').forEach(function(i){ i.value = ''; });
+    modal.querySelectorAll('input[type=number]').forEach(function(i){ i.value = ''; });
+    modal.querySelectorAll('textarea').forEach(function(i){ i.value = ''; });
+    modal.querySelectorAll('.tipo-btn').forEach(function(b){ b.classList.remove('active'); });
+    var db = modal.querySelector('.tipo-btn.despesa'); if(db) db.classList.add('active');
+    modal.querySelectorAll('.status-btn').forEach(function(b){ b.classList.toggle('active', b.classList.contains('efetivado')); });
+  }
+  modal.classList.add('open');
+}
+
+function fecharModal() { document.getElementById('modal').classList.remove('open'); _editandoIdx = null; }
+
+function salvarLancamento() {
+  var modal = document.getElementById('modal');
+  var inputs = modal.querySelectorAll('input[type=text]');
+  var nome = inputs[0] ? inputs[0].value.trim() : '';
+  if (!nome) { if(inputs[0]) inputs[0].style.borderColor='var(--red)'; return; }
+  var numInput = modal.querySelector('input[type=number]');
+  var valor = numInput ? parseFloat(numInput.value) || 0 : 0;
+  var tipoBtn = modal.querySelector('.tipo-btn.active');
+  var tipoKey = tipoBtn ? (tipoBtn.classList.contains('receita') ? 'receita' : tipoBtn.classList.contains('transf') ? 'transferencia' : 'despesa') : 'despesa';
+  var tipoNome = { despesa:'Despesa', receita:'Receita', transferencia:'Transferência' }[tipoKey];
+  var statusBtn = modal.querySelector('.status-btn.active');
+  var status = statusBtn && statusBtn.classList.contains('pendente') ? 'Pendente' : 'Efetivado';
+  var dateInputs = modal.querySelectorAll('input[type=date]');
+  var toDisplay = function(s){ return s ? s.split('-').reverse().join('/') : '—'; };
+  var dataEvt = dateInputs[0] ? toDisplay(dateInputs[0].value) : '—';
+  var dataVenc = dateInputs[1] ? toDisplay(dateInputs[1].value) : '—';
+  var selConta = modal.querySelectorAll('select')[0];
+  var conta = selConta ? selConta.options[selConta.selectedIndex].text : '—';
+  var tagsInput = modal.querySelectorAll('input[type=text]')[1];
+  var tags = tagsInput ? tagsInput.value.trim() || '—' : '—';
+  var obsEl = modal.querySelector('textarea');
+  var obsVal = obsEl ? obsEl.value.trim() || '—' : '—';
+  var prefix = tipoKey === 'receita' ? '+ ' : tipoKey === 'despesa' ? '- ' : '↔ ';
+  var valFmt = prefix + 'R$ ' + valor.toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2});
+  var iconeMap = { despesa:'💸', receita:'💰', transferencia:'↔️' };
+  var bgMap = { receita:'green', despesa:'red', transferencia:'purple' };
+
+  if (_editandoIdx !== null) {
+    var d = txDados[_editandoIdx];
+    d.title=nome; d.val=valFmt; d.tipo=tipoNome; d.status=status;
+    d.data=dataEvt; d.venc=dataVenc; d.conta=conta; d.tags=tags; d.obs=obsVal;
+    var rows = _getTxRows();
+    var row = rows[_editandoIdx];
+    if (row) {
+      row.querySelector('.tx-name').textContent = nome;
+      var valEl = row.querySelector('.tx-val');
+      if (valEl) { valEl.textContent = valFmt; valEl.className = 'tx-val ' + (tipoKey==='receita'?'pos':tipoKey==='despesa'?'neg':'transf'); }
+      var iconEl = row.querySelector('.tx-icon'); if(iconEl) iconEl.textContent = iconeMap[tipoKey];
+      var contaEl = row.querySelector('.tx-conta'); if(contaEl) contaEl.textContent = conta;
+      var dEls = row.querySelectorAll('.tx-date');
+      if(dEls[0]) dEls[0].textContent = dataEvt; if(dEls[1]) dEls[1].textContent = dataVenc;
+      row.querySelectorAll('.badge').forEach(function(b){
+        if(b.classList.contains('badge-efetivado')||b.classList.contains('badge-pendente')){
+          b.className='badge badge-'+(status==='Efetivado'?'efetivado':'pendente');
+          b.textContent=status.toLowerCase();
+        }
+      });
+      row.dataset.tipo=tipoKey; row.dataset.status=status.toLowerCase();
+      row.style.transition='background 0.3s'; row.style.background='rgba(5,150,105,0.08)';
+      setTimeout(function(){ row.style.background=''; }, 800);
+    }
+    mostrarToast('Lançamento atualizado!', 'success');
+  } else {
+    var novoIdx = txDados.length;
+    txDados.push({title:nome,val:valFmt,tipo:tipoNome,cat:'—',conta:conta,data:dataEvt,venc:dataVenc,status:status,pessoa:'—',tags:tags,obs:obsVal});
+    var list = document.getElementById('tx-list');
+    var newRow = document.createElement('div');
+    newRow.className='tx-row'; newRow.dataset.tipo=tipoKey; newRow.dataset.status=status.toLowerCase();
+    newRow.setAttribute('onclick','abrirDetalhe('+novoIdx+')');
+    var bg = bgMap[tipoKey];
+    newRow.innerHTML = '<div class="tx-desc"><div class="tx-icon" style="background:var(--'+bg+'-bg)">'+iconeMap[tipoKey]+'</div><div class="tx-info"><div class="tx-name">'+nome+'</div><div class="tx-meta"><span class="badge badge-'+status.toLowerCase()+'">'+status.toLowerCase()+'</span></div></div></div>' +
+      '<div class="tx-cat"><div class="cat-dot" style="background:#6B7280"></div>—</div><div class="tx-conta">'+conta+'</div><div class="tx-date">'+dataEvt+'</div><div class="tx-date">'+dataVenc+'</div>' +
+      '<div class="tx-val '+(tipoKey==='receita'?'pos':tipoKey==='despesa'?'neg':'transf')+'">'+valFmt+'</div><div></div>' +
+      '<div class="tx-actions">'+(status==='Pendente'?'<button class="action-btn quitar" title="Quitar" onclick="event.stopPropagation();quitarTx(this)">✓</button>':'')+
+      '<button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento('+novoIdx+',this)">✏️</button>'+
+      '<button class="action-btn" title="Duplicar" onclick="event.stopPropagation();duplicarLancamento('+novoIdx+',this)">📋</button>'+
+      '<button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento('+novoIdx+',this)">🗑️</button></div>';
+    newRow.style.opacity='0'; newRow.style.transform='translateY(-8px)';
+    list.insertBefore(newRow, list.firstChild);
+    requestAnimationFrame(function(){ newRow.style.transition='all 0.3s ease'; newRow.style.opacity='1'; newRow.style.transform='translateY(0)'; });
+    mostrarToast('Lançamento criado!', 'success');
+  }
+  fecharModal();
+}
+
+function editarLancamento(idx, btn) { abrirModal(idx); }
+
+function duplicarLancamento(idx, btn) {
+  var d = txDados[idx]; if(!d) return;
+  var novoIdx = txDados.length;
+  var copia = Object.assign({}, d, {title: d.title + ' (cópia)'});
+  txDados.push(copia);
+  var tipoKey = {'Despesa':'despesa','Receita':'receita','Transferência':'transferencia'}[d.tipo] || 'despesa';
+  var iconeMap = {despesa:'💸',receita:'💰',transferencia:'↔️'};
+  var bgMap = {receita:'green',despesa:'red',transferencia:'purple'};
+  var status = d.status.toLowerCase();
+  var row = btn ? btn.closest('.tx-row') : null;
+  var list = document.getElementById('tx-list');
+  var newRow = document.createElement('div');
+  newRow.className='tx-row'; newRow.dataset.tipo=tipoKey; newRow.dataset.status=status;
+  newRow.setAttribute('onclick','abrirDetalhe('+novoIdx+')');
+  var bg = bgMap[tipoKey];
+  newRow.innerHTML = '<div class="tx-desc"><div class="tx-icon" style="background:var(--'+bg+'-bg)">'+iconeMap[tipoKey]+'</div><div class="tx-info"><div class="tx-name">'+copia.title+'</div><div class="tx-meta"><span class="badge badge-'+status+'">'+status+'</span></div></div></div>' +
+    '<div class="tx-cat"><div class="cat-dot" style="background:#6B7280"></div>'+d.cat+'</div><div class="tx-conta">'+d.conta+'</div><div class="tx-date">'+d.data+'</div><div class="tx-date">'+d.venc+'</div>' +
+    '<div class="tx-val '+( tipoKey==='receita'?'pos':tipoKey==='despesa'?'neg':'transf')+'">'+d.val+'</div><div></div>' +
+    '<div class="tx-actions">' + (status==='pendente'?'<button class="action-btn quitar" title="Quitar" onclick="event.stopPropagation();quitarTx(this)">✓</button>':'')+
+    '<button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento('+novoIdx+',this)">✏️</button>'+
+    '<button class="action-btn" title="Duplicar" onclick="event.stopPropagation();duplicarLancamento('+novoIdx+',this)">📋</button>'+
+    '<button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento('+novoIdx+',this)">🗑️</button></div>';
+  newRow.style.opacity='0'; newRow.style.transform='translateY(-6px)';
+  list.insertBefore(newRow, row ? row.nextSibling : null);
+  requestAnimationFrame(function(){ newRow.style.transition='all 0.25s ease'; newRow.style.opacity='1'; newRow.style.transform='translateY(0)'; });
+  mostrarToast('Lançamento duplicado!', 'success');
+}
+
+function excluirLancamento(idx, btn) {
+  var d = txDados[idx]; if(!d) return;
+  if (!confirm('Excluir "' + d.title + '"?\nEsta ação não pode ser desfeita.')) return;
+  var row = btn ? btn.closest('.tx-row') : null;
+  if (row) {
+    row.style.transition='all 0.25s ease'; row.style.opacity='0'; row.style.transform='translateX(30px)';
+    setTimeout(function(){ row.remove(); }, 270);
+  }
+  txDados[idx] = null;
+  mostrarToast('Lançamento excluído.', 'error');
+}
+
 function filtrarTipo(tipo, el) {
-  document.querySelectorAll('.tipo-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tipo-tab').forEach(function(t){ t.classList.remove('active'); });
   el.classList.add('active');
-  document.querySelectorAll('.tx-row').forEach(row => {
-    if (tipo === 'todos') { row.style.display = ''; return; }
-    if (tipo === 'pendente') { row.style.display = row.dataset.status === 'pendente' ? '' : 'none'; return; }
-    row.style.display = row.dataset.tipo === tipo ? '' : 'none';
+  document.querySelectorAll('.tx-row').forEach(function(row){
+    if(tipo==='todos'){ row.style.display=''; return; }
+    if(tipo==='pendente'){ row.style.display=row.dataset.status==='pendente'?'':'none'; return; }
+    row.style.display=row.dataset.tipo===tipo?'':'none';
   });
 }
 
 function buscar(q) {
   var query = q.toLowerCase();
-  document.querySelectorAll('.tx-row').forEach(row => {
+  document.querySelectorAll('.tx-row').forEach(function(row){
     var name = row.querySelector('.tx-name').textContent.toLowerCase();
     row.style.display = name.includes(query) ? '' : 'none';
   });
 }
 
 function filtrarConta(val) {
-  document.querySelectorAll('.tx-row').forEach(row => {
-    if (!val) { row.style.display = ''; return; }
+  document.querySelectorAll('.tx-row').forEach(function(row){
+    if(!val){ row.style.display=''; return; }
     var conta = row.querySelector('.tx-conta').textContent;
     row.style.display = conta.includes(val) ? '' : 'none';
   });
 }
 
-function filtrarCategoria(val) { /* integração futura */ }
+function filtrarCategoria(val) {}
 
 function quitarTx(btn) {
   var row = btn.closest('.tx-row');
   var badgePend = row.querySelector('.badge-pendente');
-  if (badgePend) { badgePend.className = 'badge badge-efetivado'; badgePend.textContent = 'efetivado'; }
-  var statusBadge = row.children[5].querySelector('.badge');
-  if (statusBadge) row.children[5].innerHTML = '';
-  btn.className = 'action-btn';
-  btn.textContent = '✓';
-  btn.title = 'Quitado';
-  btn.disabled = true;
-  row.dataset.status = 'efetivado';
-  row.style.opacity = '0.7';
+  if(badgePend){ badgePend.className='badge badge-efetivado'; badgePend.textContent='efetivado'; }
+  var statusCol = row.children[5];
+  if(statusCol){ var sb=statusCol.querySelector('.badge'); if(sb) statusCol.innerHTML=''; }
+  btn.className='action-btn'; btn.textContent='✓'; btn.title='Quitado'; btn.disabled=true;
+  row.dataset.status='efetivado';
+  row.style.transition='background 0.4s'; row.style.background='rgba(5,150,105,0.07)';
+  setTimeout(function(){ row.style.background=''; }, 700);
+  mostrarToast('Lançamento quitado!', 'success');
 }
 
 function setTipo(tipo, el) {
-  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tipo-btn').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active');
-  var lbl = document.getElementById('lbl-pessoa');
-  if (tipo === 'receita') lbl.textContent = 'Cliente';
-  else if (tipo === 'despesa') lbl.textContent = 'Fornecedor';
-  else lbl.textContent = 'Conta destino';
+  var lbl=document.getElementById('lbl-pessoa');
+  if(lbl){ lbl.textContent = tipo==='receita'?'Cliente':tipo==='despesa'?'Fornecedor':'Conta destino'; }
 }
 
 function setStatus(status, el) {
-  document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.status-btn').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active');
 }
 
 function mostrarCamposExtras(val) {
-  document.getElementById('campos-recorrente').style.display = val === 'recorrente' ? '' : 'none';
-  document.getElementById('campos-parcelado').style.display = val === 'parcelado' ? '' : 'none';
+  document.getElementById('campos-recorrente').style.display = val==='recorrente'?'':'none';
+  document.getElementById('campos-parcelado').style.display = val==='parcelado'?'':'none';
 }
-
-function abrirModal() { document.getElementById('modal').classList.add('open'); }
-function fecharModal() { document.getElementById('modal').classList.remove('open'); }
-function salvarLancamento() { fecharModal(); }
 
 function abrirImport() { document.getElementById('modal-import').classList.add('open'); }
 function fecharImport() { document.getElementById('modal-import').classList.remove('open'); }
-function simularImport() { alert('Selecione um arquivo OFX ou CSV do seu banco.'); }
+function simularImport() { mostrarToast('Selecione um arquivo OFX ou CSV do seu banco.', 'info'); }
+function ordenar(col) {}
 
-function ordenar(col) { /* ordenação futura */ }
 
 
 // ===== PERIOD PICKER =====
@@ -7823,94 +7988,259 @@ var txDados = [
   { title:'Internet — Vivo Fibra', val:'- R$ 120,00', tipo:'Despesa', cat:'Moradia · Internet', conta:'Conta Itaú', data:'01/06/2026', venc:'01/06/2026', status:'Pendente', pessoa:'Vivo', tags:'moradia, recorrente', obs:'Débito automático' },
 ];
 
+// ── Estado dos lançamentos ────────────────────────────────────────────────
+var _editandoIdx = null;
+
+function _getTxRows() {
+  return Array.from(document.querySelectorAll('#tx-list .tx-row'));
+}
+
+// ── Detalhe ───────────────────────────────────────────────────────────────
 function abrirDetalhe(idx) {
   var d = txDados[idx];
+  if (!d) return;
+  window._detalheIdx = idx;
   document.getElementById('det-title').textContent = d.title;
-  document.getElementById('det-content').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-      ${[['Valor',d.val],['Tipo',d.tipo],['Categoria',d.cat],['Conta',d.conta],['Dt. Evento',d.data],['Dt. Vencimento',d.venc],['Status',d.status],['Fornecedor/Cliente',d.pessoa],['Tags',d.tags]].map(([k,v])=>`
-        <div style="background:var(--bg);border-radius:8px;padding:10px">
-          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:3px">${k}</div>
-          <div style="font-size:13px;font-weight:600;color:var(--text)">${v}</div>
-        </div>`).join('')}
-    </div>
-    ${d.obs !== '—' ? `<div style="background:var(--amber-bg);border-radius:8px;padding:10px;font-size:13px;color:var(--amber)">📝 ${d.obs}</div>` : ''}
-  `;
+  var valCor = d.val.startsWith('+') ? 'var(--green)' : d.val.startsWith('-') ? 'var(--red)' : 'var(--text)';
+  document.getElementById('det-content').innerHTML = '<div style="text-align:center;margin-bottom:18px"><div style="font-size:28px;font-weight:900;color:' + valCor + '">' + d.val + '</div><div style="font-size:12px;color:var(--text3);margin-top:4px">' + d.tipo + ' · ' + d.status + '</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">' +
+    [['Categoria',d.cat],['Conta',d.conta],['Dt. Evento',d.data],['Dt. Vencimento',d.venc],['Fornecedor/Cliente',d.pessoa],['Tags',d.tags]].map(function(kv){ return '<div style="background:var(--bg);border-radius:8px;padding:9px 11px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:2px">' + kv[0] + '</div><div style="font-size:13px;font-weight:600;color:var(--text)">' + kv[1] + '</div></div>'; }).join('') +
+    '</div>' + (d.obs && d.obs !== '—' ? '<div style="background:var(--amber-bg);border-radius:8px;padding:10px;font-size:13px;color:var(--amber);margin-bottom:4px">📝 ' + d.obs + '</div>' : '');
   document.getElementById('detalhe').classList.add('open');
 }
 
 function fecharDetalhe() { document.getElementById('detalhe').classList.remove('open'); }
 
+// ── Abrir modal para NOVO ou EDITAR ──────────────────────────────────────
+function abrirModal(idx) {
+  _editandoIdx = (idx !== undefined && idx !== null) ? idx : null;
+  var modal = document.getElementById('modal');
+  var title = document.getElementById('modal-title');
+
+  if (_editandoIdx !== null) {
+    var d = txDados[_editandoIdx];
+    if (!d) { _editandoIdx = null; }
+    else {
+      title.textContent = 'Editar lançamento';
+      modal.querySelector('.btn-save').textContent = 'Salvar alterações';
+      var tipoMap = { 'Despesa':'despesa','Receita':'receita','Transferência':'transf' };
+      var tipoKey = tipoMap[d.tipo] || 'despesa';
+      modal.querySelectorAll('.tipo-btn').forEach(function(b){ b.classList.remove('active'); });
+      var tipoBtn = modal.querySelector('.tipo-btn.' + tipoKey);
+      if (tipoBtn) tipoBtn.classList.add('active');
+      var inputs = modal.querySelectorAll('input[type=text]');
+      if (inputs[0]) inputs[0].value = d.title;
+      var numInput = modal.querySelector('input[type=number]');
+      if (numInput) { var num = d.val.replace(/[^0-9,.]/g,'').replace(',','.'); numInput.value = parseFloat(num) || ''; }
+      var dateInputs = modal.querySelectorAll('input[type=date]');
+      var toISO = function(s){ return s && s !== '—' ? s.split('/').reverse().join('-') : ''; };
+      if (dateInputs[0]) dateInputs[0].value = toISO(d.data);
+      if (dateInputs[1]) dateInputs[1].value = toISO(d.venc);
+      modal.querySelectorAll('.status-btn').forEach(function(b){ b.classList.toggle('active', b.classList.contains(d.status === 'Efetivado' ? 'efetivado' : 'pendente')); });
+      var selConta = modal.querySelectorAll('select')[0];
+      if (selConta) { for(var i=0;i<selConta.options.length;i++){ if(selConta.options[i].text.trim()===d.conta.trim()){ selConta.selectedIndex=i; break; } } }
+      var tagsInput = modal.querySelectorAll('input[type=text]')[1];
+      if (tagsInput) tagsInput.value = d.tags !== '—' ? d.tags : '';
+      var obsEl = modal.querySelector('textarea');
+      if (obsEl) obsEl.value = d.obs !== '—' ? d.obs : '';
+      var lbl = document.getElementById('lbl-pessoa');
+      if (lbl) lbl.textContent = d.tipo === 'Receita' ? 'Cliente' : d.tipo === 'Despesa' ? 'Fornecedor' : 'Conta destino';
+    }
+  }
+  if (_editandoIdx === null) {
+    title.textContent = 'Novo lançamento';
+    modal.querySelector('.btn-save').textContent = 'Salvar lançamento';
+    modal.querySelectorAll('input[type=text]').forEach(function(i){ i.value = ''; });
+    modal.querySelectorAll('input[type=number]').forEach(function(i){ i.value = ''; });
+    modal.querySelectorAll('textarea').forEach(function(i){ i.value = ''; });
+    modal.querySelectorAll('.tipo-btn').forEach(function(b){ b.classList.remove('active'); });
+    var db = modal.querySelector('.tipo-btn.despesa'); if(db) db.classList.add('active');
+    modal.querySelectorAll('.status-btn').forEach(function(b){ b.classList.toggle('active', b.classList.contains('efetivado')); });
+  }
+  modal.classList.add('open');
+}
+
+function fecharModal() { document.getElementById('modal').classList.remove('open'); _editandoIdx = null; }
+
+function salvarLancamento() {
+  var modal = document.getElementById('modal');
+  var inputs = modal.querySelectorAll('input[type=text]');
+  var nome = inputs[0] ? inputs[0].value.trim() : '';
+  if (!nome) { if(inputs[0]) inputs[0].style.borderColor='var(--red)'; return; }
+  var numInput = modal.querySelector('input[type=number]');
+  var valor = numInput ? parseFloat(numInput.value) || 0 : 0;
+  var tipoBtn = modal.querySelector('.tipo-btn.active');
+  var tipoKey = tipoBtn ? (tipoBtn.classList.contains('receita') ? 'receita' : tipoBtn.classList.contains('transf') ? 'transferencia' : 'despesa') : 'despesa';
+  var tipoNome = { despesa:'Despesa', receita:'Receita', transferencia:'Transferência' }[tipoKey];
+  var statusBtn = modal.querySelector('.status-btn.active');
+  var status = statusBtn && statusBtn.classList.contains('pendente') ? 'Pendente' : 'Efetivado';
+  var dateInputs = modal.querySelectorAll('input[type=date]');
+  var toDisplay = function(s){ return s ? s.split('-').reverse().join('/') : '—'; };
+  var dataEvt = dateInputs[0] ? toDisplay(dateInputs[0].value) : '—';
+  var dataVenc = dateInputs[1] ? toDisplay(dateInputs[1].value) : '—';
+  var selConta = modal.querySelectorAll('select')[0];
+  var conta = selConta ? selConta.options[selConta.selectedIndex].text : '—';
+  var tagsInput = modal.querySelectorAll('input[type=text]')[1];
+  var tags = tagsInput ? tagsInput.value.trim() || '—' : '—';
+  var obsEl = modal.querySelector('textarea');
+  var obsVal = obsEl ? obsEl.value.trim() || '—' : '—';
+  var prefix = tipoKey === 'receita' ? '+ ' : tipoKey === 'despesa' ? '- ' : '↔ ';
+  var valFmt = prefix + 'R$ ' + valor.toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2});
+  var iconeMap = { despesa:'💸', receita:'💰', transferencia:'↔️' };
+  var bgMap = { receita:'green', despesa:'red', transferencia:'purple' };
+
+  if (_editandoIdx !== null) {
+    var d = txDados[_editandoIdx];
+    d.title=nome; d.val=valFmt; d.tipo=tipoNome; d.status=status;
+    d.data=dataEvt; d.venc=dataVenc; d.conta=conta; d.tags=tags; d.obs=obsVal;
+    var rows = _getTxRows();
+    var row = rows[_editandoIdx];
+    if (row) {
+      row.querySelector('.tx-name').textContent = nome;
+      var valEl = row.querySelector('.tx-val');
+      if (valEl) { valEl.textContent = valFmt; valEl.className = 'tx-val ' + (tipoKey==='receita'?'pos':tipoKey==='despesa'?'neg':'transf'); }
+      var iconEl = row.querySelector('.tx-icon'); if(iconEl) iconEl.textContent = iconeMap[tipoKey];
+      var contaEl = row.querySelector('.tx-conta'); if(contaEl) contaEl.textContent = conta;
+      var dEls = row.querySelectorAll('.tx-date');
+      if(dEls[0]) dEls[0].textContent = dataEvt; if(dEls[1]) dEls[1].textContent = dataVenc;
+      row.querySelectorAll('.badge').forEach(function(b){
+        if(b.classList.contains('badge-efetivado')||b.classList.contains('badge-pendente')){
+          b.className='badge badge-'+(status==='Efetivado'?'efetivado':'pendente');
+          b.textContent=status.toLowerCase();
+        }
+      });
+      row.dataset.tipo=tipoKey; row.dataset.status=status.toLowerCase();
+      row.style.transition='background 0.3s'; row.style.background='rgba(5,150,105,0.08)';
+      setTimeout(function(){ row.style.background=''; }, 800);
+    }
+    mostrarToast('Lançamento atualizado!', 'success');
+  } else {
+    var novoIdx = txDados.length;
+    txDados.push({title:nome,val:valFmt,tipo:tipoNome,cat:'—',conta:conta,data:dataEvt,venc:dataVenc,status:status,pessoa:'—',tags:tags,obs:obsVal});
+    var list = document.getElementById('tx-list');
+    var newRow = document.createElement('div');
+    newRow.className='tx-row'; newRow.dataset.tipo=tipoKey; newRow.dataset.status=status.toLowerCase();
+    newRow.setAttribute('onclick','abrirDetalhe('+novoIdx+')');
+    var bg = bgMap[tipoKey];
+    newRow.innerHTML = '<div class="tx-desc"><div class="tx-icon" style="background:var(--'+bg+'-bg)">'+iconeMap[tipoKey]+'</div><div class="tx-info"><div class="tx-name">'+nome+'</div><div class="tx-meta"><span class="badge badge-'+status.toLowerCase()+'">'+status.toLowerCase()+'</span></div></div></div>' +
+      '<div class="tx-cat"><div class="cat-dot" style="background:#6B7280"></div>—</div><div class="tx-conta">'+conta+'</div><div class="tx-date">'+dataEvt+'</div><div class="tx-date">'+dataVenc+'</div>' +
+      '<div class="tx-val '+(tipoKey==='receita'?'pos':tipoKey==='despesa'?'neg':'transf')+'">'+valFmt+'</div><div></div>' +
+      '<div class="tx-actions">'+(status==='Pendente'?'<button class="action-btn quitar" title="Quitar" onclick="event.stopPropagation();quitarTx(this)">✓</button>':'')+
+      '<button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento('+novoIdx+',this)">✏️</button>'+
+      '<button class="action-btn" title="Duplicar" onclick="event.stopPropagation();duplicarLancamento('+novoIdx+',this)">📋</button>'+
+      '<button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento('+novoIdx+',this)">🗑️</button></div>';
+    newRow.style.opacity='0'; newRow.style.transform='translateY(-8px)';
+    list.insertBefore(newRow, list.firstChild);
+    requestAnimationFrame(function(){ newRow.style.transition='all 0.3s ease'; newRow.style.opacity='1'; newRow.style.transform='translateY(0)'; });
+    mostrarToast('Lançamento criado!', 'success');
+  }
+  fecharModal();
+}
+
+function editarLancamento(idx, btn) { abrirModal(idx); }
+
+function duplicarLancamento(idx, btn) {
+  var d = txDados[idx]; if(!d) return;
+  var novoIdx = txDados.length;
+  var copia = Object.assign({}, d, {title: d.title + ' (cópia)'});
+  txDados.push(copia);
+  var tipoKey = {'Despesa':'despesa','Receita':'receita','Transferência':'transferencia'}[d.tipo] || 'despesa';
+  var iconeMap = {despesa:'💸',receita:'💰',transferencia:'↔️'};
+  var bgMap = {receita:'green',despesa:'red',transferencia:'purple'};
+  var status = d.status.toLowerCase();
+  var row = btn ? btn.closest('.tx-row') : null;
+  var list = document.getElementById('tx-list');
+  var newRow = document.createElement('div');
+  newRow.className='tx-row'; newRow.dataset.tipo=tipoKey; newRow.dataset.status=status;
+  newRow.setAttribute('onclick','abrirDetalhe('+novoIdx+')');
+  var bg = bgMap[tipoKey];
+  newRow.innerHTML = '<div class="tx-desc"><div class="tx-icon" style="background:var(--'+bg+'-bg)">'+iconeMap[tipoKey]+'</div><div class="tx-info"><div class="tx-name">'+copia.title+'</div><div class="tx-meta"><span class="badge badge-'+status+'">'+status+'</span></div></div></div>' +
+    '<div class="tx-cat"><div class="cat-dot" style="background:#6B7280"></div>'+d.cat+'</div><div class="tx-conta">'+d.conta+'</div><div class="tx-date">'+d.data+'</div><div class="tx-date">'+d.venc+'</div>' +
+    '<div class="tx-val '+( tipoKey==='receita'?'pos':tipoKey==='despesa'?'neg':'transf')+'">'+d.val+'</div><div></div>' +
+    '<div class="tx-actions">' + (status==='pendente'?'<button class="action-btn quitar" title="Quitar" onclick="event.stopPropagation();quitarTx(this)">✓</button>':'')+
+    '<button class="action-btn" title="Editar" onclick="event.stopPropagation();editarLancamento('+novoIdx+',this)">✏️</button>'+
+    '<button class="action-btn" title="Duplicar" onclick="event.stopPropagation();duplicarLancamento('+novoIdx+',this)">📋</button>'+
+    '<button class="action-btn" title="Excluir" onclick="event.stopPropagation();excluirLancamento('+novoIdx+',this)">🗑️</button></div>';
+  newRow.style.opacity='0'; newRow.style.transform='translateY(-6px)';
+  list.insertBefore(newRow, row ? row.nextSibling : null);
+  requestAnimationFrame(function(){ newRow.style.transition='all 0.25s ease'; newRow.style.opacity='1'; newRow.style.transform='translateY(0)'; });
+  mostrarToast('Lançamento duplicado!', 'success');
+}
+
+function excluirLancamento(idx, btn) {
+  var d = txDados[idx]; if(!d) return;
+  if (!confirm('Excluir "' + d.title + '"?\nEsta ação não pode ser desfeita.')) return;
+  var row = btn ? btn.closest('.tx-row') : null;
+  if (row) {
+    row.style.transition='all 0.25s ease'; row.style.opacity='0'; row.style.transform='translateX(30px)';
+    setTimeout(function(){ row.remove(); }, 270);
+  }
+  txDados[idx] = null;
+  mostrarToast('Lançamento excluído.', 'error');
+}
+
 function filtrarTipo(tipo, el) {
-  document.querySelectorAll('.tipo-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tipo-tab').forEach(function(t){ t.classList.remove('active'); });
   el.classList.add('active');
-  document.querySelectorAll('.tx-row').forEach(row => {
-    if (tipo === 'todos') { row.style.display = ''; return; }
-    if (tipo === 'pendente') { row.style.display = row.dataset.status === 'pendente' ? '' : 'none'; return; }
-    row.style.display = row.dataset.tipo === tipo ? '' : 'none';
+  document.querySelectorAll('.tx-row').forEach(function(row){
+    if(tipo==='todos'){ row.style.display=''; return; }
+    if(tipo==='pendente'){ row.style.display=row.dataset.status==='pendente'?'':'none'; return; }
+    row.style.display=row.dataset.tipo===tipo?'':'none';
   });
 }
 
 function buscar(q) {
   var query = q.toLowerCase();
-  document.querySelectorAll('.tx-row').forEach(row => {
+  document.querySelectorAll('.tx-row').forEach(function(row){
     var name = row.querySelector('.tx-name').textContent.toLowerCase();
     row.style.display = name.includes(query) ? '' : 'none';
   });
 }
 
 function filtrarConta(val) {
-  document.querySelectorAll('.tx-row').forEach(row => {
-    if (!val) { row.style.display = ''; return; }
+  document.querySelectorAll('.tx-row').forEach(function(row){
+    if(!val){ row.style.display=''; return; }
     var conta = row.querySelector('.tx-conta').textContent;
     row.style.display = conta.includes(val) ? '' : 'none';
   });
 }
 
-function filtrarCategoria(val) { /* integração futura */ }
+function filtrarCategoria(val) {}
 
 function quitarTx(btn) {
   var row = btn.closest('.tx-row');
   var badgePend = row.querySelector('.badge-pendente');
-  if (badgePend) { badgePend.className = 'badge badge-efetivado'; badgePend.textContent = 'efetivado'; }
-  var statusBadge = row.children[5].querySelector('.badge');
-  if (statusBadge) row.children[5].innerHTML = '';
-  btn.className = 'action-btn';
-  btn.textContent = '✓';
-  btn.title = 'Quitado';
-  btn.disabled = true;
-  row.dataset.status = 'efetivado';
-  row.style.opacity = '0.7';
+  if(badgePend){ badgePend.className='badge badge-efetivado'; badgePend.textContent='efetivado'; }
+  var statusCol = row.children[5];
+  if(statusCol){ var sb=statusCol.querySelector('.badge'); if(sb) statusCol.innerHTML=''; }
+  btn.className='action-btn'; btn.textContent='✓'; btn.title='Quitado'; btn.disabled=true;
+  row.dataset.status='efetivado';
+  row.style.transition='background 0.4s'; row.style.background='rgba(5,150,105,0.07)';
+  setTimeout(function(){ row.style.background=''; }, 700);
+  mostrarToast('Lançamento quitado!', 'success');
 }
 
 function setTipo(tipo, el) {
-  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tipo-btn').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active');
-  var lbl = document.getElementById('lbl-pessoa');
-  if (tipo === 'receita') lbl.textContent = 'Cliente';
-  else if (tipo === 'despesa') lbl.textContent = 'Fornecedor';
-  else lbl.textContent = 'Conta destino';
+  var lbl=document.getElementById('lbl-pessoa');
+  if(lbl){ lbl.textContent = tipo==='receita'?'Cliente':tipo==='despesa'?'Fornecedor':'Conta destino'; }
 }
 
 function setStatus(status, el) {
-  document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.status-btn').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active');
 }
 
 function mostrarCamposExtras(val) {
-  document.getElementById('campos-recorrente').style.display = val === 'recorrente' ? '' : 'none';
-  document.getElementById('campos-parcelado').style.display = val === 'parcelado' ? '' : 'none';
+  document.getElementById('campos-recorrente').style.display = val==='recorrente'?'':'none';
+  document.getElementById('campos-parcelado').style.display = val==='parcelado'?'':'none';
 }
-
-function abrirModal() { document.getElementById('modal').classList.add('open'); }
-function fecharModal() { document.getElementById('modal').classList.remove('open'); }
-function salvarLancamento() { fecharModal(); }
 
 function abrirImport() { document.getElementById('modal-import').classList.add('open'); }
 function fecharImport() { document.getElementById('modal-import').classList.remove('open'); }
-function simularImport() { alert('Selecione um arquivo OFX ou CSV do seu banco.'); }
+function simularImport() { mostrarToast('Selecione um arquivo OFX ou CSV do seu banco.', 'info'); }
+function ordenar(col) {}
 
-function ordenar(col) { /* ordenação futura */ }
 
 
 // ===== PERIOD PICKER =====
