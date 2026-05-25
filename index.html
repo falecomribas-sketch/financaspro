@@ -4993,23 +4993,23 @@ document.addEventListener('keydown', e => {
 
     <div class="form-group">
       <label>Descrição</label>
-      <input type="text" placeholder="Ex: Supermercado Extra">
+      <input type="text" id="tx-descricao" placeholder="Ex: Supermercado Extra">
     </div>
 
     <div class="form-group">
       <label>Valor (R$)</label>
-      <input type="number" placeholder="0,00" step="0.01" min="0">
+      <input type="number" id="tx-valor" placeholder="0,00" step="0.01" min="0">
     </div>
 
     <div class="form-row">
       <div class="form-group">
         <label>📅 Data do evento</label>
-        <input type="date" value="2026-05-25">
+        <input type="date" id="tx-data" value="2026-05-25">
         <div class="form-hint">Quando o evento ocorreu ou ocorrerá</div>
       </div>
       <div class="form-group">
         <label>⏰ Data de vencimento</label>
-        <input type="date" value="2026-05-30" id="data-venc">
+        <input type="date" id="tx-vencimento" value="2026-05-30" id="data-venc">
         <div class="form-hint">Prazo limite para pagamento</div>
       </div>
     </div>
@@ -5025,7 +5025,7 @@ document.addEventListener('keydown', e => {
     <div class="form-row">
       <div class="form-group">
         <label>Conta</label>
-        <select>
+        <select id="tx-conta">
           <option>Conta Itaú</option>
           <option>Conta Bradesco</option>
           <option>Poupança Caixa</option>
@@ -5050,7 +5050,7 @@ document.addEventListener('keydown', e => {
     <div class="form-row">
       <div class="form-group">
         <label>Categoria</label>
-        <select>
+        <select id="tx-categoria">
           <option>Alimentação</option>
           <option>Moradia</option>
           <option>Transporte</option>
@@ -5127,7 +5127,7 @@ document.addEventListener('keydown', e => {
 
     <div class="form-group">
       <label>Observações</label>
-      <textarea placeholder="Alguma observação sobre este lançamento..."></textarea>
+      <textarea id="tx-obs" placeholder="Alguma observação sobre este lançamento..."></textarea>
     </div>
 
     <div class="toggle-row">
@@ -9391,6 +9391,7 @@ window.salvarContaComFirebase = async function() {
       mostrarToast('Conta "' + nome + '" criada!', 'success');
     }
     renderContas();
+    window._ultimaModificacao['contas'] = Date.now();
     fecharModal && fecharModal();
   } catch(e) { mostrarToast('Erro ao salvar conta: ' + e.message, 'error'); console.error(e); }
 };
@@ -9400,13 +9401,13 @@ window.excluirContaComFirebase = async function(id) {
   var nome = c ? c.nome : 'esta conta';
   if (!confirm('Excluir "' + nome + '" permanentemente?\nEsta ação não pode ser desfeita.')) return;
   var uid = _uid(); if(!uid) return;
-  try {
-    await window.FBCRUD.del(uid, 'contas', id);
-    window._appData.contas = window._appData.contas.filter(function(x){ return x.id !== id; });
-    if (window._contasData) delete window._contasData[id];
-    renderContas();
-    mostrarToast('Conta "' + nome + '" excluída.', 'error');
-  } catch(e) { mostrarToast('Erro ao excluir.', 'error'); }
+  // Remove localmente primeiro
+  window._appData.contas = window._appData.contas.filter(function(x){ return x.id !== id; });
+  if (window._contasData) delete window._contasData[id];
+  renderContas();
+  mostrarToast('Conta "' + nome + '" excluída.', 'error');
+  // Remove do Firebase em background
+  window.FBCRUD.del(uid, 'contas', id).catch(function(e){ console.warn('Erro ao excluir conta no Firebase:', e); });
 };
 
 // Override salvarEdicaoConta para usar Firebase
@@ -9440,19 +9441,8 @@ window.salvarConta = function() {
   if(_origSalvarConta) _origSalvarConta();
 };
 
-// Override the btn inside modal to call Firebase version
-document.addEventListener('click', function(e) {
-  var btn = e.target.closest('.btn-save');
-  if (!btn) return;
-  var modal = btn.closest('#modal');
-  if (!modal) return;
-  // Conta modal (has tipo-card elements)
-  var isContaModal = !!modal.querySelector('.tipo-card');
-  if (isContaModal && document.getElementById('tela-contas') && document.getElementById('tela-contas').classList.contains('ativa')) {
-    e.preventDefault(); e.stopImmediatePropagation();
-    window.salvarContaComFirebase();
-  }
-}, true);
+// Override the btn inside modal — handled by unified listener above
+// (handler removido para evitar conflito)
 
 // ══════════════════════════════════════════════════════════════════════════════════
 // LANÇAMENTOS — CRUD COMPLETO
@@ -9478,7 +9468,10 @@ window.salvarLancamento = async function() {
   var obs    = obsEl ? obsEl.value.trim() : '—';
   if (!desc || !val) { mostrarToast('Preencha descrição e valor.', 'error'); return; }
   var valNum = parseFloat(val) || 0;
-  var valFmt = (tipo==='Receita'?'+ ':'- ') + 'R$ ' + valNum.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  var tipoMap = { 'Receita':'receita', 'Despesa':'despesa', 'Transferência':'transf', 'Transferencia':'transf' };
+  var tipoKey = tipoMap[tipo] || 'despesa';
+  var prefix = tipoKey==='receita' ? '+ ' : tipoKey==='transf' ? '↔ ' : '- ';
+  var valFmt = prefix + 'R$ ' + valNum.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   var uid = _uid();
   var editIdx = window._editandoIdx;
   var editId  = (editIdx != null && window.txDados && window.txDados[editIdx]) ? window.txDados[editIdx].id : null;
@@ -9499,25 +9492,33 @@ window.salvarLancamento = async function() {
       }
     }
     renderLancamentos();
+    atualizarKPIs();
+    window._ultimaModificacao['lancamentos'] = Date.now();
   } catch(e) { mostrarToast('Erro ao salvar lançamento: '+e.message,'error'); console.error(e); }
   fecharModal && fecharModal();
   window._editandoIdx = null;
 };
 
-// Override excluirLancamento
+// Override excluirLancamento — aguarda Firebase antes de re-renderizar
 var _origExcluirLanc = window.excluirLancamento;
 window.excluirLancamento = async function(idx, btn) {
   var d = window.txDados ? window.txDados[idx] : null;
   if (!d) return;
   if (!confirm('Excluir "' + (d.title||d.descricao||'este lançamento') + '"?\nEsta ação não pode ser desfeita.')) return;
   var uid = _uid();
-  if (uid && d.id) {
-    try { await window.FBCRUD.del(uid, 'lancamentos', d.id); } catch(e){ console.warn(e); }
-  }
-  window._appData.lancamentos = window._appData.lancamentos.filter(function(x){ return x.id !== d.id; });
+  // Remove do array local PRIMEIRO para evitar reaparecer
+  var idParaRemover = d.id;
+  window._appData.lancamentos = window._appData.lancamentos.filter(function(x){ return x.id !== idParaRemover; });
+  if (window.txDados) { window.txDados.splice(idx, 1); }
   renderLancamentos();
+  atualizarKPIs();
+  window._ultimaModificacao['lancamentos'] = Date.now();
   fecharDetalhe && fecharDetalhe();
   mostrarToast('Lançamento excluído.', 'error');
+  // Remove do Firebase em background (já removido localmente)
+  if (uid && idParaRemover) {
+    window.FBCRUD.del(uid, 'lancamentos', idParaRemover).catch(function(e){ console.warn('Erro ao excluir no Firebase:', e); });
+  }
 };
 
 // ══════════════════════════════════════════════════════════════════════════════════
@@ -9563,14 +9564,18 @@ window.excluirCategoriaDOM = async function(cardEl) {
   var nome  = cardEl.querySelector('.cat-name') ? cardEl.querySelector('.cat-name').textContent.trim() : 'esta categoria';
   var fbId  = cardEl.dataset.fbId;
   if (!confirm('Excluir a categoria "'+nome+'"?\nEsta ação não pode ser desfeita.')) return;
+  // Remove localmente primeiro
   if (fbId) {
-    var uid = _uid();
-    if (uid) { try { await window.FBCRUD.del(uid,'categorias',fbId); } catch(e){ console.warn(e); } }
     window._appData.categorias = window._appData.categorias.filter(function(c){ return c.id!==fbId; });
   }
   cardEl.style.transition='all .25s'; cardEl.style.opacity='0'; cardEl.style.transform='scale(.95)';
   setTimeout(function(){ renderCategorias(); },280);
   mostrarToast('Categoria "'+nome+'" excluída.','error');
+  // Remove do Firebase em background
+  if (fbId) {
+    var uid = _uid();
+    if (uid) { window.FBCRUD.del(uid,'categorias',fbId).catch(function(e){ console.warn(e); }); }
+  }
 };
 
 window.editarCategoriaDOM = function(cardEl) {
@@ -9589,14 +9594,32 @@ window.editarCategoriaDOM = function(cardEl) {
   }
 };
 
-// Hook btn-save in categoria modal
+// ══════════════════════════════════════════════════════════════════════════════════
+// HANDLER ÚNICO para btn-save — evita conflitos entre múltiplos listeners
+// ══════════════════════════════════════════════════════════════════════════════════
 document.addEventListener('click', function(e) {
   var btn = e.target.closest('.btn-save');
   if (!btn) return;
   var modal = btn.closest('#modal');
   if (!modal) return;
-  var isCatTela = document.getElementById('tela-categorias')?.classList.contains('ativa');
-  if (isCatTela) { e.preventDefault(); e.stopImmediatePropagation(); window.salvarCategoriaComFirebase(); }
+
+  var telaContas       = document.getElementById('tela-contas')?.classList.contains('ativa');
+  var telaLancamentos  = document.getElementById('tela-lancamentos')?.classList.contains('ativa');
+  var telaCategorias   = document.getElementById('tela-categorias')?.classList.contains('ativa');
+  var telaPessoas      = document.getElementById('tela-pessoas')?.classList.contains('ativa');
+
+  e.preventDefault();
+  e.stopImmediatePropagation();
+
+  if (telaContas && modal.querySelector('.tipo-card')) {
+    window.salvarContaComFirebase();
+  } else if (telaLancamentos) {
+    window.salvarLancamento();
+  } else if (telaCategorias) {
+    window.salvarCategoriaComFirebase();
+  } else if (telaPessoas) {
+    window.salvarCadastroComFirebase();
+  }
 }, true);
 
 // ══════════════════════════════════════════════════════════════════════════════════
@@ -9666,23 +9689,18 @@ window.excluirPessoaComFirebase = async function(id) {
   var nome = p ? p.nome : 'este cadastro';
   if (!confirm('Excluir "'+nome+'" permanentemente?\nEsta ação não pode ser desfeita.')) return;
   var uid = _uid(); if(!uid) return;
-  try { await window.FBCRUD.del(uid,'pessoas',id); } catch(e){ console.warn(e); }
+  // Remove localmente primeiro
   window._appData.pessoas = window._appData.pessoas.filter(function(x){ return x.id!==id; });
   if(window._pessoasData) delete window._pessoasData[id];
   renderPessoas();
   if(typeof fecharDetalhe==='function') fecharDetalhe();
   mostrarToast('Cadastro "'+nome+'" excluído.','error');
+  // Remove do Firebase em background
+  window.FBCRUD.del(uid,'pessoas',id).catch(function(e){ console.warn(e); });
 };
 
-// Hook btn-save in pessoas modal
-document.addEventListener('click', function(e) {
-  var btn = e.target.closest('.btn-save');
-  if (!btn) return;
-  var modal = btn.closest('#modal');
-  if (!modal) return;
-  var isPessoaTela = document.getElementById('tela-pessoas')?.classList.contains('ativa');
-  if (isPessoaTela) { e.preventDefault(); e.stopImmediatePropagation(); window.salvarCadastroComFirebase(); }
-}, true);
+// Hook btn-save in pessoas modal — handled by unified listener above
+// (handler removido para evitar conflito)
 
 // ══════════════════════════════════════════════════════════════════════════════════
 // CONFIGURAÇÕES
@@ -9769,18 +9787,76 @@ window.apagarTodosDados = async function() {
   mostrarToast('Todos os dados foram apagados.','error');
 };
 
+// ── ATUALIZAR KPIs DA TELA DE LANÇAMENTOS ────────────────────────────────────────
+function atualizarKPIs() {
+  var lancs = window._appData.lancamentos || [];
+  var receitas = 0, despesas = 0, pendentes = 0;
+  lancs.forEach(function(l) {
+    var valStr = (l.val||'').replace(/[^\d,.]/g,'').replace(',','.');
+    var val = parseFloat(valStr) || 0;
+    var isRec = (l.tipo||'').toLowerCase().includes('receita') || (l.val||'').startsWith('+');
+    var isPend = (l.status||'').toLowerCase() === 'pendente';
+    if (isPend) { pendentes += val; }
+    else if (isRec) { receitas += val; }
+    else { despesas += val; }
+  });
+  var fmt = function(v){ return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var kpis = document.querySelectorAll('.kpi .kpi-value');
+  if (kpis[0]) { kpis[0].textContent = fmt(receitas); }
+  if (kpis[1]) { kpis[1].textContent = fmt(despesas); }
+  if (kpis[2]) { kpis[2].textContent = fmt(pendentes); }
+  if (kpis[3]) { kpis[3].textContent = fmt(receitas - despesas - pendentes); }
+}
+
 // ══════════════════════════════════════════════════════════════════════════════════
-// NAVEGAÇÃO — recarrega dados ao trocar de tela
+// NAVEGAÇÃO — recarrega dados ao trocar de tela (com proteção anti-race-condition)
 // ══════════════════════════════════════════════════════════════════════════════════
 var _origNavegarPara = window.navegarPara;
+// Timestamp da última modificação local para evitar sobrescrita
+window._ultimaModificacao = {};
+
 window.navegarPara = function(tela) {
   _origNavegarPara(tela);
   if (!window._currentUser) return;
   var reloaders = {
-    'contas':      function(){ window.FBCRUD.get(_uid(),'contas').then(function(d){ window._appData.contas=d||[]; renderContas(); }); },
-    'lancamentos': function(){ window.FBCRUD.get(_uid(),'lancamentos').then(function(d){ window._appData.lancamentos=d||[]; renderLancamentos(); }); },
-    'categorias':  function(){ window.FBCRUD.get(_uid(),'categorias').then(function(d){ window._appData.categorias=d||[]; renderCategorias(); }); },
-    'pessoas':     function(){ window.FBCRUD.get(_uid(),'pessoas').then(function(d){ window._appData.pessoas=d||[]; renderPessoas(); }); },
+    'contas': function(){
+      var ts = Date.now();
+      window.FBCRUD.get(_uid(),'contas').then(function(d){
+        // Só atualiza se não houve modificação local nos últimos 3 segundos
+        if (!window._ultimaModificacao['contas'] || (ts - window._ultimaModificacao['contas'] > 3000)) {
+          window._appData.contas = d||[];
+          renderContas();
+        }
+      });
+    },
+    'lancamentos': function(){
+      var ts = Date.now();
+      window.FBCRUD.get(_uid(),'lancamentos').then(function(d){
+        if (!window._ultimaModificacao['lancamentos'] || (ts - window._ultimaModificacao['lancamentos'] > 3000)) {
+          window._appData.lancamentos = d||[];
+          renderLancamentos();
+          atualizarKPIs();
+        }
+      });
+    },
+    'categorias': function(){
+      var ts = Date.now();
+      window.FBCRUD.get(_uid(),'categorias').then(function(d){
+        if (!window._ultimaModificacao['categorias'] || (ts - window._ultimaModificacao['categorias'] > 3000)) {
+          window._appData.categorias = d||[];
+          renderCategorias();
+        }
+      });
+    },
+    'pessoas': function(){
+      var ts = Date.now();
+      window.FBCRUD.get(_uid(),'pessoas').then(function(d){
+        if (!window._ultimaModificacao['pessoas'] || (ts - window._ultimaModificacao['pessoas'] > 3000)) {
+          window._appData.pessoas = d||[];
+          renderPessoas();
+        }
+      });
+    },
     'configuracoes': function(){ setTimeout(window.carregarConfigsFirebase, 200); }
   };
   if (reloaders[tela]) setTimeout(reloaders[tela], 150);
