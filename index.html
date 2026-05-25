@@ -9120,450 +9120,695 @@ console.log('✅ FinançasPRO ok!');
 </div>
 </div>
 
+
 <script>
-// ==================== FIREBASE CRUD UNIFICADO ====================
-// Carrega e salva dados do usuário no Firestore em tempo real
+// ==================== FINANCASPRO — INTEGRAÇÃO FIREBASE COMPLETA ====================
+// Todas operações salvam no Firestore e re-renderizam o DOM imediatamente
 
-window._appData = {
-  contas: [],
-  lancamentos: [],
-  categorias: [],
-  pessoas: [],
-  configuracoes: {}
-};
-
-// ---- HELPER: espera Firebase estar pronto ----
-window._fbReady = false;
+// ── Estado global ─────────────────────────────────────────────────────────────────
+window._appData = { contas: [], lancamentos: [], categorias: [], pessoas: [], configuracoes: {} };
+window._fbReady  = false;
 window.addEventListener('fbready', function() { window._fbReady = true; });
 
-function _waitFb(fn) {
-  if (window._fbReady && window._currentUser) { fn(); }
-  else {
-    var tries = 0;
-    var iv = setInterval(function() {
-      tries++;
-      if ((window._fbReady && window._currentUser) || tries > 40) {
-        clearInterval(iv);
-        if (window._currentUser) fn();
-      }
-    }, 150);
-  }
+// ══════════════════════════════════════════════════════════════════════════════════
+// HELPERS GLOBAIS
+// ══════════════════════════════════════════════════════════════════════════════════
+
+// Toast (garante existência única)
+if (!window.mostrarToast) {
+  window.mostrarToast = function(msg, tipo) {
+    var t = document.getElementById('_toast_root');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = '_toast_root';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none';
+      document.body.appendChild(t);
+    }
+    var bg = tipo==='success'?'#059669':tipo==='error'?'#DC2626':tipo==='info'?'#1B4B8A':'#374151';
+    var el = document.createElement('div');
+    el.style.cssText = 'background:'+bg+';color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:600;font-family:inherit;box-shadow:0 4px 18px rgba(0,0,0,.2);opacity:0;transform:translateY(8px);transition:all .22s ease;pointer-events:none;max-width:320px';
+    el.textContent = msg;
+    t.appendChild(el);
+    requestAnimationFrame(function(){ el.style.opacity='1'; el.style.transform='translateY(0)'; });
+    setTimeout(function(){ el.style.opacity='0'; el.style.transform='translateY(8px)'; setTimeout(function(){ el.remove(); },280); },3500);
+  };
 }
 
-// ==================== CONTAS BANCÁRIAS ====================
-window.salvarContaFirebase = async function(dados) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  if (dados.id) {
-    await window.FBCRUD.update(uid, 'contas', dados.id, dados);
-    return dados.id;
-  } else {
-    return await window.FBCRUD.add(uid, 'contas', dados);
+function _uid() { return window._currentUser ? window._currentUser.uid : null; }
+
+// ══════════════════════════════════════════════════════════════════════════════════
+// RENDER FUNCTIONS — atualizam o DOM a partir dos dados
+// ══════════════════════════════════════════════════════════════════════════════════
+
+// ── CONTAS ────────────────────────────────────────────────────────────────────────
+var _tipoIcone = { corrente:'🏦', poupanca:'🐷', cartao:'💳', investimento:'📈', digital:'📱', outros:'💰' };
+var _tipoLabel = { corrente:'Conta corrente', poupanca:'Conta poupança', cartao:'Cartão de crédito', investimento:'Investimento', digital:'Carteira digital', outros:'Outros' };
+var _tipoClass = { corrente:'type-corrente', poupanca:'type-poupanca', cartao:'type-cartao', investimento:'type-investimento', digital:'type-digital', outros:'type-corrente' };
+var _corBg     = { corrente:'#EFF6FF', poupanca:'#ECFDF5', cartao:'#FFFBEB', investimento:'#F3E8FF', digital:'#E0F2FE', outros:'#F3F4F6' };
+
+function renderContas() {
+  var grid = document.getElementById('contas-grid');
+  if (!grid) return;
+  var contas = window._appData.contas;
+  if (!contas || !contas.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);font-size:14px">Nenhuma conta cadastrada.<br><small>Clique em "+ Nova conta" para adicionar.</small></div>';
+    return;
   }
-};
+  // Sincroniza _contasData com Firebase data
+  if (!window._contasData) window._contasData = {};
+  contas.forEach(function(c){ window._contasData[c.id] = c; });
 
-window.excluirContaFirebase = async function(id) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  await window.FBCRUD.del(uid, 'contas', id);
-};
+  grid.innerHTML = contas.map(function(c) {
+    var tipo  = c.tipo || 'corrente';
+    var cor   = c.cor  || '#1B4B8A';
+    var icone = c.icone || _tipoIcone[tipo] || '🏦';
+    var saldo = c.saldo || 'R$ 0,00';
+    var neg   = saldo.trim().startsWith('-');
+    return `<div class="conta-card" data-tipo="${tipo}" onclick="abrirDetalhe('${c.id}')">
+      <div class="conta-card-accent" style="background:${cor}"></div>
+      <div class="conta-card-header">
+        <div class="conta-card-left">
+          <div class="conta-icon" style="background:${_corBg[tipo]||'#EFF6FF'}">${icone}</div>
+          <div>
+            <div class="conta-card-name">${c.nome}</div>
+            <div class="conta-card-bank">${c.banco||''}</div>
+          </div>
+        </div>
+        <button class="conta-card-menu" onclick="event.stopPropagation();menuConta('${c.id}',this)">⋮</button>
+      </div>
+      <div><span class="conta-card-type ${_tipoClass[tipo]||'type-corrente'}">${_tipoLabel[tipo]||tipo}</span></div>
+      <div class="conta-card-balance${neg?' neg':''}">${saldo}</div>
+      <div class="conta-card-sub">${c.sub||'—'}</div>
+      <div class="conta-card-footer">
+        <div class="conta-card-footer-label">Última movimentação</div>
+        <div class="conta-card-footer-val">${c.ultimaMov||'—'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-window.carregarContasFirebase = async function(callback) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  var contas = await window.FBCRUD.get(uid, 'contas');
-  window._appData.contas = contas;
-  if(callback) callback(contas);
-};
-
-// ==================== LANÇAMENTOS ====================
-window.salvarLancamentoFirebase = async function(dados) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  if (dados.id) {
-    await window.FBCRUD.update(uid, 'lancamentos', dados.id, dados);
-    return dados.id;
-  } else {
-    return await window.FBCRUD.add(uid, 'lancamentos', dados);
+// ── LANÇAMENTOS ──────────────────────────────────────────────────────────────────
+function renderLancamentos() {
+  var list = document.getElementById('tx-list');
+  if (!list) return;
+  var lancs = window._appData.lancamentos;
+  if (!lancs || !lancs.length) {
+    list.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);font-size:14px">Nenhum lançamento cadastrado.<br><small>Clique em "+ Novo lançamento" para adicionar.</small></div>';
+    // also sync txDados
+    if (window.txDados) window.txDados.length = 0;
+    return;
   }
-};
+  // Sync txDados array for compatibility with existing functions
+  if (!window.txDados) window.txDados = [];
+  // Replace contents without breaking the reference
+  window.txDados.length = 0;
+  lancs.forEach(function(l){ window.txDados.push(l); });
 
-window.excluirLancamentoFirebase = async function(id) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  await window.FBCRUD.del(uid, 'lancamentos', id);
-};
+  list.innerHTML = lancs.map(function(l, idx) {
+    var isRec = (l.tipo||'').toLowerCase().includes('receita') || (l.val||'').startsWith('+');
+    var isTrans = (l.tipo||'').toLowerCase().includes('transfer');
+    var cls = isTrans ? '' : (isRec ? 'g' : 'r');
+    var efetivado = (l.status||'').toLowerCase() === 'efetivado';
+    return `<div class="tx-row" onclick="abrirDetalhe(${idx})">
+      <div class="tx-icon" style="background:${isRec?'#ECFDF5':isTrans?'#EFF6FF':'#FEF2F2'}">${isRec?'⬆️':isTrans?'↔️':'⬇️'}</div>
+      <div class="tx-main">
+        <div class="tx-title">${l.title||l.descricao||'—'}</div>
+        <div class="tx-meta">${l.cat||'—'} · ${l.conta||'—'}</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-val ${cls}">${l.val||'—'}</div>
+        <div class="tx-date">${l.data||'—'}</div>
+      </div>
+      <div class="tx-status">
+        <span class="status-dot ${efetivado?'efetivado':'pendente'}"></span>
+        <span class="status-label">${l.status||'—'}</span>
+      </div>
+      <div class="tx-actions">
+        <button class="tx-action-btn" onclick="event.stopPropagation();editarLancamento(${idx},this)" title="Editar">✏️</button>
+        <button class="tx-action-btn" onclick="event.stopPropagation();excluirLancamento(${idx},this)" title="Excluir">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-window.carregarLancamentosFirebase = async function(callback) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  var lancs = await window.FBCRUD.get(uid, 'lancamentos');
-  window._appData.lancamentos = lancs;
-  if(callback) callback(lancs);
-};
-
-// ==================== CATEGORIAS ====================
-window.salvarCategoriaFirebase = async function(dados) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  if (dados.id) {
-    await window.FBCRUD.update(uid, 'categorias', dados.id, dados);
-    return dados.id;
-  } else {
-    return await window.FBCRUD.add(uid, 'categorias', dados);
+// ── CATEGORIAS ───────────────────────────────────────────────────────────────────
+function renderCategorias() {
+  var grid = document.getElementById('cats-grid');
+  if (!grid) return;
+  var cats = window._appData.categorias;
+  var principais = (cats||[]).filter(function(c){ return c.tipo !== 'subcategoria'; });
+  if (!principais.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);font-size:14px">Nenhuma categoria cadastrada.<br><small>Clique em "+ Nova categoria" para adicionar.</small></div>';
+    return;
   }
-};
+  grid.innerHTML = principais.map(function(c) {
+    var bgCor = c.cor || '#1B4B8A';
+    var icone = c.icone || '🏷️';
+    var tipo  = c.tipo  || 'despesa';
+    var isRec = tipo.toLowerCase().includes('receita');
+    return `<div class="cat-card" data-fb-id="${c.id}">
+      <div class="cat-card-header">
+        <div class="cat-card-icon" style="background:${bgCor}">${icone}</div>
+        <div class="cat-card-actions">
+          <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
+          <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
+        </div>
+      </div>
+      <div class="cat-name">${c.nome}</div>
+      <div class="cat-type ${isRec?'receita':'despesa'}">${isRec?'Receita':'Despesa'}</div>
+      <div class="cat-sub">${c.descricao||'Sem descrição'}</div>
+    </div>`;
+  }).join('');
+}
 
-window.excluirCategoriaFirebase = async function(id) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  await window.FBCRUD.del(uid, 'categorias', id);
-};
+// ── PESSOAS ──────────────────────────────────────────────────────────────────────
+function renderPessoas() {
+  var lista = document.getElementById('lista');
+  if (!lista) return;
+  var pessoas = window._appData.pessoas;
+  if (!window._pessoasData) window._pessoasData = {};
+  (pessoas||[]).forEach(function(p){ if(p.id) window._pessoasData[p.id] = p; });
 
-window.carregarCategoriasFirebase = async function(callback) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  var cats = await window.FBCRUD.get(uid, 'categorias');
-  window._appData.categorias = cats;
-  if(callback) callback(cats);
-};
-
-// ==================== PESSOAS (FORNEC/CLIENTES) ====================
-window.salvarPessoaFirebase = async function(dados) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  if (dados.id) {
-    await window.FBCRUD.update(uid, 'pessoas', dados.id, dados);
-    return dados.id;
-  } else {
-    return await window.FBCRUD.add(uid, 'pessoas', dados);
+  if (!pessoas || !pessoas.length) {
+    lista.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text3);font-size:14px">Nenhum cadastro encontrado.<br><small>Clique em "+ Novo cadastro" para adicionar.</small></div>';
+    return;
   }
-};
+  var _papel = { cliente:'badge-cli', fornecedor:'badge-forn', ambos:'badge-amb', cliente_fornecedor:'badge-amb' };
+  lista.innerHTML = pessoas.map(function(p) {
+    var papelKey = (p.papel||'fornecedor').toLowerCase().replace(/\s/g,'_');
+    var badgeCls = _papel[papelKey] || 'badge-forn';
+    var ini = (p.nome||'?').split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
+    var cores = ['linear-gradient(135deg,#60A5FA,#1B4B8A)','linear-gradient(135deg,#34D399,#059669)','linear-gradient(135deg,#F97316,#DC2626)','linear-gradient(135deg,#A78BFA,#7C3AED)','linear-gradient(135deg,#34D399,#0F766E)'];
+    var corIdx = (p.nome||'').charCodeAt(0) % cores.length;
+    return `<div class="pessoa-item" data-papel="${papelKey}" data-id="${p.id}" onclick="abrirDetalhe('${p.id}')">
+      <div class="pessoa-avatar" style="background:${cores[corIdx]}">${ini}</div>
+      <div class="pessoa-info">
+        <div class="pessoa-name">${p.nome} <span class="badge ${badgeCls}">${p.papel||'fornecedor'}</span></div>
+        <div class="pessoa-doc">${p.doc||''} ${p.email?'· '+p.email:''}</div>
+      </div>
+      <div class="pessoa-stats">
+        <div class="pessoa-val">—</div>
+        <div class="pessoa-tx">${p.tel||'—'}</div>
+      </div>
+      <div class="pessoa-actions">
+        <button class="act-btn" title="Editar" onclick="event.stopPropagation();editarPessoa('${p.id}')">✏️</button>
+        <button class="act-btn" title="Excluir" onclick="event.stopPropagation();excluirPessoaComFirebase('${p.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-window.excluirPessoaFirebase = async function(id) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  await window.FBCRUD.del(uid, 'pessoas', id);
-};
-
-window.carregarPessoasFirebase = async function(callback) {
-  var uid = window._currentUser?.uid; if(!uid) return;
-  var pessoas = await window.FBCRUD.get(uid, 'pessoas');
-  window._appData.pessoas = pessoas;
-  if(callback) callback(pessoas);
-};
-
-// ==================== CONFIGURAÇÕES ====================
-window.carregarConfigsFirebase = async function() {
-  var uid = window._currentUser?.uid; if(!uid) return;
+// ══════════════════════════════════════════════════════════════════════════════════
+// CARREGAMENTO INICIAL — busca do Firebase e renderiza
+// ══════════════════════════════════════════════════════════════════════════════════
+async function carregarTudo() {
+  var uid = _uid();
+  if (!uid) return;
   try {
-    var cfgs = await window.FBCRUD.get(uid, 'configuracoes');
-    if (cfgs && cfgs.length > 0) {
-      var cfg = cfgs[0];
-      window._appData.configuracoes = cfg;
-      // Preenche os campos na tela
-      if(document.getElementById('cfg-nome')) document.getElementById('cfg-nome').value = cfg.nome || window._currentUser.displayName || '';
-      if(document.getElementById('cfg-email')) document.getElementById('cfg-email').value = window._currentUser.email || '';
-      if(document.getElementById('cfg-moeda')) document.getElementById('cfg-moeda').value = cfg.moeda || 'BRL';
-      if(document.getElementById('cfg-fechamento')) document.getElementById('cfg-fechamento').value = cfg.diaFechamento || '';
-      if(document.getElementById('cfg-vencimento')) document.getElementById('cfg-vencimento').value = cfg.diaVencimento || '';
-      if(document.getElementById('cfg-inicio-mes')) document.getElementById('cfg-inicio-mes').value = cfg.inicioMes || '1';
-      if(document.getElementById('cfg-notif-venc')) document.getElementById('cfg-notif-venc').checked = cfg.notifVenc !== false;
-      if(document.getElementById('cfg-notif-saldo')) document.getElementById('cfg-notif-saldo').checked = cfg.notifSaldo !== false;
-      if(document.getElementById('cfg-notif-email')) document.getElementById('cfg-notif-email').checked = !!cfg.notifEmail;
+    var [contas, lancs, cats, pessoas] = await Promise.all([
+      window.FBCRUD.get(uid,'contas'),
+      window.FBCRUD.get(uid,'lancamentos'),
+      window.FBCRUD.get(uid,'categorias'),
+      window.FBCRUD.get(uid,'pessoas')
+    ]);
+    window._appData.contas      = contas  || [];
+    window._appData.lancamentos = lancs   || [];
+    window._appData.categorias  = cats    || [];
+    window._appData.pessoas     = pessoas || [];
+    // Render whichever tela is active
+    renderContas();
+    renderLancamentos();
+    renderCategorias();
+    renderPessoas();
+  } catch(e) { console.warn('Erro ao carregar dados:', e); }
+}
+
+// Dispara quando Firebase estiver pronto + usuário logado
+window.addEventListener('fbready', function() {
+  setTimeout(function() {
+    if (window._currentUser) carregarTudo();
+  }, 400);
+});
+// Fallback para quando já estava logado antes do script carregar
+setTimeout(function() {
+  if (window._currentUser && window._fbReady) carregarTudo();
+}, 1500);
+
+// ══════════════════════════════════════════════════════════════════════════════════
+// CONTAS — CRUD COMPLETO
+// ══════════════════════════════════════════════════════════════════════════════════
+window.salvarContaComFirebase = async function() {
+  var modal = document.getElementById('modal');
+  if (!modal) return;
+  var nomeEl  = modal.querySelector('#nova-conta-nome') || modal.querySelector('input[type=text]');
+  var nome    = nomeEl ? nomeEl.value.trim() : '';
+  if (!nome) { mostrarToast('Informe o nome da conta.', 'error'); return; }
+  var tipoEl  = modal.querySelector('.tipo-card.selected .tipo-card-name');
+  var tipo    = tipoEl ? tipoEl.textContent.trim().toLowerCase() : 'corrente';
+  var bancoEl = modal.querySelector('select');
+  var banco   = bancoEl ? bancoEl.options[bancoEl.selectedIndex]?.text : '';
+  var corEl   = modal.querySelector('.cor-item.selected');
+  var cor     = corEl ? (corEl.dataset.cor || corEl.style.background || '#1B4B8A') : '#1B4B8A';
+  var editId  = modal.dataset.editContaId;
+  var uid = _uid();
+  if (!uid) { mostrarToast('Você precisa estar logado.', 'error'); return; }
+  try {
+    if (editId) {
+      var dados = { nome, tipo, banco, cor };
+      await window.FBCRUD.update(uid, 'contas', editId, dados);
+      var idx = window._appData.contas.findIndex(function(c){ return c.id === editId; });
+      if (idx >= 0) Object.assign(window._appData.contas[idx], dados);
+      if (window._contasData && window._contasData[editId]) Object.assign(window._contasData[editId], dados);
+      delete modal.dataset.editContaId;
+      mostrarToast('Conta atualizada!', 'success');
     } else {
-      if(document.getElementById('cfg-email')) document.getElementById('cfg-email').value = window._currentUser.email || '';
+      var dados = { nome, tipo, banco, cor, saldo:'R$ 0,00', icone: _tipoIcone[tipo]||'🏦', ativo:true };
+      var id = await window.FBCRUD.add(uid, 'contas', dados);
+      dados.id = id;
+      window._appData.contas.push(dados);
+      if (!window._contasData) window._contasData = {};
+      window._contasData[id] = dados;
+      mostrarToast('Conta "' + nome + '" criada!', 'success');
     }
-  } catch(e) { console.warn('Erro ao carregar configs:', e); }
+    renderContas();
+    fecharModal && fecharModal();
+  } catch(e) { mostrarToast('Erro ao salvar conta: ' + e.message, 'error'); console.error(e); }
+};
+
+window.excluirContaComFirebase = async function(id) {
+  var c = window._contasData ? window._contasData[id] : null;
+  var nome = c ? c.nome : 'esta conta';
+  if (!confirm('Excluir "' + nome + '" permanentemente?\nEsta ação não pode ser desfeita.')) return;
+  var uid = _uid(); if(!uid) return;
+  try {
+    await window.FBCRUD.del(uid, 'contas', id);
+    window._appData.contas = window._appData.contas.filter(function(x){ return x.id !== id; });
+    if (window._contasData) delete window._contasData[id];
+    renderContas();
+    mostrarToast('Conta "' + nome + '" excluída.', 'error');
+  } catch(e) { mostrarToast('Erro ao excluir.', 'error'); }
+};
+
+// Override salvarEdicaoConta para usar Firebase
+window.salvarEdicaoConta = async function(id) {
+  var modal = document.getElementById('modal');
+  var nomeInput = modal ? modal.querySelector('input[type=text]') : null;
+  var novoNome = nomeInput ? nomeInput.value.trim() : '';
+  if (!novoNome) return;
+  var uid = _uid(); if(!uid) return;
+  try {
+    await window.FBCRUD.update(uid, 'contas', id, { nome: novoNome });
+    var idx = window._appData.contas.findIndex(function(c){ return c.id===id; });
+    if (idx >= 0) window._appData.contas[idx].nome = novoNome;
+    if (window._contasData && window._contasData[id]) window._contasData[id].nome = novoNome;
+    document.querySelectorAll('.conta-card').forEach(function(c) {
+      var btn = c.querySelector('.conta-card-menu');
+      if (btn && (btn.getAttribute('onclick')||'').includes("'"+id+"'")) {
+        var nameEl = c.querySelector('.conta-card-name');
+        if (nameEl) nameEl.textContent = novoNome;
+      }
+    });
+    mostrarToast('Conta atualizada!', 'success');
+    fecharModal && fecharModal();
+  } catch(e) { mostrarToast('Erro ao atualizar conta.', 'error'); }
+};
+
+// Hook the + Nova conta button to save to Firebase
+var _origSalvarConta = window.salvarConta;
+window.salvarConta = function() {
+  // Will be intercepted by salvarContaComFirebase if called from the modal btn
+  if(_origSalvarConta) _origSalvarConta();
+};
+
+// Override the btn inside modal to call Firebase version
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('.btn-save');
+  if (!btn) return;
+  var modal = btn.closest('#modal');
+  if (!modal) return;
+  // Conta modal (has tipo-card elements)
+  var isContaModal = !!modal.querySelector('.tipo-card');
+  if (isContaModal && document.getElementById('tela-contas') && document.getElementById('tela-contas').classList.contains('ativa')) {
+    e.preventDefault(); e.stopImmediatePropagation();
+    window.salvarContaComFirebase();
+  }
+}, true);
+
+// ══════════════════════════════════════════════════════════════════════════════════
+// LANÇAMENTOS — CRUD COMPLETO
+// ══════════════════════════════════════════════════════════════════════════════════
+// Override salvarLancamento (usado em múltiplas telas)
+var _origSalvarLanc = window.salvarLancamento;
+window.salvarLancamento = async function() {
+  var tipo   = document.querySelector('.tipo-btn.active')?.textContent.trim() || 'Despesa';
+  var descEl = document.getElementById('tx-descricao');
+  var desc   = descEl ? descEl.value.trim() : '';
+  var valEl  = document.getElementById('tx-valor');
+  var val    = valEl ? valEl.value.replace(/[^\d,.]/g,'').replace(',','.') : '';
+  var dataEl = document.getElementById('tx-data');
+  var data   = dataEl ? dataEl.value : '';
+  var vencEl = document.getElementById('tx-vencimento');
+  var venc   = vencEl ? vencEl.value : data;
+  var catEl  = document.getElementById('tx-categoria');
+  var cat    = catEl ? catEl.options[catEl.selectedIndex]?.text : '';
+  var contaEl= document.getElementById('tx-conta');
+  var conta  = contaEl ? contaEl.options[contaEl.selectedIndex]?.text : '';
+  var status = document.querySelector('.status-btn.active')?.classList.contains('efetivado') ? 'Efetivado' : 'Pendente';
+  var obsEl  = document.getElementById('tx-obs');
+  var obs    = obsEl ? obsEl.value.trim() : '—';
+  if (!desc || !val) { mostrarToast('Preencha descrição e valor.', 'error'); return; }
+  var valNum = parseFloat(val) || 0;
+  var valFmt = (tipo==='Receita'?'+ ':'- ') + 'R$ ' + valNum.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  var uid = _uid();
+  var editIdx = window._editandoIdx;
+  var editId  = (editIdx != null && window.txDados && window.txDados[editIdx]) ? window.txDados[editIdx].id : null;
+  var dadosFb = { title:desc, val:valFmt, data:data||new Date().toLocaleDateString('pt-BR'), venc:venc||data, cat, conta, tipo, status, obs, criadoEm: new Date().toISOString() };
+  try {
+    if (uid) {
+      if (editId) {
+        dadosFb.id = editId;
+        await window.FBCRUD.update(uid, 'lancamentos', editId, dadosFb);
+        var idx = window._appData.lancamentos.findIndex(function(x){ return x.id===editId; });
+        if (idx>=0) window._appData.lancamentos[idx] = dadosFb;
+        mostrarToast('Lançamento atualizado!', 'success');
+      } else {
+        var id = await window.FBCRUD.add(uid, 'lancamentos', dadosFb);
+        dadosFb.id = id;
+        window._appData.lancamentos.push(dadosFb);
+        mostrarToast('Lançamento salvo na nuvem!', 'success');
+      }
+    }
+    renderLancamentos();
+  } catch(e) { mostrarToast('Erro ao salvar lançamento: '+e.message,'error'); console.error(e); }
+  fecharModal && fecharModal();
+  window._editandoIdx = null;
+};
+
+// Override excluirLancamento
+var _origExcluirLanc = window.excluirLancamento;
+window.excluirLancamento = async function(idx, btn) {
+  var d = window.txDados ? window.txDados[idx] : null;
+  if (!d) return;
+  if (!confirm('Excluir "' + (d.title||d.descricao||'este lançamento') + '"?\nEsta ação não pode ser desfeita.')) return;
+  var uid = _uid();
+  if (uid && d.id) {
+    try { await window.FBCRUD.del(uid, 'lancamentos', d.id); } catch(e){ console.warn(e); }
+  }
+  window._appData.lancamentos = window._appData.lancamentos.filter(function(x){ return x.id !== d.id; });
+  renderLancamentos();
+  fecharDetalhe && fecharDetalhe();
+  mostrarToast('Lançamento excluído.', 'error');
+};
+
+// ══════════════════════════════════════════════════════════════════════════════════
+// CATEGORIAS — CRUD COMPLETO
+// ══════════════════════════════════════════════════════════════════════════════════
+window.salvarCategoriaComFirebase = async function() {
+  var modal = document.getElementById('modal');
+  if (!modal) return;
+  var inputs  = modal.querySelectorAll('input[type=text]');
+  var nome    = inputs[0] ? inputs[0].value.trim() : '';
+  var descric = inputs[1] ? inputs[1].value.trim() : '';
+  var tipoEl  = modal.querySelector('.tipo-opt.selected .tipo-opt-label');
+  var tipo    = tipoEl ? tipoEl.textContent.trim().toLowerCase() : 'despesa';
+  var iconeEl = modal.querySelector('.icon-item.selected');
+  var icone   = iconeEl ? iconeEl.textContent.trim() : '🏷️';
+  var corEl   = modal.querySelector('.cor-item.selected');
+  var cor     = corEl ? (corEl.dataset.cor || corEl.style.background || '#1B4B8A') : '#1B4B8A';
+  if (!nome) { mostrarToast('Informe o nome da categoria.', 'error'); return; }
+  var uid = _uid(); if(!uid) { mostrarToast('Faça login.','error'); return; }
+  var editId = modal.dataset.editCatId;
+  try {
+    if (editId) {
+      var dados = { nome, tipo, icone, cor, descricao: descric };
+      await window.FBCRUD.update(uid, 'categorias', editId, dados);
+      var idx = window._appData.categorias.findIndex(function(c){ return c.id===editId; });
+      if (idx>=0) Object.assign(window._appData.categorias[idx], dados);
+      delete modal.dataset.editCatId;
+      mostrarToast('Categoria atualizada!','success');
+    } else {
+      var dados = { nome, tipo, icone, cor, descricao: descric };
+      var id = await window.FBCRUD.add(uid, 'categorias', dados);
+      dados.id = id;
+      window._appData.categorias.push(dados);
+      mostrarToast('Categoria "'+nome+'" criada!','success');
+    }
+    renderCategorias();
+    fecharModal && fecharModal();
+  } catch(e) { mostrarToast('Erro ao salvar categoria: '+e.message,'error'); console.error(e); }
+};
+
+window.excluirCategoriaDOM = async function(cardEl) {
+  if (!cardEl) return;
+  var nome  = cardEl.querySelector('.cat-name') ? cardEl.querySelector('.cat-name').textContent.trim() : 'esta categoria';
+  var fbId  = cardEl.dataset.fbId;
+  if (!confirm('Excluir a categoria "'+nome+'"?\nEsta ação não pode ser desfeita.')) return;
+  if (fbId) {
+    var uid = _uid();
+    if (uid) { try { await window.FBCRUD.del(uid,'categorias',fbId); } catch(e){ console.warn(e); } }
+    window._appData.categorias = window._appData.categorias.filter(function(c){ return c.id!==fbId; });
+  }
+  cardEl.style.transition='all .25s'; cardEl.style.opacity='0'; cardEl.style.transform='scale(.95)';
+  setTimeout(function(){ renderCategorias(); },280);
+  mostrarToast('Categoria "'+nome+'" excluída.','error');
+};
+
+window.editarCategoriaDOM = function(cardEl) {
+  if (!cardEl) return;
+  var nome  = cardEl.querySelector('.cat-name')?.textContent.trim() || '';
+  var fbId  = cardEl.dataset.fbId;
+  if (typeof abrirModal === 'function') abrirModal();
+  var modal = document.getElementById('modal');
+  if (modal && nome) {
+    var inputs = modal.querySelectorAll('input[type=text]');
+    if (inputs[0]) inputs[0].value = nome;
+    if (fbId) modal.dataset.editCatId = fbId;
+    var title = modal.querySelector('.modal-title'); if(title) title.textContent = 'Editar categoria';
+    var btnSave = modal.querySelector('.btn-save');
+    if (btnSave) btnSave.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.salvarCategoriaComFirebase(); };
+  }
+};
+
+// Hook btn-save in categoria modal
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('.btn-save');
+  if (!btn) return;
+  var modal = btn.closest('#modal');
+  if (!modal) return;
+  var isCatTela = document.getElementById('tela-categorias')?.classList.contains('ativa');
+  if (isCatTela) { e.preventDefault(); e.stopImmediatePropagation(); window.salvarCategoriaComFirebase(); }
+}, true);
+
+// ══════════════════════════════════════════════════════════════════════════════════
+// PESSOAS — CRUD COMPLETO
+// ══════════════════════════════════════════════════════════════════════════════════
+window.salvarCadastroComFirebase = async function() {
+  var modal  = document.getElementById('modal');
+  if (!modal) return;
+  var nomeEl = document.getElementById('p-nome')  || modal.querySelector('input[name=nome]') || modal.querySelector('input[type=text]');
+  var nome   = nomeEl ? nomeEl.value.trim() : '';
+  if (!nome) { mostrarToast('Informe o nome.','error'); return; }
+  var docEl   = document.getElementById('p-doc');
+  var emailEl = document.getElementById('p-email');
+  var telEl   = document.getElementById('p-tel');
+  var papelEl = modal.querySelector('.papel-opt.selected .papel-opt-label');
+  var papel   = papelEl ? papelEl.textContent.trim() : 'Fornecedor';
+  var uid = _uid(); if(!uid){ mostrarToast('Faça login.','error'); return; }
+  var editId = modal.dataset.editId;
+  var dados = { nome, doc: docEl?docEl.value.trim():'', email: emailEl?emailEl.value.trim():'', tel: telEl?telEl.value.trim():'', papel, ativo:true };
+  try {
+    if (editId) {
+      dados.id = editId;
+      await window.FBCRUD.update(uid,'pessoas',editId,dados);
+      var idx = window._appData.pessoas.findIndex(function(p){ return p.id===editId; });
+      if(idx>=0) window._appData.pessoas[idx] = dados;
+      if(window._pessoasData) window._pessoasData[editId] = dados;
+      delete modal.dataset.editId;
+      mostrarToast('Cadastro atualizado!','success');
+    } else {
+      var id = await window.FBCRUD.add(uid,'pessoas',dados);
+      dados.id = id;
+      window._appData.pessoas.push(dados);
+      if(!window._pessoasData) window._pessoasData = {};
+      window._pessoasData[id] = dados;
+      mostrarToast('Cadastro de "'+nome+'" salvo!','success');
+    }
+    renderPessoas();
+    fecharModal && fecharModal();
+  } catch(e){ mostrarToast('Erro ao salvar cadastro: '+e.message,'error'); console.error(e); }
+};
+
+window.salvarCadastro = window.salvarCadastroComFirebase;
+
+window.editarPessoa = function(id) {
+  if (!id) return;
+  var p = window._pessoasData ? window._pessoasData[id] : null;
+  if (typeof abrirModal === 'function') abrirModal();
+  var modal = document.getElementById('modal');
+  if (!modal) return;
+  modal.dataset.editId = id;
+  if (document.getElementById('p-nome'))  document.getElementById('p-nome').value  = p ? p.nome  || '' : '';
+  if (document.getElementById('p-doc'))   document.getElementById('p-doc').value   = p ? p.doc   || '' : '';
+  if (document.getElementById('p-email')) document.getElementById('p-email').value = p ? p.email || '' : '';
+  if (document.getElementById('p-tel'))   document.getElementById('p-tel').value   = p ? p.tel   || '' : '';
+  if (p && p.papel) {
+    modal.querySelectorAll('.papel-opt').forEach(function(o) {
+      var lbl = o.querySelector('.papel-opt-label');
+      o.classList.toggle('selected', lbl && lbl.textContent.trim().toLowerCase() === p.papel.toLowerCase());
+    });
+  }
+  var title = modal.querySelector('.modal-title'); if(title) title.textContent = 'Editar — ' + (p?p.nome:'cadastro');
+  var btn = modal.querySelector('.btn-save'); if(btn) btn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); window.salvarCadastroComFirebase(); };
+};
+
+window.excluirPessoaComFirebase = async function(id) {
+  var p    = window._pessoasData ? window._pessoasData[id] : null;
+  var nome = p ? p.nome : 'este cadastro';
+  if (!confirm('Excluir "'+nome+'" permanentemente?\nEsta ação não pode ser desfeita.')) return;
+  var uid = _uid(); if(!uid) return;
+  try { await window.FBCRUD.del(uid,'pessoas',id); } catch(e){ console.warn(e); }
+  window._appData.pessoas = window._appData.pessoas.filter(function(x){ return x.id!==id; });
+  if(window._pessoasData) delete window._pessoasData[id];
+  renderPessoas();
+  if(typeof fecharDetalhe==='function') fecharDetalhe();
+  mostrarToast('Cadastro "'+nome+'" excluído.','error');
+};
+
+// Hook btn-save in pessoas modal
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('.btn-save');
+  if (!btn) return;
+  var modal = btn.closest('#modal');
+  if (!modal) return;
+  var isPessoaTela = document.getElementById('tela-pessoas')?.classList.contains('ativa');
+  if (isPessoaTela) { e.preventDefault(); e.stopImmediatePropagation(); window.salvarCadastroComFirebase(); }
+}, true);
+
+// ══════════════════════════════════════════════════════════════════════════════════
+// CONFIGURAÇÕES
+// ══════════════════════════════════════════════════════════════════════════════════
+window.carregarConfigsFirebase = async function() {
+  var uid = _uid(); if(!uid) return;
+  try {
+    var cfgs = await window.FBCRUD.get(uid,'configuracoes');
+    var cfg  = cfgs && cfgs.length ? cfgs[0] : {};
+    window._appData.configuracoes = cfg;
+    var F = function(id,val){ var el=document.getElementById(id); if(el) el.value=val||''; };
+    var T = function(id,val){ var el=document.getElementById(id); if(el) el.checked=val!==false; };
+    F('cfg-nome',   cfg.nome || window._currentUser?.displayName || '');
+    F('cfg-email',  window._currentUser?.email || '');
+    F('cfg-moeda',  cfg.moeda || 'BRL');
+    F('cfg-fechamento', cfg.diaFechamento || '');
+    F('cfg-vencimento', cfg.diaVencimento || '');
+    F('cfg-inicio-mes', cfg.inicioMes || '1');
+    T('cfg-notif-venc',  cfg.notifVenc);
+    T('cfg-notif-saldo', cfg.notifSaldo);
+    var e2=document.getElementById('cfg-notif-email'); if(e2) e2.checked=!!cfg.notifEmail;
+  } catch(e) { console.warn('Erro ao carregar configs:',e); }
 };
 
 window.salvarConfigs = async function() {
-  var uid = window._currentUser?.uid; if(!uid) { mostrarToast('Você precisa estar logado.', 'error'); return; }
+  var uid = _uid(); if(!uid){ mostrarToast('Faça login.','error'); return; }
+  var g = function(id){ var el=document.getElementById(id); return el?el.value:''; };
   var cfg = {
-    nome: document.getElementById('cfg-nome')?.value || '',
-    moeda: document.getElementById('cfg-moeda')?.value || 'BRL',
-    diaFechamento: parseInt(document.getElementById('cfg-fechamento')?.value) || 10,
-    diaVencimento: parseInt(document.getElementById('cfg-vencimento')?.value) || 15,
-    inicioMes: document.getElementById('cfg-inicio-mes')?.value || '1',
-    notifVenc: document.getElementById('cfg-notif-venc')?.checked !== false,
-    notifSaldo: document.getElementById('cfg-notif-saldo')?.checked !== false,
-    notifEmail: !!document.getElementById('cfg-notif-email')?.checked
+    nome:         g('cfg-nome'),
+    moeda:        g('cfg-moeda')        || 'BRL',
+    diaFechamento:parseInt(g('cfg-fechamento')) || 10,
+    diaVencimento:parseInt(g('cfg-vencimento')) || 15,
+    inicioMes:    g('cfg-inicio-mes')   || '1',
+    notifVenc:    document.getElementById('cfg-notif-venc')?.checked  !== false,
+    notifSaldo:   document.getElementById('cfg-notif-saldo')?.checked !== false,
+    notifEmail:   !!document.getElementById('cfg-notif-email')?.checked
   };
   try {
-    var existentes = await window.FBCRUD.get(uid, 'configuracoes');
-    if (existentes && existentes.length > 0) {
-      await window.FBCRUD.update(uid, 'configuracoes', existentes[0].id, cfg);
-    } else {
-      await window.FBCRUD.add(uid, 'configuracoes', cfg);
-    }
+    var existentes = await window.FBCRUD.get(uid,'configuracoes');
+    if (existentes && existentes.length) await window.FBCRUD.update(uid,'configuracoes',existentes[0].id,cfg);
+    else await window.FBCRUD.add(uid,'configuracoes',cfg);
     window._appData.configuracoes = cfg;
-    mostrarToast('Configurações salvas com sucesso!', 'success');
-  } catch(e) { mostrarToast('Erro ao salvar configurações.', 'error'); console.error(e); }
+    mostrarToast('Configurações salvas!','success');
+  } catch(e){ mostrarToast('Erro ao salvar configurações.','error'); console.error(e); }
 };
 
-// Exportar dados
+// ══════════════════════════════════════════════════════════════════════════════════
+// EXPORTAÇÃO DE DADOS
+// ══════════════════════════════════════════════════════════════════════════════════
 window.exportarDados = function() {
-  var data = {
-    exportadoEm: new Date().toISOString(),
-    contas: window._appData.contas,
-    lancamentos: window._appData.lancamentos,
-    categorias: window._appData.categorias,
-    pessoas: window._appData.pessoas
-  };
-  var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  var data = { exportadoEm:new Date().toISOString(), contas:window._appData.contas, lancamentos:window._appData.lancamentos, categorias:window._appData.categorias, pessoas:window._appData.pessoas };
   var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'financaspro-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+  a.download = 'financaspro-'+new Date().toISOString().split('T')[0]+'.json';
   a.click();
-  mostrarToast('Dados exportados com sucesso!', 'success');
+  mostrarToast('Dados exportados!','success');
 };
 
 window.exportarCSV = function() {
   var lancs = window._appData.lancamentos;
-  if (!lancs || !lancs.length) { mostrarToast('Nenhum lançamento para exportar.', 'info'); return; }
-  var header = ['Data','Descrição','Tipo','Categoria','Conta','Valor','Status'];
-  var rows = lancs.map(function(l) {
-    return [l.data||'', l.title||l.descricao||'', l.tipo||'', l.cat||l.categoria||'', l.conta||'', l.val||l.valor||'', l.status||''].join(';');
-  });
-  var csv = [header.join(';')].concat(rows).join('\n');
-  var blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+  if (!lancs || !lancs.length){ mostrarToast('Nenhum lançamento para exportar.','info'); return; }
+  var rows = [['Data','Descrição','Tipo','Categoria','Conta','Valor','Status']].concat(
+    lancs.map(function(l){ return [l.data||'',l.title||'',l.tipo||'',l.cat||'',l.conta||'',l.val||'',l.status||'']; })
+  ).map(function(r){ return r.join(';'); }).join('\n');
   var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'lancamentos-' + new Date().toISOString().split('T')[0] + '.csv';
+  a.href = URL.createObjectURL(new Blob([rows],{type:'text/csv;charset=utf-8'}));
+  a.download = 'lancamentos-'+new Date().toISOString().split('T')[0]+'.csv';
   a.click();
-  mostrarToast('CSV exportado com sucesso!', 'success');
+  mostrarToast('CSV exportado!','success');
 };
 
 window.apagarTodosDados = async function() {
-  if (!confirm('⚠️ ATENÇÃO: Isso irá apagar TODOS os seus dados (contas, lançamentos, categorias e pessoas). Esta ação NÃO pode ser desfeita.\n\nDeseja continuar?')) return;
-  if (!confirm('Tem absoluta certeza? Todos os dados serão perdidos permanentemente.')) return;
-  var uid = window._currentUser?.uid; if(!uid) return;
-  var colecoes = ['contas', 'lancamentos', 'categorias', 'pessoas', 'configuracoes'];
-  for (var col of colecoes) {
+  if (!confirm('⚠️ Isso irá apagar TODOS os seus dados permanentemente.\n\nDeseja continuar?')) return;
+  if (!confirm('Confirmação final — ação irreversível. Continuar?')) return;
+  var uid = _uid(); if(!uid) return;
+  for (var col of ['contas','lancamentos','categorias','pessoas','configuracoes']) {
     try {
-      var items = await window.FBCRUD.get(uid, col);
-      for (var item of items) {
-        await window.FBCRUD.del(uid, col, item.id);
-      }
-    } catch(e) {}
+      var items = await window.FBCRUD.get(uid,col);
+      for (var item of items) await window.FBCRUD.del(uid,col,item.id);
+    } catch(e){}
   }
-  window._appData = { contas: [], lancamentos: [], categorias: [], pessoas: [], configuracoes: {} };
-  mostrarToast('Todos os dados foram apagados.', 'error');
+  window._appData = { contas:[], lancamentos:[], categorias:[], pessoas:[], configuracoes:{} };
+  renderContas(); renderLancamentos(); renderCategorias(); renderPessoas();
+  mostrarToast('Todos os dados foram apagados.','error');
 };
 
-// ==================== INTEGRAÇÃO: SALVAR CONTA NO FIREBASE ====================
-// Intercepta a função salvarConta existente para também salvar no Firebase
-(function() {
-  var _origSalvarConta = window.salvarConta;
-  window.salvarContaComFirebase = async function() {
-    var modal = document.getElementById('modal');
-    if (!modal) { if(_origSalvarConta) _origSalvarConta(); return; }
-    var nomeInput = modal.querySelector('input[type=text]');
-    var nome = nomeInput ? nomeInput.value.trim() : '';
-    if (!nome) { mostrarToast('Informe o nome da conta.', 'error'); return; }
-    var tipoSel = modal.querySelector('.tipo-card.selected .tipo-card-name');
-    var tipo = tipoSel ? tipoSel.textContent.trim().toLowerCase() : 'corrente';
-    var bancoSel = modal.querySelector('select');
-    var banco = bancoSel ? bancoSel.options[bancoSel.selectedIndex]?.text : '';
-    var corSel = modal.querySelector('.cor-item.selected');
-    var cor = corSel ? (corSel.style.background || corSel.style.backgroundColor) : '#1B4B8A';
-    var dados = { nome, tipo, banco, cor, saldo: 'R$ 0,00', ativo: true };
-    var uid = window._currentUser?.uid;
-    if (uid) {
-      try {
-        var id = await window.FBCRUD.add(uid, 'contas', dados);
-        dados.id = id;
-        window._appData.contas.push(dados);
-        mostrarToast('Conta "' + nome + '" salva na nuvem!', 'success');
-      } catch(e) { mostrarToast('Erro ao salvar na nuvem.', 'error'); }
-    }
-    if(_origSalvarConta) _origSalvarConta();
-  };
-})();
-
-// ==================== INTEGRAÇÃO: SALVAR LANÇAMENTO NO FIREBASE ====================
-(function() {
-  var _origSalvarLanc = window.salvarLancamento;
-  window.salvarLancamentoComFirebase = async function() {
-    var modal = document.getElementById('modal-lancamento') || document.getElementById('modal');
-    // Coleta dados do formulário atual
-    var descEl = document.getElementById('tx-descricao') || modal?.querySelector('input[type=text]');
-    var desc = descEl ? descEl.value.trim() : '';
-    var valEl = document.getElementById('tx-valor');
-    var val = valEl ? valEl.value.trim() : '';
-    var dataEl = document.getElementById('tx-data');
-    var data = dataEl ? dataEl.value : '';
-    var catEl = document.getElementById('tx-categoria');
-    var cat = catEl ? catEl.value : '';
-    var contaEl = document.getElementById('tx-conta');
-    var conta = contaEl ? contaEl.value : '';
-    var tipoSel = modal?.querySelector('.tipo-btn.active');
-    var tipo = tipoSel ? tipoSel.textContent.trim() : 'Despesa';
-    var statusSel = modal?.querySelector('.status-btn.active');
-    var status = statusSel ? statusSel.textContent.trim() : 'Efetivado';
-    if (desc && val) {
-      var uid = window._currentUser?.uid;
-      if (uid) {
-        try {
-          var dados = { title: desc, val: 'R$ ' + val, data, venc: data, cat, conta, tipo, status, criadoEm: new Date().toISOString() };
-          var id = await window.FBCRUD.add(uid, 'lancamentos', dados);
-          dados.id = id;
-          window._appData.lancamentos.push(dados);
-          mostrarToast('Lançamento salvo na nuvem!', 'success');
-        } catch(e) { console.warn('Erro Firebase lancamento:', e); }
-      }
-    }
-    if(_origSalvarLanc) _origSalvarLanc();
-  };
-})();
-
-// ==================== INTEGRAÇÃO: SALVAR CATEGORIA NO FIREBASE ====================
-(function() {
-  var _origSalvarCat = window.salvarCategoria;
-  window.salvarCategoriaComFirebase = async function() {
-    var modal = document.getElementById('modal');
-    if (!modal) { return; }
-    var inputs = modal.querySelectorAll('input[type=text]');
-    var nome = inputs[0] ? inputs[0].value.trim() : '';
-    var descricao = inputs[1] ? inputs[1].value.trim() : '';
-    var tipoSel = modal.querySelector('.tipo-opt.selected .tipo-opt-label');
-    var tipo = tipoSel ? tipoSel.textContent.trim().toLowerCase() : 'despesa';
-    var iconeSel = modal.querySelector('.icon-item.selected');
-    var icone = iconeSel ? iconeSel.textContent.trim() : '🏷️';
-    var corSel = modal.querySelector('.cor-item.selected');
-    var cor = corSel ? (corSel.style.background || '#1B4B8A') : '#1B4B8A';
-    if (!nome) { mostrarToast('Informe o nome da categoria.', 'error'); return; }
-    var uid = window._currentUser?.uid;
-    if (uid) {
-      try {
-        var dados = { nome, tipo, icone, cor, descricao };
-        var id = await window.FBCRUD.add(uid, 'categorias', dados);
-        dados.id = id;
-        window._appData.categorias.push(dados);
-        mostrarToast('Categoria "' + nome + '" salva na nuvem!', 'success');
-      } catch(e) { mostrarToast('Erro ao salvar na nuvem.', 'error'); }
-    }
-    fecharModal && fecharModal();
-  };
-})();
-
-// ==================== INTEGRAÇÃO: SALVAR PESSOA NO FIREBASE ====================
-(function() {
-  var _origSalvarPessoa = window.salvarPessoa;
-  window.salvarPessoaComFirebase = async function() {
-    var modal = document.getElementById('modal');
-    if (!modal) { if(_origSalvarPessoa) _origSalvarPessoa(); return; }
-    var nomeEl = document.getElementById('p-nome');
-    var docEl = document.getElementById('p-doc');
-    var emailEl = document.getElementById('p-email');
-    var telEl = document.getElementById('p-tel');
-    var papelSel = modal.querySelector('.papel-opt.selected .papel-opt-label');
-    var nome = nomeEl ? nomeEl.value.trim() : '';
-    var doc = docEl ? docEl.value.trim() : '';
-    var email = emailEl ? emailEl.value.trim() : '';
-    var tel = telEl ? telEl.value.trim() : '';
-    var papel = papelSel ? papelSel.textContent.trim() : 'Fornecedor';
-    if (!nome) { mostrarToast('Informe o nome.', 'error'); return; }
-    var uid = window._currentUser?.uid;
-    if (uid) {
-      try {
-        var dados = { nome, doc, email, tel, papel, ativo: true };
-        var id = await window.FBCRUD.add(uid, 'pessoas', dados);
-        dados.id = id;
-        window._appData.pessoas.push(dados);
-        mostrarToast('Cadastro de "' + nome + '" salvo na nuvem!', 'success');
-      } catch(e) { mostrarToast('Erro ao salvar na nuvem.', 'error'); }
-    }
-    if(_origSalvarPessoa) _origSalvarPessoa();
-  };
-})();
-
-// ==================== EXCLUIR COM FIREBASE ====================
-window.excluirContaComFirebase = async function(id) {
-  var c = window._contasData ? window._contasData[id] : null;
-  var nome = c ? c.nome : 'esta conta';
-  if (!confirm('Excluir permanentemente "' + nome + '"?\nEsta ação não pode ser desfeita.')) return;
-  try { await window.excluirContaFirebase(id); } catch(e) {}
-  // Remove do DOM
-  document.querySelectorAll('.conta-card').forEach(function(card) {
-    var btn = card.querySelector('.conta-card-menu');
-    if (btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + id + "'")) card.remove();
-  });
-  window._appData.contas = window._appData.contas.filter(function(c){ return c.id !== id; });
-  mostrarToast('Conta "' + nome + '" excluída.', 'error');
-};
-
-// ==================== INICIALIZAÇÃO POR TELA ====================
-window.addEventListener('fbready', function() {
-  if(window._currentUser) _carregarDadosIniciais();
-});
-
-// Também tenta quando o usuário logar
-var _origAuthCallback = window._telaAtiva;
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    if(window._currentUser) _carregarDadosIniciais();
-  }, 2000);
-});
-
-function _carregarDadosIniciais() {
-  if (!window._currentUser) return;
-  window.carregarContasFirebase(function(contas) {
-    // Atualiza _contasData se disponível
-    if (window._contasData !== undefined && contas.length > 0) {
-      contas.forEach(function(c) { if(c.id) window._contasData[c.id] = c; });
-    }
-  });
-  window.carregarLancamentosFirebase(function(lancs) {});
-  window.carregarCategoriasFirebase(function(cats) {});
-  window.carregarPessoasFirebase(function(pessoas) {});
-}
-
-// Carrega configs quando navegar para configuracoes
+// ══════════════════════════════════════════════════════════════════════════════════
+// NAVEGAÇÃO — recarrega dados ao trocar de tela
+// ══════════════════════════════════════════════════════════════════════════════════
 var _origNavegarPara = window.navegarPara;
 window.navegarPara = function(tela) {
   _origNavegarPara(tela);
-  if (tela === 'configuracoes') {
-    setTimeout(function() { window.carregarConfigsFirebase(); }, 300);
-  }
-  // Atualiza nav-item active
-  document.querySelectorAll('.nav-item').forEach(function(n) {
-    var href = n.getAttribute('href') || '';
-    var mapa = {'01_login.html':'login','02_dashboard.html':'dashboard','03_contas.html':'contas',
-      '04_lancamentos.html':'lancamentos','05_categorias.html':'categorias',
-      '06_pessoas.html':'pessoas','07_relatorios.html':'relatorios','08_configuracoes.html':'configuracoes'};
-    n.classList.toggle('active', mapa[href] === tela);
-  });
+  if (!window._currentUser) return;
+  var reloaders = {
+    'contas':      function(){ window.FBCRUD.get(_uid(),'contas').then(function(d){ window._appData.contas=d||[]; renderContas(); }); },
+    'lancamentos': function(){ window.FBCRUD.get(_uid(),'lancamentos').then(function(d){ window._appData.lancamentos=d||[]; renderLancamentos(); }); },
+    'categorias':  function(){ window.FBCRUD.get(_uid(),'categorias').then(function(d){ window._appData.categorias=d||[]; renderCategorias(); }); },
+    'pessoas':     function(){ window.FBCRUD.get(_uid(),'pessoas').then(function(d){ window._appData.pessoas=d||[]; renderPessoas(); }); },
+    'configuracoes': function(){ setTimeout(window.carregarConfigsFirebase, 200); }
+  };
+  if (reloaders[tela]) setTimeout(reloaders[tela], 150);
 };
 
-// ==================== HELPER: mostrarToast global ====================
-if (!window.mostrarToast) {
-  window.mostrarToast = function(msg, tipo) {
-    var t = document.getElementById('fpro-toast');
-    if (!t) { t = document.createElement('div'); t.id = 'fpro-toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none'; document.body.appendChild(t); }
-    var item = document.createElement('div');
-    var bg = tipo==='success'?'#059669':tipo==='error'?'#DC2626':'#1B4B8A';
-    item.style.cssText = 'background:'+bg+';color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,0.18);opacity:0;transform:translateY(10px);transition:all 0.25s ease;pointer-events:none;max-width:320px';
-    item.textContent = msg;
-    t.appendChild(item);
-    requestAnimationFrame(function(){ item.style.opacity='1'; item.style.transform='translateY(0)'; });
-    setTimeout(function(){ item.style.opacity='0'; item.style.transform='translateY(10px)'; setTimeout(function(){ item.remove(); }, 300); }, 3500);
-  };
-}
-
-console.log('✅ FinançasPRO CRUD Firebase carregado!');
-</script>
-
-<script>
+// ══════════════════════════════════════════════════════════════════════════════════
+// SUBCATEGORIA
+// ══════════════════════════════════════════════════════════════════════════════════
 window.salvarSubcategoriaComFirebase = async function() {
   var modal = document.getElementById('modal-sub');
   if (!modal) { fecharModalSub && fecharModalSub(); return; }
   var inputs = modal.querySelectorAll('input[type=text]');
-  var nome = inputs[1] ? inputs[1].value.trim() : (inputs[0] ? inputs[0].value.trim() : '');
-  var catPai = document.getElementById('sub-cat-pai')?.value || '';
-  if (!nome) { mostrarToast('Informe o nome da subcategoria.', 'error'); return; }
-  var uid = window._currentUser?.uid;
+  var nome   = inputs[1] ? inputs[1].value.trim() : (inputs[0] ? inputs[0].value.trim() : '');
+  if (!nome) { mostrarToast('Informe o nome.','error'); return; }
+  var uid = _uid();
   if (uid) {
     try {
       var icone = modal.querySelector('.icon-item.selected')?.textContent.trim() || '🏷️';
-      var dados = { nome, catPai, icone, tipo: 'subcategoria' };
-      var id = await window.FBCRUD.add(uid, 'categorias', dados);
+      var dados = { nome, icone, tipo:'subcategoria', catPai:document.getElementById('sub-cat-pai')?.value||'' };
+      var id = await window.FBCRUD.add(uid,'categorias',dados);
       dados.id = id;
-      if(window._appData) window._appData.categorias.push(dados);
-      mostrarToast('Subcategoria "' + nome + '" salva na nuvem!', 'success');
-    } catch(e) { mostrarToast('Erro ao salvar na nuvem.', 'error'); console.error(e); }
+      window._appData.categorias.push(dados);
+      mostrarToast('Subcategoria "'+nome+'" salva!','success');
+    } catch(e){ mostrarToast('Erro ao salvar.','error'); }
   }
   fecharModalSub && fecharModalSub();
 };
+
+console.log('✅ FinançasPRO — Firebase integrado com render completo!');
 </script>
 </body>
-</html>
