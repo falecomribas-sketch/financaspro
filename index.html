@@ -6127,7 +6127,7 @@ document.addEventListener('keydown', e => {
   <div class="topbar">
     <div class="topbar-left">
       <div class="topbar-title">Fornecedores e Clientes</div>
-      <div class="topbar-sub">5 cadastros ativos · PF e PJ</div>
+      <div class="topbar-sub" id="pessoas-topbar-sub">0 cadastros ativos · PF e PJ</div>
     </div>
     <div class="topbar-right">
       <button class="btn-secondary" onclick="exportarCSV()">📥 Exportar CSV</button>
@@ -6141,26 +6141,26 @@ document.addEventListener('keydown', e => {
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-accent" style="background:var(--amber)"></div>
-        <div class="stat-label">Total pago (maio)</div>
-        <div class="stat-value" style="color:var(--red)">R$ 0,00</div>
-        <div class="stat-sub">4 fornecedores</div>
+        <div class="stat-label" id="pessoas-kpi-pago-label">Total pago</div>
+        <div class="stat-value" id="pessoas-kpi-pago-val" style="color:var(--red)">R$ 0,00</div>
+        <div class="stat-sub" id="pessoas-kpi-pago-sub">0 fornecedores</div>
       </div>
       <div class="stat-card">
         <div class="stat-accent" style="background:var(--green)"></div>
-        <div class="stat-label">Total recebido (maio)</div>
-        <div class="stat-value" style="color:var(--green)">R$ 0,00</div>
-        <div class="stat-sub">1 cliente</div>
+        <div class="stat-label" id="pessoas-kpi-receb-label">Total recebido</div>
+        <div class="stat-value" id="pessoas-kpi-receb-val" style="color:var(--green)">R$ 0,00</div>
+        <div class="stat-sub" id="pessoas-kpi-receb-sub">0 clientes</div>
       </div>
       <div class="stat-card">
         <div class="stat-accent" style="background:var(--primary)"></div>
         <div class="stat-label">Maior fornecedor</div>
-        <div class="stat-value" style="font-size:14px">🏠 Imob. XYZ</div>
-        <div class="stat-sub">R$ 1.200 · 37% das despesas</div>
+        <div class="stat-value" id="pessoas-kpi-maior-val" style="font-size:14px">—</div>
+        <div class="stat-sub" id="pessoas-kpi-maior-sub">sem lançamentos</div>
       </div>
       <div class="stat-card">
         <div class="stat-accent" style="background:var(--purple)"></div>
         <div class="stat-label">Ticket médio</div>
-        <div class="stat-value">R$ 648</div>
+        <div class="stat-value" id="pessoas-kpi-ticket-val">—</div>
         <div class="stat-sub">por fornecedor/mês</div>
       </div>
     </div>
@@ -6174,9 +6174,9 @@ document.addEventListener('keydown', e => {
         <!-- TOOLBAR -->
         <div class="toolbar">
           <div class="tabs-bar">
-            <button class="tab active" onclick="filtrarTab('todos',this)">Todos (5)</button>
-            <button class="tab" onclick="filtrarTab('fornecedor',this)">Fornecedores (4)</button>
-            <button class="tab" onclick="filtrarTab('cliente',this)">Clientes (1)</button>
+            <button class="tab active" onclick="filtrarTab('todos',this)">Todos (<span id="tab-count-todos">0</span>)</button>
+            <button class="tab" onclick="filtrarTab('fornecedor',this)">Fornecedores (<span id="tab-count-forn">0</span>)</button>
+            <button class="tab" onclick="filtrarTab('cliente',this)">Clientes (<span id="tab-count-cli">0</span>)</button>
           </div>
           <div class="search-wrap">
             <span class="search-icon">🔍</span>
@@ -6196,117 +6196,7 @@ document.addEventListener('keydown', e => {
 
         <!-- LISTA DE PESSOAS -->
         <div class="lista-wrap" id="lista">
-
-          <!-- EMPRESA ABC - CLIENTE -->
-          <div class="pessoa-item selected" data-papel="cliente" onclick="abrirDetalhe('abc')">
-            <div class="pessoa-avatar" style="background:linear-gradient(135deg,#34D399,#059669)">EA</div>
-            <div class="pessoa-info">
-              <div class="pessoa-name">
-                Empresa ABC Ltda
-                <span class="badge badge-cli">cliente</span>
-                <span class="badge badge-pj">PJ</span>
-              </div>
-              <div class="pessoa-doc">CNPJ: 12.345.678/0001-90 · Salário · CLT</div>
-            </div>
-            <div class="pessoa-stats">
-              <div class="pessoa-val pos">+ R$ 6.500</div>
-              <div class="pessoa-tx">1 lanç. · maio/26</div>
-            </div>
-            <div class="pessoa-actions">
-              <button class="act-btn" title="Editar" onclick="event.stopPropagation();abrirModal()">✏️</button>
-              <button class="act-btn" title="Ver lançamentos" onclick="event.stopPropagation()">↕️</button>
-              <button class="act-btn" title="Inativar" onclick="event.stopPropagation()">🗃️</button>
-            </div>
-          </div>
-
-          <!-- IMOBILIÁRIA XYZ - FORNECEDOR -->
-          <div class="pessoa-item" data-papel="fornecedor" onclick="abrirDetalhe('imob')">
-            <div class="pessoa-avatar" style="background:linear-gradient(135deg,#F97316,#DC2626)">IX</div>
-            <div class="pessoa-info">
-              <div class="pessoa-name">
-                Imobiliária XYZ
-                <span class="badge badge-forn">fornecedor</span>
-                <span class="badge badge-pj">PJ</span>
-              </div>
-              <div class="pessoa-doc">CNPJ: 98.765.432/0001-10 · Moradia · Aluguel</div>
-            </div>
-            <div class="pessoa-stats">
-              <div class="pessoa-val neg">- R$ 1.200</div>
-              <div class="pessoa-tx">1 lanç. · maio/26</div>
-            </div>
-            <div class="pessoa-actions">
-              <button class="act-btn" onclick="event.stopPropagation();abrirModal()">✏️</button>
-              <button class="act-btn" onclick="event.stopPropagation()">↕️</button>
-              <button class="act-btn" onclick="event.stopPropagation()">🗃️</button>
-            </div>
-          </div>
-
-          <!-- SUPERMERCADO EXTRA - FORNECEDOR -->
-          <div class="pessoa-item" data-papel="fornecedor" onclick="abrirDetalhe('extra')">
-            <div class="pessoa-avatar" style="background:linear-gradient(135deg,#60A5FA,#1B4B8A)">SE</div>
-            <div class="pessoa-info">
-              <div class="pessoa-name">
-                Supermercado Extra
-                <span class="badge badge-forn">fornecedor</span>
-                <span class="badge badge-pj">PJ</span>
-              </div>
-              <div class="pessoa-doc">CNPJ: 47.508.411/0001-56 · Alimentação</div>
-            </div>
-            <div class="pessoa-stats">
-              <div class="pessoa-val neg">- R$ 640</div>
-              <div class="pessoa-tx">2 lanç. · maio/26</div>
-            </div>
-            <div class="pessoa-actions">
-              <button class="act-btn" onclick="event.stopPropagation();abrirModal()">✏️</button>
-              <button class="act-btn" onclick="event.stopPropagation()">↕️</button>
-              <button class="act-btn" onclick="event.stopPropagation()">🗃️</button>
-            </div>
-          </div>
-
-          <!-- NETFLIX - FORNECEDOR -->
-          <div class="pessoa-item" data-papel="fornecedor" onclick="abrirDetalhe('netflix')">
-            <div class="pessoa-avatar" style="background:linear-gradient(135deg,#A78BFA,#7C3AED)">NF</div>
-            <div class="pessoa-info">
-              <div class="pessoa-name">
-                Netflix
-                <span class="badge badge-forn">fornecedor</span>
-                <span class="badge badge-pj">PJ</span>
-              </div>
-              <div class="pessoa-doc">CNPJ: 13.590.585/0001-32 · Assinaturas · Streaming</div>
-            </div>
-            <div class="pessoa-stats">
-              <div class="pessoa-val neg">- R$ 55,90</div>
-              <div class="pessoa-tx">1 lanç. · maio/26</div>
-            </div>
-            <div class="pessoa-actions">
-              <button class="act-btn" onclick="event.stopPropagation();abrirModal()">✏️</button>
-              <button class="act-btn" onclick="event.stopPropagation()">↕️</button>
-              <button class="act-btn" onclick="event.stopPropagation()">🗃️</button>
-            </div>
-          </div>
-
-          <!-- CARLOS OLIVEIRA - PF FORNECEDOR -->
-          <div class="pessoa-item" data-papel="fornecedor" onclick="abrirDetalhe('carlos')">
-            <div class="pessoa-avatar" style="background:linear-gradient(135deg,#34D399,#0F766E)">CO</div>
-            <div class="pessoa-info">
-              <div class="pessoa-name">
-                Carlos Oliveira
-                <span class="badge badge-amb">ambos</span>
-                <span class="badge badge-pf">PF</span>
-              </div>
-              <div class="pessoa-doc">CPF: 123.456.789-00 · Freelance / Serviços</div>
-            </div>
-            <div class="pessoa-stats">
-              <div class="pessoa-val neg">- R$ 350</div>
-              <div class="pessoa-tx">1 lanç. · maio/26</div>
-            </div>
-            <div class="pessoa-actions">
-              <button class="act-btn" onclick="event.stopPropagation();abrirModal()">✏️</button>
-              <button class="act-btn" onclick="event.stopPropagation()">↕️</button>
-              <button class="act-btn" onclick="event.stopPropagation()">🗃️</button>
-            </div>
-          </div>
-
+          <div style="text-align:center;padding:48px;color:var(--text3);font-size:14px">Carregando...</div>
         </div>
       </div>
 
@@ -6484,60 +6374,6 @@ document.addEventListener('keydown', e => {
 </div>
 
 <script>
-var dados = {
-  abc: {
-    nome: 'Empresa ABC Ltda', ini: 'EA', cor: 'linear-gradient(135deg,#34D399,#059669)',
-    badges: ['cliente','PJ'], doc: 'CNPJ: 12.345.678/0001-90',
-    email: 'rh@empresaabc.com.br', tel: '(11) 3333-4444', site: 'www.empresaabc.com.br',
-    cat: 'Salário · CLT', cidade: 'São Paulo / SP',
-    pago: '—', recebido: '—', ticket: '—', txCount: '0 lançamentos',
-    saldo: [5500,5800,5800,6000,6200,6500],
-    txs: [{ icon:'💰', bg:'#ECFDF5', name:'Salário maio/26', date:'05/05', val:'+R$6.500', cls:'g' }]
-  },
-  imob: {
-    nome: 'Imobiliária XYZ', ini: 'IX', cor: 'linear-gradient(135deg,#F97316,#DC2626)',
-    badges: ['fornecedor','PJ'], doc: 'CNPJ: 98.765.432/0001-10',
-    email: 'cobranca@imobxyz.com', tel: '(11) 9999-8888', site: '—',
-    cat: 'Moradia · Aluguel', cidade: 'São Paulo / SP',
-    pago: 'R$ 1.200', recebido: '—', ticket: 'R$ 1.200', txCount: '0 lançamentos',
-    saldo: [1200,1200,1200,1200,1200,1200],
-    txs: [
-      { icon:'🏠', bg:'#FFFBEB', name:'Aluguel maio/26', date:'30/05', val:'-R$1.200', cls:'r' },
-      { icon:'🏠', bg:'#FFFBEB', name:'Aluguel abr/26', date:'30/04', val:'-R$1.200', cls:'r' },
-    ]
-  },
-  extra: {
-    nome: 'Supermercado Extra', ini: 'SE', cor: 'linear-gradient(135deg,#60A5FA,#1B4B8A)',
-    badges: ['fornecedor','PJ'], doc: 'CNPJ: 47.508.411/0001-56',
-    email: '—', tel: '—', site: 'www.extra.com.br',
-    cat: 'Alimentação · Supermercado', cidade: 'São Paulo / SP',
-    pago: 'R$ 640', recebido: '—', ticket: 'R$ 320', txCount: '2 lançamentos',
-    saldo: [280,410,580,490,610,640],
-    txs: [
-      { icon:'🛒', bg:'#EFF6FF', name:'Compras 24/05', date:'24/05', val:'-R$320', cls:'r' },
-      { icon:'🛒', bg:'#EFF6FF', name:'Compras 10/05', date:'10/05', val:'-R$320', cls:'r' },
-    ]
-  },
-  netflix: {
-    nome: 'Netflix', ini: 'NF', cor: 'linear-gradient(135deg,#A78BFA,#7C3AED)',
-    badges: ['fornecedor','PJ'], doc: 'CNPJ: 13.590.585/0001-32',
-    email: '—', tel: '—', site: 'www.netflix.com',
-    cat: 'Assinaturas · Streaming', cidade: '—',
-    pago: 'R$ 55,90', recebido: '—', ticket: 'R$ 55,90', txCount: '0 lançamentos',
-    saldo: [39.90,39.90,45.90,45.90,55.90,55.90],
-    txs: [{ icon:'📺', bg:'#F3E8FF', name:'Assinatura maio/26', date:'01/05', val:'-R$55,90', cls:'r' }]
-  },
-  carlos: {
-    nome: 'Carlos Oliveira', ini: 'CO', cor: 'linear-gradient(135deg,#34D399,#0F766E)',
-    badges: ['ambos','PF'], doc: 'CPF: 123.456.789-00',
-    email: 'carlos@email.com', tel: '(11) 98765-4321', site: '—',
-    cat: 'Serviços / Freelance', cidade: 'São Paulo / SP',
-    pago: 'R$ 350', recebido: '—', ticket: 'R$ 350', txCount: '0 lançamentos',
-    saldo: [200,350,300,400,280,350],
-    txs: [{ icon:'🔧', bg:'#ECFDF5', name:'Serviço manutenção', date:'15/05', val:'-R$350', cls:'r' }]
-  }
-};
-
 var chartDetalhe = null;
 
 function badgeHtml(b) {
@@ -6545,88 +6381,194 @@ function badgeHtml(b) {
   return `<span class="badge ${map[b]||''}">${b}</span>`;
 }
 
+// ── Calcula KPIs dos cards superiores com dados reais ──
+function atualizarKPIsPessoas() {
+  var pessoas  = (window._appData && window._appData.pessoas) || [];
+  var lancs    = (window._appData && window._appData.lancamentos) || [];
+  var fmt = function(v){ return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var parseLanc = function(l){
+    var s = (l.val||'').toString().replace(/[^\d,.]/g,'').replace(',','.');
+    return parseFloat(s)||0;
+  };
+  var now = new Date();
+  var mesAtual = now.getMonth(), anoAtual = now.getFullYear();
+
+  // Total pago (despesas com pessoa vinculada) e total recebido (receitas) no mês atual
+  var totalPago=0, totalRecebido=0;
+  var gastosPorPessoa = {};
+
+  lancs.forEach(function(l){
+    var data = l.data ? new Date(l.data) : null;
+    if (!data || isNaN(data)) return;
+    // aceita YYYY-MM-DD
+    var partes = (l.data||'').split('-');
+    var lMes = partes.length>=2 ? parseInt(partes[1])-1 : data.getMonth();
+    var lAno = partes.length>=1 ? parseInt(partes[0]) : data.getFullYear();
+    var val = parseLanc(l);
+    var isRec = (l.tipo||'').toLowerCase().includes('receita') || (l.val||'').toString().startsWith('+');
+    if (lMes === mesAtual && lAno === anoAtual) {
+      if (isRec) totalRecebido += val;
+      else totalPago += val;
+    }
+    // acumula por pessoa (nome do fornecedor/cliente no lançamento)
+    var pessoaRef = (l.pessoa||l.fornecedor||'').trim();
+    if (pessoaRef && !isRec) {
+      gastosPorPessoa[pessoaRef] = (gastosPorPessoa[pessoaRef]||0) + val;
+    }
+  });
+
+  var nForn = pessoas.filter(function(p){ return (p.papel||'').toLowerCase().includes('fornecedor')||((p.papel||'').toLowerCase()==='ambos'); }).length;
+  var nCli  = pessoas.filter(function(p){ return (p.papel||'').toLowerCase().includes('cliente')||((p.papel||'').toLowerCase()==='ambos'); }).length;
+  var nomeMes = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'][mesAtual];
+
+  var elPagoVal  = document.getElementById('pessoas-kpi-pago-val');
+  var elPagoLbl  = document.getElementById('pessoas-kpi-pago-label');
+  var elPagoSub  = document.getElementById('pessoas-kpi-pago-sub');
+  var elRecebVal = document.getElementById('pessoas-kpi-receb-val');
+  var elRecebLbl = document.getElementById('pessoas-kpi-receb-label');
+  var elRecebSub = document.getElementById('pessoas-kpi-receb-sub');
+  var elMaiorVal = document.getElementById('pessoas-kpi-maior-val');
+  var elMaiorSub = document.getElementById('pessoas-kpi-maior-sub');
+  var elTicket   = document.getElementById('pessoas-kpi-ticket-val');
+
+  if (elPagoLbl)  elPagoLbl.textContent  = 'Total pago (' + nomeMes + ')';
+  if (elRecebLbl) elRecebLbl.textContent = 'Total recebido (' + nomeMes + ')';
+  if (elPagoVal)  elPagoVal.textContent  = fmt(totalPago);
+  if (elPagoSub)  elPagoSub.textContent  = nForn + ' fornecedor' + (nForn!==1?'es':'');
+  if (elRecebVal) elRecebVal.textContent = fmt(totalRecebido);
+  if (elRecebSub) elRecebSub.textContent = nCli + ' cliente' + (nCli!==1?'s':'');
+
+  // Maior fornecedor (por valor acumulado nos lançamentos)
+  var maiorNome = null, maiorVal = 0;
+  Object.keys(gastosPorPessoa).forEach(function(nome){
+    if (gastosPorPessoa[nome] > maiorVal) { maiorVal = gastosPorPessoa[nome]; maiorNome = nome; }
+  });
+  if (maiorNome) {
+    var pct = totalPago > 0 ? ((maiorVal/totalPago)*100).toFixed(0) : 0;
+    if (elMaiorVal) elMaiorVal.textContent = '🏢 ' + maiorNome;
+    if (elMaiorSub) elMaiorSub.textContent = fmt(maiorVal) + ' · ' + pct + '% das despesas';
+  } else {
+    if (elMaiorVal) elMaiorVal.textContent = '—';
+    if (elMaiorSub) elMaiorSub.textContent = 'sem lançamentos vinculados';
+  }
+
+  // Ticket médio = total pago / fornecedores ativos (evita divisão por zero)
+  var ticket = nForn > 0 ? totalPago / nForn : 0;
+  if (elTicket) elTicket.textContent = nForn > 0 ? fmt(ticket) : '—';
+
+  // Topbar subtitle e tabs
+  var elSub = document.getElementById('pessoas-topbar-sub');
+  if (elSub) elSub.textContent = pessoas.length + ' cadastro' + (pessoas.length!==1?'s':'') + ' ativo' + (pessoas.length!==1?'s':'') + ' · PF e PJ';
+  var elTodos = document.getElementById('tab-count-todos');
+  var elForn  = document.getElementById('tab-count-forn');
+  var elCli   = document.getElementById('tab-count-cli');
+  if (elTodos) elTodos.textContent = pessoas.length;
+  if (elForn)  elForn.textContent  = nForn;
+  if (elCli)   elCli.textContent   = nCli;
+}
+
 function abrirDetalhe(id) {
+  window._currentPessoaId = id;
   document.querySelectorAll('.pessoa-item').forEach(el => el.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
-  var d = dados[id];
+  if (event && event.currentTarget) event.currentTarget.classList.add('selected');
+  // Busca dados reais do _pessoasData (preenchido pelo renderPessoas)
+  var p = (window._pessoasData && window._pessoasData[id]) || {};
+  // Fallback: buscar em _appData.pessoas
+  if (!p.nome && window._appData && window._appData.pessoas) {
+    p = window._appData.pessoas.find(function(x){ return x.id === id; }) || {};
+  }
+  if (!p.nome) {
+    document.getElementById('detalhe-empty').style.display = '';
+    return;
+  }
+
+  var fmt = function(v){ return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var parseLanc = function(l){
+    var s = (l.val||'').toString().replace(/[^\d,.]/g,'').replace(',','.');
+    return parseFloat(s)||0;
+  };
+
+  // Lançamentos vinculados a esta pessoa
+  var lancs = (window._appData && window._appData.lancamentos) || [];
+  var lancsP = lancs.filter(function(l){
+    return (l.pessoa||l.fornecedor||'').trim().toLowerCase() === (p.nome||'').toLowerCase();
+  });
+  var totalPago=0, totalReceb=0;
+  lancsP.forEach(function(l){
+    var val = parseLanc(l);
+    var isRec = (l.tipo||'').toLowerCase().includes('receita') || (l.val||'').toString().startsWith('+');
+    if (isRec) totalReceb += val; else totalPago += val;
+  });
+  var ticket = lancsP.length > 0 ? (totalPago+totalReceb)/lancsP.length : 0;
+
+  var ini = (p.nome||'?').split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
+  var cores = ['linear-gradient(135deg,#60A5FA,#1B4B8A)','linear-gradient(135deg,#34D399,#059669)','linear-gradient(135deg,#F97316,#DC2626)','linear-gradient(135deg,#A78BFA,#7C3AED)','linear-gradient(135deg,#34D399,#0F766E)'];
+  var cor = cores[(p.nome||'').charCodeAt(0) % cores.length];
+
+  var papelKey = (p.papel||'fornecedor').toLowerCase();
+  var badgesCls = { cliente:'badge-cli', fornecedor:'badge-forn', ambos:'badge-amb' };
+  var badges = [badgeHtml(p.papel||'fornecedor')];
+  if (p.tipo) badges.push(badgeHtml(p.tipo.toUpperCase()));
+
+  // Últimas transações (até 5)
+  var ultimas = lancsP.slice(-5).reverse();
+  var txsHtml = ultimas.length > 0 ? ultimas.map(function(l){
+    var isRec = (l.tipo||'').toLowerCase().includes('receita') || (l.val||'').toString().startsWith('+');
+    var val = parseLanc(l);
+    return `<div class="mini-tx">
+      <div class="mini-tx-icon" style="background:${isRec?'#ECFDF5':'#FEF2F2'}">${isRec?'💰':'💸'}</div>
+      <div class="mini-tx-name">${l.title||l.descricao||'Lançamento'}</div>
+      <div class="mini-tx-date">${(l.data||'').split('-').reverse().slice(0,2).join('/')}</div>
+      <div class="mini-tx-val ${isRec?'g':'r'}">${isRec?'+':'-'}${fmt(val)}</div>
+    </div>`;
+  }).join('') : '<div style="color:var(--text3);font-size:13px;padding:8px 0">Nenhum lançamento vinculado a este cadastro.</div>';
+
   document.getElementById('detalhe-empty').style.display = 'none';
   var content = document.getElementById('detalhe-content');
   content.style.display = 'block';
 
   content.innerHTML = `
     <div class="detalhe-header">
-      <div class="detalhe-avatar" style="background:${d.cor}">${d.ini}</div>
+      <div class="detalhe-avatar" style="background:${cor}">${ini}</div>
       <div>
-        <div class="detalhe-name">${d.nome}</div>
-        <div class="detalhe-badges">${d.badges.map(badgeHtml).join('')}</div>
+        <div class="detalhe-name">${p.nome}</div>
+        <div class="detalhe-badges">${badges.join('')}</div>
       </div>
     </div>
     <div class="detalhe-kpis">
       <div class="detalhe-kpi">
         <div class="detalhe-kpi-label">Total pago</div>
-        <div class="detalhe-kpi-val r">${d.pago}</div>
+        <div class="detalhe-kpi-val r">${totalPago > 0 ? fmt(totalPago) : '—'}</div>
       </div>
       <div class="detalhe-kpi">
         <div class="detalhe-kpi-label">Total recebido</div>
-        <div class="detalhe-kpi-val g">${d.recebido}</div>
+        <div class="detalhe-kpi-val g">${totalReceb > 0 ? fmt(totalReceb) : '—'}</div>
       </div>
       <div class="detalhe-kpi">
         <div class="detalhe-kpi-label">Ticket médio</div>
-        <div class="detalhe-kpi-val">${d.ticket}</div>
+        <div class="detalhe-kpi-val">${ticket > 0 ? fmt(ticket) : '—'}</div>
       </div>
       <div class="detalhe-kpi">
         <div class="detalhe-kpi-label">Lançamentos</div>
-        <div class="detalhe-kpi-val">${d.txCount}</div>
+        <div class="detalhe-kpi-val">${lancsP.length} lançamento${lancsP.length!==1?'s':''}</div>
       </div>
-    </div>
-    <div class="detalhe-chart">
-      <div class="detalhe-chart-title">Evolução mensal — últimos 6 meses</div>
-      <div style="position:relative;height:80px"><canvas id="chart-det"></canvas></div>
     </div>
     <div class="detalhe-txs">
       <div class="detalhe-txs-title">Últimas transações</div>
-      ${d.txs.map(t=>`
-        <div class="mini-tx">
-          <div class="mini-tx-icon" style="background:${t.bg}">${t.icon}</div>
-          <div class="mini-tx-name">${t.name}</div>
-          <div class="mini-tx-date">${t.date}</div>
-          <div class="mini-tx-val ${t.cls}">${t.val}</div>
-        </div>`).join('')}
+      ${txsHtml}
     </div>
     <div class="detalhe-info">
-      <div class="info-row"><span class="info-label">Documento</span><span class="info-val">${d.doc}</span></div>
-      <div class="info-row"><span class="info-label">E-mail</span><span class="info-val">${d.email}</span></div>
-      <div class="info-row"><span class="info-label">Telefone</span><span class="info-val">${d.tel}</span></div>
-      <div class="info-row"><span class="info-label">Categoria padrão</span><span class="info-val">${d.cat}</span></div>
-      <div class="info-row"><span class="info-label">Cidade</span><span class="info-val">${d.cidade}</span></div>
+      <div class="info-row"><span class="info-label">Documento</span><span class="info-val">${p.doc||'—'}</span></div>
+      <div class="info-row"><span class="info-label">E-mail</span><span class="info-val">${p.email||'—'}</span></div>
+      <div class="info-row"><span class="info-label">Telefone</span><span class="info-val">${p.tel||'—'}</span></div>
+      <div class="info-row"><span class="info-label">Observações</span><span class="info-val">${p.obs||'—'}</span></div>
     </div>
     <div class="detalhe-actions">
-      <button class="btn-det" onclick="editarPessoa(_currentPessoaId)">✏️ Editar</button>
+      <button class="btn-det" onclick="editarPessoa('${id}')">✏️ Editar</button>
       <button class="btn-det" onclick="window.navegarPara('lancamentos')">↕️ Lançamentos</button>
-      <button class="btn-det danger" onclick="excluirPessoaComFirebase(_currentPessoaId)">🗑️ Excluir</button>
+      <button class="btn-det danger" onclick="excluirPessoaComFirebase('${id}')">🗑️ Excluir</button>
     </div>
   `;
-
-  if (chartDetalhe) chartDetalhe.destroy();
-  setTimeout(() => {
-    var ctx = document.getElementById('chart-det');
-    if (!ctx) return;
-    chartDetalhe = new Chart(ctx.getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: ['Dez','Jan','Fev','Mar','Abr','Mai'],
-        datasets: [{ data: d.saldo, backgroundColor: 'rgba(27,75,138,0.7)', borderRadius: 4 }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } } },
-          y: { grid: { color: '#F3F4F6' }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, callback: v => 'R$' + v } }
-        }
-      }
-    });
-  }, 50);
 }
 
 function editarPessoa(id) {
@@ -7283,10 +7225,10 @@ var relatorios = {
   pessoas: {
     title: '👥 Fornecedores e Clientes — Maio 2026',
     kpis: [
-      {label:'Total pago',val:'R$ 0,00',cls:'r',sub:'4 fornecedores'},
-      {label:'Total recebido',val:'R$ 0,00',cls:'g',sub:'1 cliente'},
-      {label:'Maior fornecedor',val:'Imob. XYZ',cls:'',sub:'R$ 1.200'},
-      {label:'Ticket médio',val:'R$ 648',cls:'',sub:'por fornecedor'},
+      {label:'Total pago',val:'R$ 0,00',cls:'r',sub:'0 fornecedores'},
+      {label:'Total recebido',val:'R$ 0,00',cls:'g',sub:'0 clientes'},
+      {label:'Maior fornecedor',val:'—',cls:'',sub:'sem dados'},
+      {label:'Ticket médio',val:'—',cls:'',sub:'sem dados'},
     ]
   },
   cartao: {
@@ -8534,7 +8476,7 @@ function buscarCEP(el) { /* integração ViaCEP */ }
 function abrirModal() { document.getElementById('modal').classList.add('open'); }
 function fecharModal() { document.getElementById('modal').classList.remove('open'); }
 function salvarCadastro() { fecharModal(); }
-function exportarCSV() { alert('Exportando lista de fornecedores e clientes em CSV...'); }
+function exportarCSV() { if (typeof window.exportarCSV === 'function') window.exportarCSV(); else alert('Exportando CSV...'); }
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') fecharModal();
@@ -8651,10 +8593,10 @@ var _rels_relatorios = {
   pessoas: {
     title: '👥 Fornecedores e Clientes — Maio 2026',
     kpis: [
-      {label:'Total pago',val:'R$ 0,00',cls:'r',sub:'4 fornecedores'},
-      {label:'Total recebido',val:'R$ 0,00',cls:'g',sub:'1 cliente'},
-      {label:'Maior fornecedor',val:'Imob. XYZ',cls:'',sub:'R$ 1.200'},
-      {label:'Ticket médio',val:'R$ 648',cls:'',sub:'por fornecedor'},
+      {label:'Total pago',val:'R$ 0,00',cls:'r',sub:'0 fornecedores'},
+      {label:'Total recebido',val:'R$ 0,00',cls:'g',sub:'0 clientes'},
+      {label:'Maior fornecedor',val:'—',cls:'',sub:'sem dados'},
+      {label:'Ticket médio',val:'—',cls:'',sub:'sem dados'},
     ]
   },
   cartao: {
@@ -9467,6 +9409,8 @@ function renderPessoas() {
       </div>
     </div>`;
   }).join('');
+  // Atualiza KPIs dos cards superiores com dados reais
+  if (typeof atualizarKPIsPessoas === 'function') atualizarKPIsPessoas();
 }
 
 // ══════════════════════════════════════════════════════════════════════════════════
