@@ -7690,61 +7690,134 @@ var contas = {
 var _chart_contas = null;
 
 function abrirDetalhe(id) {
-  var c = contas[id];
+  // Busca primeiro nos dados reais do Firebase; fallback para objeto estático hardcoded
+  var fbConta = (window._appData && window._appData.contas)
+    ? window._appData.contas.find(function(x){ return x.id === id; })
+    : null;
+  if (!fbConta && window._contasData) fbConta = window._contasData[id];
+
   window._detalheConta = id;
   document.querySelectorAll('.conta-card').forEach(el => el.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
+  if (event && event.currentTarget) event.currentTarget.classList.add('selected');
 
-  document.getElementById('det-title').textContent = c.title;
-  document.getElementById('det-bank').textContent = c.bank;
-  var bal = document.getElementById('det-balance');
-  bal.textContent = c.balance;
-  bal.className = 'detalhe-balance ' + c.balanceClass;
-  document.getElementById('det-entradas').textContent = c.entradas;
-  document.getElementById('det-saidas').textContent = c.saidas;
-  document.getElementById('det-inicial').textContent = c.inicial;
-  document.getElementById('det-tx').textContent = c.tx;
+  if (fbConta) {
+    // ── Dados reais do Firebase ──────────────────────────────────────────────
+    var tipoLabel = { corrente:'Conta corrente', poupanca:'Conta poupança', cartao:'Cartão de crédito', investimento:'Investimento', digital:'Carteira digital', outros:'Outros' };
+    var saldo = fbConta.saldo || 'R$ 0,00';
+    var neg   = saldo.trim().startsWith('-');
 
-  // Transações
-  var list = document.getElementById('det-txlist');
-  list.innerHTML = c.txlist.map(t => `
-    <div class="mini-tx">
-      <div class="mini-tx-icon" style="background:${t.bg}">${t.icon}</div>
-      <div class="mini-tx-name">${t.name}</div>
-      <div class="mini-tx-date">${t.date}</div>
-      <div class="mini-tx-val ${t.cls}">${t.val}</div>
-    </div>`).join('');
+    var titleEl = document.getElementById('det-title');
+    var bankEl  = document.getElementById('det-bank');
+    var balEl   = document.getElementById('det-balance');
+    var entEl   = document.getElementById('det-entradas');
+    var saiEl   = document.getElementById('det-saidas');
+    var iniEl   = document.getElementById('det-inicial');
+    var txEl    = document.getElementById('det-tx');
+    var listEl  = document.getElementById('det-txlist');
 
-  // Gráfico
-  if (_chart_contas) _chart_contas.destroy();
-  var ctx = (function(){ var _e=document.getElementById('_chart_contas'); return _e?_e.getContext('2d'):null; })();
-  if (ctx) _chart_contas = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Dez','Jan','Fev','Mar','Abr','Mai'],
-      datasets: [{
-        data: c.saldo,
-        borderColor: '#1B4B8A',
-        backgroundColor: 'rgba(27,75,138,0.08)',
-        borderWidth: 2,
-        pointRadius: 3,
-        fill: true,
-        tension: 0.4
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } } },
-        y: { grid: { color: '#F3F4F6' }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, callback: v => 'R$' + (v/1000).toFixed(1) + 'k' } }
+    if (titleEl) titleEl.textContent = fbConta.nome || '—';
+    if (bankEl)  bankEl.textContent  = (fbConta.banco || '') + (fbConta.banco ? ' · ' : '') + (tipoLabel[fbConta.tipo] || fbConta.tipo || '—');
+    if (balEl)   { balEl.textContent = saldo; balEl.className = 'detalhe-balance' + (neg ? ' neg' : ''); }
+    if (entEl)   entEl.textContent = 'R$ 0,00';
+    if (saiEl)   saiEl.textContent = 'R$ 0,00';
+    if (iniEl)   iniEl.textContent = fbConta.saldo || 'R$ 0,00';
+    if (txEl)    txEl.textContent  = '— transações';
+
+    // Calcula entradas/saídas a partir dos lançamentos reais
+    var lancs = (window._appData && window._appData.lancamentos) || [];
+    var nomeConta = fbConta.nome || '';
+    var totalEnt = 0, totalSai = 0, nTx = 0;
+    lancs.forEach(function(l) {
+      if ((l.conta||'').toLowerCase().trim() === nomeConta.toLowerCase().trim()) {
+        nTx++;
+        var v = parseFloat((l.val||'').replace(/[^\d,.]/g,'').replace(',','.')) || 0;
+        if ((l.tipo||'').toLowerCase().includes('receita') || (l.val||'').startsWith('+')) totalEnt += v;
+        else totalSai += v;
+      }
+    });
+    var fmt2 = function(v){ return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+    if (entEl) entEl.textContent = fmt2(totalEnt);
+    if (saiEl) saiEl.textContent = fmt2(totalSai);
+    if (txEl)  txEl.textContent  = nTx + (nTx === 1 ? ' transação' : ' transações');
+
+    // Lista de transações recentes dessa conta
+    if (listEl) {
+      var txsConta = lancs.filter(function(l){ return (l.conta||'').toLowerCase().trim() === nomeConta.toLowerCase().trim(); }).slice(0,5);
+      if (!txsConta.length) {
+        listEl.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">Nenhuma transação registrada para esta conta.</div>';
+      } else {
+        listEl.innerHTML = txsConta.map(function(t) {
+          var isRec = (t.tipo||'').toLowerCase().includes('receita') || (t.val||'').startsWith('+');
+          var bg  = isRec ? '#ECFDF5' : '#FEF2F2';
+          var cls = isRec ? 'g' : 'r';
+          var icone = isRec ? '💰' : '💸';
+          return '<div class="mini-tx">' +
+            '<div class="mini-tx-icon" style="background:'+bg+'">'+icone+'</div>' +
+            '<div class="mini-tx-name">'+(t.title||t.descricao||'—')+'</div>' +
+            '<div class="mini-tx-date">'+(t.data||'—')+'</div>' +
+            '<div class="mini-tx-val '+cls+'">'+(t.val||'—')+'</div>' +
+          '</div>';
+        }).join('');
       }
     }
-  });
 
-  document.getElementById('detalhe-panel').classList.add('open');
-  document.getElementById('detalhe-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Gráfico: linha plana com o saldo atual (sem histórico disponível)
+    if (_chart_contas) _chart_contas.destroy();
+    var ctx = (function(){ var _e=document.getElementById('_chart_contas'); return _e?_e.getContext('2d'):null; })();
+    var saldoNum = parseFloat((saldo).replace(/[^\d,.]/g,'').replace(',','.')) || 0;
+    if (ctx) _chart_contas = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan','Fev','Mar','Abr','Mai','Jun'],
+        datasets: [{
+          data: [saldoNum, saldoNum, saldoNum, saldoNum, saldoNum, saldoNum],
+          borderColor: '#1B4B8A',
+          backgroundColor: 'rgba(27,75,138,0.08)',
+          borderWidth: 2, pointRadius: 3, fill: true, tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } } },
+          y: { grid: { color: '#F3F4F6' }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, callback: v => 'R$' + (v/1000).toFixed(1) + 'k' } }
+        }
+      }
+    });
+
+  } else {
+    // ── Fallback para dados estáticos hardcoded (contas de demonstração) ──────
+    var c = contas[id];
+    if (!c) { console.warn('abrirDetalhe: conta não encontrada para id:', id); return; }
+
+    var titleEl2 = document.getElementById('det-title');
+    var bankEl2  = document.getElementById('det-bank');
+    var balEl2   = document.getElementById('det-balance');
+    if (titleEl2) titleEl2.textContent = c.title;
+    if (bankEl2)  bankEl2.textContent  = c.bank;
+    if (balEl2)   { balEl2.textContent = c.balance; balEl2.className = 'detalhe-balance ' + c.balanceClass; }
+    var entEl2 = document.getElementById('det-entradas'); if(entEl2) entEl2.textContent = c.entradas;
+    var saiEl2 = document.getElementById('det-saidas');   if(saiEl2) saiEl2.textContent = c.saidas;
+    var iniEl2 = document.getElementById('det-inicial');  if(iniEl2) iniEl2.textContent = c.inicial;
+    var txEl2  = document.getElementById('det-tx');       if(txEl2)  txEl2.textContent  = c.tx;
+    var listEl2 = document.getElementById('det-txlist');
+    if (listEl2) listEl2.innerHTML = c.txlist.map(t =>
+      '<div class="mini-tx"><div class="mini-tx-icon" style="background:'+t.bg+'">'+t.icon+'</div>' +
+      '<div class="mini-tx-name">'+t.name+'</div><div class="mini-tx-date">'+t.date+'</div>' +
+      '<div class="mini-tx-val '+t.cls+'">'+t.val+'</div></div>').join('');
+
+    if (_chart_contas) _chart_contas.destroy();
+    var ctx2 = (function(){ var _e=document.getElementById('_chart_contas'); return _e?_e.getContext('2d'):null; })();
+    if (ctx2) _chart_contas = new Chart(ctx2, {
+      type: 'line',
+      data: { labels: ['Dez','Jan','Fev','Mar','Abr','Mai'], datasets: [{ data: c.saldo, borderColor: '#1B4B8A', backgroundColor: 'rgba(27,75,138,0.08)', borderWidth: 2, pointRadius: 3, fill: true, tension: 0.4 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } } }, y: { grid: { color: '#F3F4F6' }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, callback: v => 'R$' + (v/1000).toFixed(1) + 'k' } } } }
+    });
+  }
+
+  var panel = document.getElementById('detalhe-panel');
+  if (panel) { panel.classList.add('open'); panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
 }
 
 function fecharDetalhe() {
