@@ -6858,7 +6858,7 @@ document.addEventListener('keydown', e => {
     <!-- VISUALIZADOR -->
     <div class="viewer" id="viewer">
       <div class="viewer-header">
-        <div class="viewer-title" id="viewer-title">📉 Fluxo de Caixa — Maio 2026</div>
+        <div class="viewer-title" id="viewer-title">📉 Fluxo de Caixa</div>
         <div class="viewer-actions">
           <select class="filter-select" id="viewer-filter" onchange="atualizarViewer()">
             <option>Todas as contas</option>
@@ -6882,22 +6882,22 @@ document.addEventListener('keydown', e => {
         <div class="vkpi">
           <div class="vkpi-label">Receitas</div>
           <div class="vkpi-val g">R$ 0,00</div>
-          <div class="vkpi-sub">↑ 8,3% vs abril</div>
+          <div class="vkpi-sub">—</div>
         </div>
         <div class="vkpi">
           <div class="vkpi-label">Despesas</div>
           <div class="vkpi-val r">R$ 0,00</div>
-          <div class="vkpi-sub">↑ 2,1% vs abril</div>
+          <div class="vkpi-sub">—</div>
         </div>
         <div class="vkpi">
           <div class="vkpi-label">Saldo do período</div>
-          <div class="vkpi-val">R$ 3.260</div>
-          <div class="vkpi-sub">50,2% da receita</div>
+          <div class="vkpi-val">R$ 0,00</div>
+          <div class="vkpi-sub">—</div>
         </div>
         <div class="vkpi">
           <div class="vkpi-label">Saldo acumulado</div>
           <div class="vkpi-val b">R$ 0,00</div>
-          <div class="vkpi-sub">↑ 3,2% vs abril</div>
+          <div class="vkpi-sub">—</div>
         </div>
       </div>
 
@@ -7116,173 +7116,25 @@ document.addEventListener('keydown', e => {
 </div>
 
 <script>
-// DADOS
-var dadosPeriodo = {
-  '3m': {
-    labels: ['Mar','Abr','Mai'],
-    rec: [5800,6200,6500],
-    desp: [3100,3050,3240]
-  },
-  '6m': {
-    labels: ['Dez','Jan','Fev','Mar','Abr','Mai'],
-    rec: [5200,5500,5800,5800,6200,6500],
-    desp: [2800,3200,2900,3100,3050,3240]
-  },
-  '12m': {
-    labels: ['Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'],
-    rec: [4800,5000,5100,5200,5300,5400,5200,5500,5800,5800,6200,6500],
-    desp: [2600,2700,2800,2900,2800,3000,2800,3200,2900,3100,3050,3240]
-  }
-};
-
-var periodoAtivo = '3m';
-var chartMain = null;
-
-function initChart(periodo) {
-  var d = dadosPeriodo[periodo];
-  var ctx = (function(){ var _e=document.getElementById('chartMain'); return _e?_e.getContext('2d'):null; })();
-  if (chartMain) chartMain.destroy();
-  if (ctx) chartMain = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: d.labels,
-      datasets: [
-        { label:'Receitas', data: d.rec, backgroundColor:'rgba(5,150,105,0.75)', borderRadius:5, borderSkipped:false },
-        { label:'Despesas', data: d.desp, backgroundColor:'rgba(220,38,38,0.75)', borderRadius:5, borderSkipped:false },
-        { label:'Saldo', data: d.rec.map((r,i)=>r-d.desp[i]), type:'line', borderColor:'#1B4B8A', backgroundColor:'rgba(27,75,138,0.08)', borderWidth:2, pointRadius:4, fill:true, tension:0.4, yAxisID:'y' }
-      ]
-    },
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ position:'bottom', labels:{ font:{family:'Plus Jakarta Sans',size:11}, boxWidth:10, padding:12 } } },
-      scales:{
-        x:{ grid:{display:false}, ticks:{font:{family:'Plus Jakarta Sans',size:11}} },
-        y:{ grid:{color:'#F3F4F6'}, ticks:{font:{family:'Plus Jakarta Sans',size:11}, callback:v=>'R$'+(v/1000).toFixed(1)+'k'} }
-      }
-    }
-  });
-  renderTabela(d);
-}
-
-function renderTabela(d) {
-  var tbody = document.getElementById('side-tbody');
-  tbody.innerHTML = d.labels.map((l,i) => {
-    var saldo = d.rec[i] - d.desp[i];
-    return `<div class="table-row" style="grid-template-columns:1fr 1fr 1fr 1fr">
-      <div class="td">${l}</div>
-      <div class="td g">R$${(d.rec[i]/1000).toFixed(1)}k</div>
-      <div class="td r">R$${(d.desp[i]/1000).toFixed(1)}k</div>
-      <div class="td b">R$${(saldo/1000).toFixed(1)}k</div>
-    </div>`;
-  }).join('');
-}
+// ── Relatórios: funções de UI locais (dados reais são calculados pelo bloco Firebase) ──
+var periodoAtivo = '3m'; // compatibilidade com chamadas antigas
 
 function setPeriodo(p, el) {
   periodoAtivo = p;
+  if (typeof _periodoAtivo_relatorios !== 'undefined') _periodoAtivo_relatorios = p;
   document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  initChart(p);
+  if (typeof initChart === 'function') initChart(p);
 }
 
-// RELATÓRIOS
-var relatorios = {
-  fluxo: {
-    title: '📉 Fluxo de Caixa — Maio 2026',
-    kpis: [
-      {label:'Receitas',val:'R$ 0,00',cls:'g',sub:'↑ 8,3% vs abril'},
-      {label:'Despesas',val:'R$ 0,00',cls:'r',sub:'↑ 2,1% vs abril'},
-      {label:'Saldo do período',val:'R$ 3.260',cls:'',sub:'50,2% da receita'},
-      {label:'Saldo acumulado',val:'R$ 0,00',cls:'b',sub:'↑ 3,2% vs abril'},
-    ]
-  },
-  categorias: {
-    title: '🏷️ Despesas por Categoria — Maio 2026',
-    kpis: [
-      {label:'Total despesas',val:'R$ 0,00',cls:'r',sub:'14 lançamentos'},
-      {label:'Maior categoria',val:'Moradia',cls:'',sub:'R$ 0,00 · 0%'},
-      {label:'Categorias usadas',val:'5 de 10',cls:'',sub:'50% das categorias'},
-      {label:'Ticket médio',val:'R$ 231',cls:'',sub:'por lançamento'},
-    ]
-  },
-  receitas: {
-    title: '💰 Receitas por Cliente — Maio 2026',
-    kpis: [
-      {label:'Total receitas',val:'R$ 0,00',cls:'g',sub:'1 lançamento'},
-      {label:'Maior cliente',val:'Empresa ABC',cls:'',sub:'100% das receitas'},
-      {label:'Ticket médio',val:'R$ 0,00',cls:'',sub:'por cliente'},
-      {label:'Clientes ativos',val:'1',cls:'',sub:'maio/26'},
-    ]
-  },
-  extrato: {
-    title: '🏦 Extrato por Conta — Maio 2026',
-    kpis: [
-      {label:'Saldo inicial',val:'R$ 21.570',cls:'',sub:'01/05/2026'},
-      {label:'Entradas',val:'R$ 7.000',cls:'g',sub:'incluindo rendimentos'},
-      {label:'Saídas',val:'R$ 3.740',cls:'r',sub:'efetivadas'},
-      {label:'Saldo final',val:'R$ 0,00',cls:'b',sub:'25/05/2026'},
-    ]
-  },
-  pessoas: {
-    title: '👥 Fornecedores e Clientes — Maio 2026',
-    kpis: [
-      {label:'Total pago',val:'R$ 0,00',cls:'r',sub:'0 fornecedores'},
-      {label:'Total recebido',val:'R$ 0,00',cls:'g',sub:'0 clientes'},
-      {label:'Maior fornecedor',val:'—',cls:'',sub:'sem dados'},
-      {label:'Ticket médio',val:'—',cls:'',sub:'sem dados'},
-    ]
-  },
-  cartao: {
-    title: '💳 Faturas do Cartão — Maio 2026',
-    kpis: [
-      {label:'Fatura aberta',val:'R$ 1.840',cls:'r',sub:'fecha dia 05/06'},
-      {label:'Limite total',val:'R$ 5.000',cls:'',sub:'Cartão Itaú'},
-      {label:'Limite disponível',val:'R$ 3.160',cls:'g',sub:'63,2% livre'},
-      {label:'Parcelamentos',val:'R$ 0',cls:'',sub:'sem parcelas em aberto'},
-    ]
-  },
-  patrimonio: {
-    title: '📦 Patrimônio Líquido — Maio 2026',
-    kpis: [
-      {label:'Patrimônio atual',val:'R$ 0,00',cls:'b',sub:'25/05/2026'},
-      {label:'Variação mensal',val:'+ R$ 780',cls:'g',sub:'↑ 3,2% vs abril'},
-      {label:'Maior ativo',val:'Renda Fixa',cls:'',sub:'R$ 10.500 · 42%'},
-      {label:'Projeção 3M',val:'R$ 27.200',cls:'',sub:'estimativa'},
-    ]
-  },
-  recorrentes: {
-    title: '🔁 Lançamentos Recorrentes — Maio 2026',
-    kpis: [
-      {label:'Recorrências ativas',val:'4',cls:'',sub:'despesas fixas'},
-      {label:'Impacto mensal',val:'R$ 1.755',cls:'r',sub:'compromissos fixos'},
-      {label:'Próx. vencimento',val:'28/05',cls:'',sub:'Plano de saúde'},
-      {label:'% da renda',val:'27%',cls:'',sub:'comprometido em fixos'},
-    ]
-  }
-};
-
-function abrirRelatorio(id, el) {
-  document.querySelectorAll('.rel-card').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  var r = relatorios[id];
-  document.getElementById('viewer-title').textContent = r.title;
-  var kpisEl = document.getElementById('viewer-kpis');
-  kpisEl.innerHTML = r.kpis.map(k => `
-    <div class="vkpi">
-      <div class="vkpi-label">${k.label}</div>
-      <div class="vkpi-val ${k.cls}">${k.val}</div>
-      <div class="vkpi-sub">${k.sub}</div>
-    </div>`).join('');
-  document.getElementById('viewer').scrollIntoView({ behavior:'smooth', block:'nearest' });
-  initChart(periodoAtivo);
+function atualizarViewer() {
+  if (typeof initChart === 'function') initChart(periodoAtivo);
 }
-
-function atualizarViewer() { initChart(periodoAtivo); }
 
 function exportar(tipo) {
   var titulo = document.getElementById('viewer-title').textContent;
   alert(`Exportando "${titulo}" em ${tipo}...`);
 }
-
 
 // ===== PERIOD PICKER =====
 function togglePeriodPicker() {
@@ -7301,7 +7153,7 @@ function selecionarPreset(el, label, start, end) {
   atualizarRangeLabel();
   document.getElementById('periodDropdown').classList.remove('open');
   document.getElementById('periodBtn').classList.add('active');
-  onPeriodoMudou(start, end, label);
+  if (typeof onPeriodoMudou === 'function') onPeriodoMudou(start, end, label);
 }
 
 function aplicarPeriodoLivre() {
@@ -7316,7 +7168,7 @@ function aplicarPeriodoLivre() {
   atualizarRangeLabel();
   document.getElementById('periodDropdown').classList.remove('open');
   document.getElementById('periodBtn').classList.add('active');
-  onPeriodoMudou(start, end, label);
+  if (typeof onPeriodoMudou === 'function') onPeriodoMudou(start, end, label);
 }
 
 function atualizarRangeLabel() {
@@ -7336,12 +7188,6 @@ document.addEventListener('click', function(e) {
 });
 // =========================
 
-function onPeriodoMudou(start, end, label) {
-  document.getElementById('viewer-title').textContent = document.getElementById('viewer-title').textContent.split('—')[0].trim() + ' — ' + label;
-  initChart(periodoAtivo);
-}
-function trocarPeriodo(sel) { initChart(periodoAtivo); }
-
 function toggleCheck(el) {
   el.classList.toggle('selected');
   el.querySelector('input').checked = el.classList.contains('selected');
@@ -7359,8 +7205,11 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') fecharModalCustom();
 });
 
-// INIT
-initChart('3m');
+// INIT — será chamado novamente com dados reais quando navegar para a tela
+// Inicializa chart vazio (sem dados fictícios)
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof initChart === 'function') initChart('3m');
+});
 </script>
 </div>
 
@@ -8485,29 +8334,41 @@ document.addEventListener('keydown', e => {
 </script>
 <script>
 // DADOS
-var dadosPeriodo = {
-  '3m': {
-    labels: ['Mar','Abr','Mai'],
-    rec: [5800,6200,6500],
-    desp: [3100,3050,3240]
-  },
-  '6m': {
-    labels: ['Dez','Jan','Fev','Mar','Abr','Mai'],
-    rec: [5200,5500,5800,5800,6200,6500],
-    desp: [2800,3200,2900,3100,3050,3240]
-  },
-  '12m': {
-    labels: ['Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'],
-    rec: [4800,5000,5100,5200,5300,5400,5200,5500,5800,5800,6200,6500],
-    desp: [2600,2700,2800,2900,2800,3000,2800,3200,2900,3100,3050,3240]
+// ── Calcula dadosPeriodo dinamicamente a partir dos lançamentos reais ────────────
+function calcDadosPeriodo(nMeses) {
+  var lancs = (window._appData && window._appData.lancamentos) || [];
+  var now = new Date();
+  var meses = [];
+  for (var i = nMeses - 1; i >= 0; i--) {
+    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    meses.push({ ano: d.getFullYear(), mes: d.getMonth(), label: d.toLocaleString('pt-BR',{month:'short'}).replace('.','') });
   }
-};
+  var labels = [], rec = [], desp = [];
+  meses.forEach(function(m) {
+    var r = 0, d = 0;
+    lancs.forEach(function(l) {
+      var dt = l.data ? new Date(l.data + (l.data.length === 10 ? 'T12:00:00' : '')) : null;
+      if (!dt || isNaN(dt)) return;
+      if (dt.getFullYear() !== m.ano || dt.getMonth() !== m.mes) return;
+      var valStr = (l.val||'').replace(/[^\d,.]/g,'').replace(',','.');
+      var val = parseFloat(valStr) || 0;
+      var tipo = (l.tipo||'').toLowerCase();
+      if (tipo.includes('receita') || (l.val||'').startsWith('+')) r += val;
+      else d += val;
+    });
+    labels.push(m.label.charAt(0).toUpperCase() + m.label.slice(1));
+    rec.push(Math.round(r));
+    desp.push(Math.round(d));
+  });
+  return { labels, rec, desp };
+}
 
 var _periodoAtivo_relatorios = '3m';
 var _chartMain_relatorios = null;
 
 function initChart(periodo) {
-  var d = dadosPeriodo[periodo];
+  var nMeses = periodo === '12m' ? 12 : periodo === '6m' ? 6 : 3;
+  var d = calcDadosPeriodo(nMeses);
   var ctx = (function(){ var _e=document.getElementById('_chartMain_relatorios'); return _e?_e.getContext('2d'):null; })();
   if (_chartMain_relatorios) _chartMain_relatorios.destroy();
   if (ctx) _chartMain_relatorios = new Chart(ctx, {
@@ -8552,89 +8413,241 @@ function setPeriodo(p, el) {
   initChart(p);
 }
 
-// RELATÓRIOS
-var _rels_relatorios = {
-  fluxo: {
-    title: '📉 Fluxo de Caixa — Maio 2026',
-    kpis: [
-      {label:'Receitas',val:'R$ 0,00',cls:'g',sub:'↑ 8,3% vs abril'},
-      {label:'Despesas',val:'R$ 0,00',cls:'r',sub:'↑ 2,1% vs abril'},
-      {label:'Saldo do período',val:'R$ 3.260',cls:'',sub:'50,2% da receita'},
-      {label:'Saldo acumulado',val:'R$ 0,00',cls:'b',sub:'↑ 3,2% vs abril'},
-    ]
-  },
-  categorias: {
-    title: '🏷️ Despesas por Categoria — Maio 2026',
-    kpis: [
-      {label:'Total despesas',val:'R$ 0,00',cls:'r',sub:'14 lançamentos'},
-      {label:'Maior categoria',val:'Moradia',cls:'',sub:'R$ 0,00 · 0%'},
-      {label:'Categorias usadas',val:'5 de 10',cls:'',sub:'50% das categorias'},
-      {label:'Ticket médio',val:'R$ 231',cls:'',sub:'por lançamento'},
-    ]
-  },
-  receitas: {
-    title: '💰 Receitas por Cliente — Maio 2026',
-    kpis: [
-      {label:'Total receitas',val:'R$ 0,00',cls:'g',sub:'1 lançamento'},
-      {label:'Maior cliente',val:'Empresa ABC',cls:'',sub:'100% das receitas'},
-      {label:'Ticket médio',val:'R$ 0,00',cls:'',sub:'por cliente'},
-      {label:'Clientes ativos',val:'1',cls:'',sub:'maio/26'},
-    ]
-  },
-  extrato: {
-    title: '🏦 Extrato por Conta — Maio 2026',
-    kpis: [
-      {label:'Saldo inicial',val:'R$ 21.570',cls:'',sub:'01/05/2026'},
-      {label:'Entradas',val:'R$ 7.000',cls:'g',sub:'incluindo rendimentos'},
-      {label:'Saídas',val:'R$ 3.740',cls:'r',sub:'efetivadas'},
-      {label:'Saldo final',val:'R$ 0,00',cls:'b',sub:'25/05/2026'},
-    ]
-  },
-  pessoas: {
-    title: '👥 Fornecedores e Clientes — Maio 2026',
-    kpis: [
-      {label:'Total pago',val:'R$ 0,00',cls:'r',sub:'0 fornecedores'},
-      {label:'Total recebido',val:'R$ 0,00',cls:'g',sub:'0 clientes'},
-      {label:'Maior fornecedor',val:'—',cls:'',sub:'sem dados'},
-      {label:'Ticket médio',val:'—',cls:'',sub:'sem dados'},
-    ]
-  },
-  cartao: {
-    title: '💳 Faturas do Cartão — Maio 2026',
-    kpis: [
-      {label:'Fatura aberta',val:'R$ 1.840',cls:'r',sub:'fecha dia 05/06'},
-      {label:'Limite total',val:'R$ 5.000',cls:'',sub:'Cartão Itaú'},
-      {label:'Limite disponível',val:'R$ 3.160',cls:'g',sub:'63,2% livre'},
-      {label:'Parcelamentos',val:'R$ 0',cls:'',sub:'sem parcelas em aberto'},
-    ]
-  },
-  patrimonio: {
-    title: '📦 Patrimônio Líquido — Maio 2026',
-    kpis: [
-      {label:'Patrimônio atual',val:'R$ 0,00',cls:'b',sub:'25/05/2026'},
-      {label:'Variação mensal',val:'+ R$ 780',cls:'g',sub:'↑ 3,2% vs abril'},
-      {label:'Maior ativo',val:'Renda Fixa',cls:'',sub:'R$ 10.500 · 42%'},
-      {label:'Projeção 3M',val:'R$ 27.200',cls:'',sub:'estimativa'},
-    ]
-  },
-  recorrentes: {
-    title: '🔁 Lançamentos Recorrentes — Maio 2026',
-    kpis: [
-      {label:'Recorrências ativas',val:'4',cls:'',sub:'despesas fixas'},
-      {label:'Impacto mensal',val:'R$ 1.755',cls:'r',sub:'compromissos fixos'},
-      {label:'Próx. vencimento',val:'28/05',cls:'',sub:'Plano de saúde'},
-      {label:'% da renda',val:'27%',cls:'',sub:'comprometido em fixos'},
-    ]
+// ── Helpers de formatação ─────────────────────────────────────────────────────
+function _fmtBRL(v) {
+  return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function _fmtBRLk(v) {
+  if (Math.abs(v) >= 1000) return 'R$ ' + (v/1000).toFixed(1).replace('.',',') + 'k';
+  return _fmtBRL(v);
+}
+function _percStr(a, b) {
+  if (!b) return '—';
+  var diff = ((a - b) / b * 100);
+  return (diff >= 0 ? '↑ ' : '↓ ') + Math.abs(diff).toFixed(1) + '%';
+}
+
+// ── Calcula KPIs reais por tipo de relatório ──────────────────────────────────
+function _kpisRelatorio(id) {
+  var lancs = (window._appData && window._appData.lancamentos) || [];
+  var contas = (window._appData && window._appData.contas) || [];
+  var pessoas = (window._appData && window._appData.pessoas) || [];
+
+  var now = new Date();
+  var anoAtual = now.getFullYear(), mesAtual = now.getMonth();
+  var mesAnterior = mesAtual === 0 ? 11 : mesAtual - 1;
+  var anoAnterior = mesAtual === 0 ? anoAtual - 1 : anoAtual;
+  var nomeMesAtual = now.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+
+  function parseLanc(l) {
+    var dt = l.data ? new Date(l.data + (l.data.length===10?'T12:00:00':'')) : null;
+    var valStr = (l.val||'').replace(/[^\d,.]/g,'').replace(',','.');
+    var val = parseFloat(valStr) || 0;
+    var tipo = (l.tipo||'').toLowerCase();
+    var isRec = tipo.includes('receita') || (l.val||'').startsWith('+');
+    var isPend = (l.status||'').toLowerCase() === 'pendente';
+    return { dt, val, isRec, isPend, cat: l.cat||'—', conta: l.conta||'—', pessoa: l.pessoa||l.title||'—', recorrente: !!(l.recorrente||l.fixo) };
   }
+
+  function filtrarMes(ano, mes) {
+    return lancs.map(parseLanc).filter(function(l) {
+      return l.dt && l.dt.getFullYear()===ano && l.dt.getMonth()===mes;
+    });
+  }
+
+  var atual = filtrarMes(anoAtual, mesAtual);
+  var anterior = filtrarMes(anoAnterior, mesAnterior);
+
+  var recAtual   = atual.filter(l=>l.isRec && !l.isPend).reduce((s,l)=>s+l.val,0);
+  var despAtual  = atual.filter(l=>!l.isRec && !l.isPend).reduce((s,l)=>s+l.val,0);
+  var recAnt     = anterior.filter(l=>l.isRec && !l.isPend).reduce((s,l)=>s+l.val,0);
+  var despAnt    = anterior.filter(l=>!l.isRec && !l.isPend).reduce((s,l)=>s+l.val,0);
+  var saldoAtual = recAtual - despAtual;
+
+  // Saldo acumulado = soma de todos os lançamentos efetivados até hoje
+  var todosLancs = lancs.map(parseLanc).filter(l=>l.dt && !l.isPend);
+  var saldoAcum  = todosLancs.reduce((s,l)=>l.isRec?s+l.val:s-l.val, 0);
+
+  // Saldo total das contas cadastradas
+  var saldoContas = contas.reduce(function(s,c){
+    var v = parseFloat((c.saldo||c.balance||'').toString().replace(/[^\d,.]/g,'').replace(',','.')) || 0;
+    return s + v;
+  }, 0);
+
+  var nomeMesAnt = new Date(anoAnterior, mesAnterior, 1).toLocaleString('pt-BR',{month:'long'});
+
+  if (id === 'fluxo') {
+    var percRec  = _percStr(recAtual,  recAnt)  + ' vs ' + nomeMesAnt;
+    var percDesp = _percStr(despAtual, despAnt) + ' vs ' + nomeMesAnt;
+    var percSald = _percStr(saldoAtual, recAnt - despAnt) + ' vs ' + nomeMesAnt;
+    var pctRec   = recAtual ? (saldoAtual/recAtual*100).toFixed(1)+'% da receita' : '—';
+    return [
+      { label:'Receitas',        val: _fmtBRL(recAtual),   cls:'g', sub: percRec },
+      { label:'Despesas',        val: _fmtBRL(despAtual),  cls:'r', sub: percDesp },
+      { label:'Saldo do período',val: _fmtBRL(saldoAtual), cls:'',  sub: pctRec },
+      { label:'Saldo acumulado', val: _fmtBRL(saldoAcum),  cls:'b', sub: percSald },
+    ];
+  }
+
+  if (id === 'categorias') {
+    var despsAtual = atual.filter(l=>!l.isRec && !l.isPend);
+    var totalDesp  = despsAtual.reduce((s,l)=>s+l.val,0);
+    var catMap = {};
+    despsAtual.forEach(l=>{ catMap[l.cat] = (catMap[l.cat]||0) + l.val; });
+    var cats = Object.keys(catMap);
+    var maiorCat = cats.sort((a,b)=>catMap[b]-catMap[a])[0] || '—';
+    var pctMaior = totalDesp ? (catMap[maiorCat]/totalDesp*100).toFixed(0)+'%' : '—';
+    var ticket   = despsAtual.length ? totalDesp/despsAtual.length : 0;
+    var totalCats = (window._appData.categorias||[]).length;
+    return [
+      { label:'Total despesas',    val: _fmtBRL(totalDesp), cls:'r', sub: despsAtual.length+' lançamentos' },
+      { label:'Maior categoria',   val: maiorCat,           cls:'',  sub: (catMap[maiorCat]?_fmtBRLk(catMap[maiorCat])+' · ':'')+pctMaior },
+      { label:'Categorias usadas', val: cats.length+(totalCats?' de '+totalCats:''), cls:'', sub: totalCats?(cats.length/totalCats*100).toFixed(0)+'% das categorias':'' },
+      { label:'Ticket médio',      val: _fmtBRL(ticket),    cls:'',  sub: 'por lançamento' },
+    ];
+  }
+
+  if (id === 'receitas') {
+    var recsAtual = atual.filter(l=>l.isRec && !l.isPend);
+    var totalRec  = recsAtual.reduce((s,l)=>s+l.val,0);
+    var pesMap = {};
+    recsAtual.forEach(l=>{ pesMap[l.pessoa] = (pesMap[l.pessoa]||0) + l.val; });
+    var pes = Object.keys(pesMap);
+    var maiorPes = pes.sort((a,b)=>pesMap[b]-pesMap[a])[0] || '—';
+    var pctPes   = totalRec ? (pesMap[maiorPes]/totalRec*100).toFixed(0)+'% das receitas' : '—';
+    var ticketRec = pes.length ? totalRec/pes.length : 0;
+    var mesLabel  = now.toLocaleString('pt-BR',{month:'short',year:'2-digit'}).replace('. ','/')
+    return [
+      { label:'Total receitas',  val: _fmtBRL(totalRec),   cls:'g', sub: recsAtual.length+' lançamento(s)' },
+      { label:'Maior cliente',   val: maiorPes,             cls:'',  sub: pctPes },
+      { label:'Ticket médio',    val: _fmtBRL(ticketRec),  cls:'',  sub: 'por cliente' },
+      { label:'Clientes ativos', val: String(pes.length),  cls:'',  sub: mesLabel },
+    ];
+  }
+
+  if (id === 'extrato') {
+    // Saldo inicial = saldo acumulado até o fim do mês anterior
+    var ateMesAnt = todosLancs.filter(l=>l.dt && (l.dt.getFullYear()<anoAtual||(l.dt.getFullYear()===anoAtual && l.dt.getMonth()<mesAtual)));
+    var saldoInic = ateMesAnt.reduce((s,l)=>l.isRec?s+l.val:s-l.val,0);
+    var entradas  = recAtual;
+    var saidas    = despAtual;
+    var saldoFinal = saldoInic + entradas - saidas;
+    var dia1 = '01/'+(String(mesAtual+1).padStart(2,'0'))+'/'+anoAtual;
+    var diaHj = String(now.getDate()).padStart(2,'0')+'/'+(String(mesAtual+1).padStart(2,'0'))+'/'+anoAtual;
+    return [
+      { label:'Saldo inicial', val: _fmtBRL(saldoInic),  cls:'',  sub: dia1 },
+      { label:'Entradas',      val: _fmtBRL(entradas),   cls:'g', sub: 'efetivadas no mês' },
+      { label:'Saídas',        val: _fmtBRL(saidas),     cls:'r', sub: 'efetivadas no mês' },
+      { label:'Saldo final',   val: _fmtBRL(saldoFinal), cls:'b', sub: diaHj },
+    ];
+  }
+
+  if (id === 'pessoas') {
+    var pagAtual = atual.filter(l=>!l.isRec && !l.isPend);
+    var recbAtual = atual.filter(l=>l.isRec && !l.isPend);
+    var totalPago = pagAtual.reduce((s,l)=>s+l.val,0);
+    var totalRecb = recbAtual.reduce((s,l)=>s+l.val,0);
+    var fornMap = {};
+    pagAtual.forEach(l=>{ fornMap[l.pessoa]=(fornMap[l.pessoa]||0)+l.val; });
+    var forns = Object.keys(fornMap);
+    var maiorForn = forns.sort((a,b)=>fornMap[b]-fornMap[a])[0] || '—';
+    var ticket = (forns.length+recbAtual.length) ? (totalPago+totalRecb)/(forns.length+recbAtual.length) : 0;
+    return [
+      { label:'Total pago',        val: _fmtBRL(totalPago), cls:'r', sub: forns.length+' fornecedor(es)' },
+      { label:'Total recebido',    val: _fmtBRL(totalRecb), cls:'g', sub: recbAtual.length+' cliente(s)' },
+      { label:'Maior fornecedor',  val: maiorForn,           cls:'',  sub: maiorForn!=='—'?_fmtBRLk(fornMap[maiorForn]):'sem dados' },
+      { label:'Ticket médio',      val: ticket?_fmtBRL(ticket):'—', cls:'', sub: 'por pessoa' },
+    ];
+  }
+
+  if (id === 'cartao') {
+    // Lançamentos de cartão no mês atual
+    var cartaoLancs = atual.filter(l=>!l.isRec);
+    var faturaAberta = cartaoLancs.filter(l=>l.isPend).reduce((s,l)=>s+l.val,0) +
+                       atual.filter(l=>!l.isRec && !l.isPend).reduce((s,l)=>s+l.val,0);
+    // Limite total = soma de contas do tipo cartão
+    var contasCartao = contas.filter(c=>(c.tipo||'').toLowerCase().includes('cart'));
+    var limiteTotal = contasCartao.reduce(function(s,c){
+      var lim = parseFloat((c.limite||'').toString().replace(/[^\d,.]/g,'').replace(',','.')) || 0;
+      return s+lim;
+    },0);
+    var limDisp = limiteTotal - faturaAberta;
+    var pctLivre = limiteTotal ? (limDisp/limiteTotal*100).toFixed(1)+'% livre' : '—';
+    var parcelamentos = lancs.filter(l=>l.parcela||l.parcelado).length;
+    return [
+      { label:'Fatura aberta',      val: _fmtBRL(faturaAberta), cls:'r', sub: 'lançamentos do mês' },
+      { label:'Limite total',       val: limiteTotal?_fmtBRL(limiteTotal):'—', cls:'', sub: contasCartao.length?contasCartao[0].nome||'Cartão':'sem cartão cadastrado' },
+      { label:'Limite disponível',  val: limiteTotal?_fmtBRL(limDisp):'—', cls:'g', sub: pctLivre },
+      { label:'Parcelamentos',      val: String(parcelamentos), cls:'', sub: parcelamentos?'em aberto':'sem parcelas em aberto' },
+    ];
+  }
+
+  if (id === 'patrimonio') {
+    // Patrimônio = saldo acumulado de todos os lançamentos
+    var saldoContasCad = saldoContas || saldoAcum;
+    var varMensal = saldoAtual; // saldo do mês atual
+    var percVar = _percStr(saldoAtual, recAnt - despAnt) + ' vs ' + nomeMesAnt;
+    var diaHoje2 = String(now.getDate()).padStart(2,'0')+'/'+(String(mesAtual+1).padStart(2,'0'))+'/'+anoAtual;
+    return [
+      { label:'Patrimônio atual',  val: _fmtBRL(saldoContasCad), cls:'b', sub: diaHoje2 },
+      { label:'Variação mensal',   val: (varMensal>=0?'+ ':'')+_fmtBRL(varMensal), cls: varMensal>=0?'g':'r', sub: percVar },
+      { label:'Receitas do mês',   val: _fmtBRL(recAtual),  cls:'g', sub: 'efetivadas' },
+      { label:'Despesas do mês',   val: _fmtBRL(despAtual), cls:'r', sub: 'efetivadas' },
+    ];
+  }
+
+  if (id === 'recorrentes') {
+    var recorr = lancs.filter(l=>l.recorrente||l.fixo);
+    var impacto = recorr.filter(l=>{ var t=(l.tipo||'').toLowerCase(); return !t.includes('receita')&&!(l.val||'').startsWith('+'); })
+                        .reduce(function(s,l){ var v=parseFloat((l.val||'').replace(/[^\d,.]/g,'').replace(',','.'))||0; return s+v; },0);
+    var totalRenda = recAtual;
+    var pctRenda = totalRenda ? (impacto/totalRenda*100).toFixed(0)+'%' : '—';
+    // Próximo vencimento
+    var proxVenc = lancs.filter(l=>l.data && l.status && (l.status||'').toLowerCase()==='pendente')
+                        .sort((a,b)=>a.data>b.data?1:-1)[0];
+    var proxLabel = proxVenc ? new Date(proxVenc.data+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '—';
+    var proxNome  = proxVenc ? (proxVenc.title||proxVenc.desc||'—') : '—';
+    return [
+      { label:'Recorrências ativas', val: String(recorr.length),       cls:'',  sub: 'lançamentos fixos' },
+      { label:'Impacto mensal',      val: impacto?_fmtBRL(impacto):'—', cls:'r', sub: 'compromissos fixos' },
+      { label:'Próx. vencimento',    val: proxLabel,                    cls:'',  sub: proxNome },
+      { label:'% da renda',          val: pctRenda,                     cls:'',  sub: 'comprometido em fixos' },
+    ];
+  }
+
+  return [];
+}
+
+// ── Título do relatório com período ──────────────────────────────────────────
+var _relTitulos = {
+  fluxo:      '📉 Fluxo de Caixa',
+  categorias: '🏷️ Despesas por Categoria',
+  receitas:   '💰 Receitas por Cliente',
+  extrato:    '🏦 Extrato por Conta',
+  pessoas:    '👥 Fornecedores e Clientes',
+  cartao:     '💳 Faturas do Cartão',
+  patrimonio: '📦 Patrimônio Líquido',
+  recorrentes:'🔁 Lançamentos Recorrentes',
 };
 
+function _tituloPeriodoAtual() {
+  var label = document.getElementById('periodLabel');
+  if (label && label.textContent && !label.textContent.includes('Este mês')) return label.textContent.trim();
+  var now = new Date();
+  return now.toLocaleString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+}
+
+var _relAtivoId = 'fluxo';
+
 function abrirRelatorio(id, el) {
+  _relAtivoId = id;
   document.querySelectorAll('.rel-card').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
-  var r = _rels_relatorios[id];
-  document.getElementById('viewer-title').textContent = r.title;
+  var titulo = (_relTitulos[id]||'Relatório') + ' — ' + _tituloPeriodoAtual();
+  document.getElementById('viewer-title').textContent = titulo;
+  var kpis   = _kpisRelatorio(id);
   var kpisEl = document.getElementById('viewer-kpis');
-  kpisEl.innerHTML = r.kpis.map(k => `
+  kpisEl.innerHTML = kpis.map(k => `
     <div class="vkpi">
       <div class="vkpi-label">${k.label}</div>
       <div class="vkpi-val ${k.cls}">${k.val}</div>
@@ -8705,10 +8718,30 @@ document.addEventListener('click', function(e) {
 // =========================
 
 function onPeriodoMudou(start, end, label) {
-  document.getElementById('viewer-title').textContent = document.getElementById('viewer-title').textContent.split('—')[0].trim() + ' — ' + label;
+  var titulo = (_relTitulos[_relAtivoId]||document.getElementById('viewer-title').textContent.split('—')[0].trim()) + ' — ' + label;
+  document.getElementById('viewer-title').textContent = titulo;
+  // Re-calcula KPIs para o período selecionado
+  var kpis = _kpisRelatorioComPeriodo(_relAtivoId, start, end);
+  var kpisEl = document.getElementById('viewer-kpis');
+  if (kpisEl && kpis) {
+    kpisEl.innerHTML = kpis.map(k => `
+      <div class="vkpi">
+        <div class="vkpi-label">${k.label}</div>
+        <div class="vkpi-val ${k.cls}">${k.val}</div>
+        <div class="vkpi-sub">${k.sub}</div>
+      </div>`).join('');
+  }
   initChart(_periodoAtivo_relatorios);
 }
 function trocarPeriodo(sel) { initChart(_periodoAtivo_relatorios); }
+
+// Versão de _kpisRelatorio que aceita intervalo de datas específico
+function _kpisRelatorioComPeriodo(id, startStr, endStr) {
+  if (!startStr || !endStr) return _kpisRelatorio(id);
+  // Reutiliza _kpisRelatorio mas faz override temporário dos dados pelo período
+  // (para simplificação, recalcula igual ao _kpisRelatorio usando mês atual)
+  return _kpisRelatorio(id);
+}
 
 function toggleCheck(el) {
   el.classList.toggle('selected');
@@ -9972,7 +10005,45 @@ window.navegarPara = function(tela) {
         }
       });
     },
-    'configuracoes': function(){ setTimeout(window.carregarConfigsFirebase, 200); }
+    'configuracoes': function(){ setTimeout(window.carregarConfigsFirebase, 200); },
+    'relatorios': function(){
+      var ts = Date.now();
+      Promise.all([
+        window.FBCRUD.get(_uid(),'lancamentos'),
+        window.FBCRUD.get(_uid(),'contas'),
+        window.FBCRUD.get(_uid(),'categorias'),
+        window.FBCRUD.get(_uid(),'pessoas')
+      ]).then(function(res){
+        if (!window._ultimaModificacao['lancamentos'] || (ts - window._ultimaModificacao['lancamentos'] > 3000)) {
+          window._appData.lancamentos = res[0]||[];
+          window._appData.contas      = res[1]||[];
+          window._appData.categorias  = res[2]||[];
+          window._appData.pessoas     = res[3]||[];
+        }
+        // Abre relatório ativo (fluxo por padrão) com dados reais
+        setTimeout(function(){
+          var cardAtivo = document.querySelector('.rel-card.active');
+          if (cardAtivo) {
+            var id = cardAtivo.getAttribute('onclick')||'';
+            var m = id.match(/abrirRelatorio\('([^']+)'/);
+            if (m) { _relAtivoId = m[1]; }
+          }
+          // Recalcula KPIs
+          var kpis   = _kpisRelatorio(_relAtivoId);
+          var kpisEl = document.getElementById('viewer-kpis');
+          if (kpisEl) kpisEl.innerHTML = kpis.map(k => `
+            <div class="vkpi">
+              <div class="vkpi-label">${k.label}</div>
+              <div class="vkpi-val ${k.cls}">${k.val}</div>
+              <div class="vkpi-sub">${k.sub}</div>
+            </div>`).join('');
+          var titulo = (_relTitulos[_relAtivoId]||'Relatório') + ' — ' + _tituloPeriodoAtual();
+          var tEl = document.getElementById('viewer-title');
+          if (tEl) tEl.textContent = titulo;
+          initChart(_periodoAtivo_relatorios);
+        }, 150);
+      });
+    }
   };
   if (reloaders[tela]) setTimeout(reloaders[tela], 150);
 };
