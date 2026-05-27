@@ -10072,5 +10072,62 @@ window.salvarSubcategoriaComFirebase = async function() {
 };
 
 console.log('✅ FinançasPRO — Firebase integrado com render completo!');
+
+// ══════════════════════════════════════════════════════════════════════════════════
+// FIX: abrirModal e abrirModalInstituicao globais — conscientes da tela ativa
+// Resolve o conflito de múltiplas redefinições de abrirModal por cada tela
+// ══════════════════════════════════════════════════════════════════════════════════
+(function() {
+  function _telaAtiva() {
+    var telas = ['tela-contas','tela-lancamentos','tela-categorias','tela-pessoas','tela-relatorios','tela-configuracoes','tela-dashboard'];
+    for (var i = 0; i < telas.length; i++) {
+      var el = document.getElementById(telas[i]);
+      if (el && el.classList.contains('ativa')) return telas[i];
+    }
+    return null;
+  }
+
+  window.abrirModal = function(arg) {
+    var tela = _telaAtiva();
+    var modal = document.getElementById('modal');
+    if (!modal) return;
+
+    // Reseta título e dataset de edição conforme a tela
+    if (tela === 'tela-contas') {
+      delete modal.dataset.editContaId;
+      var titulo = modal.querySelector('.modal-title');
+      if (titulo) titulo.textContent = 'Nova conta bancária';
+      // Reseta campos
+      modal.querySelectorAll('input[type=text], input[type=number], input[type=date]').forEach(function(el){ el.value = ''; });
+      modal.querySelectorAll('.tipo-card').forEach(function(c,i){ c.classList.toggle('selected', i===0); });
+      modal.querySelectorAll('.cor-item').forEach(function(c,i){ c.classList.toggle('selected', i===0); });
+    } else if (tela === 'tela-lancamentos') {
+      delete modal.dataset.editId;
+      var titulo = modal.querySelector('.modal-title');
+      if (titulo) titulo.textContent = 'Novo lançamento';
+    } else if (tela === 'tela-categorias') {
+      delete modal.dataset.editCatId;
+      var titulo = modal.querySelector('.modal-title');
+      // abrirModal pode receber tipo como argumento (ex: 'despesa','receita')
+      if (titulo) titulo.textContent = arg ? ('Nova categoria — ' + arg) : 'Nova categoria';
+    } else if (tela === 'tela-pessoas') {
+      delete modal.dataset.editId;
+      var titulo = modal.querySelector('.modal-title');
+      if (titulo) titulo.textContent = 'Novo cadastro';
+    }
+
+    modal.classList.add('open');
+  };
+
+  window.abrirModalInstituicao = function() {
+    var modal = document.getElementById('modal-inst');
+    if (modal) modal.classList.add('open');
+  };
+
+  window.fecharModal = function() {
+    var modal = document.getElementById('modal');
+    if (modal) modal.classList.remove('open');
+  };
+})();
 </script>
 </body>
