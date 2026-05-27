@@ -5610,10 +5610,8 @@ function salvarLancamento() {
 
 function editarLancamento(idx, btn) {
   var d = txDados[idx]; if(!d) return;
+  window._editandoIdx = idx;
   abrirModal(idx);
-  // Set edit ID if Firebase ID available
-  var modalEl = document.getElementById('modal');
-  if (modalEl && d.fbId) { modalEl.dataset.editLancId = d.fbId; }
 }
 
 function duplicarLancamento(idx, btn) {
@@ -5648,7 +5646,7 @@ function excluirLancamento(idx, btn) {
   var d = txDados[idx]; if(!d) return;
   if (!confirm('Excluir "' + d.title + '"?\nEsta ação não pode ser desfeita.')) return;
   // Deleta do Firebase
-  if (d.fbId && window.excluirLancamentoFirebase) window.excluirLancamentoFirebase(d.fbId).catch(function(e){ console.warn(e); });
+  // Firebase deletion handled by the override below (uses d.id)
   var row = btn ? btn.closest('.tx-row') : null;
   if (row) {
     row.style.transition='all 0.25s ease'; row.style.opacity='0'; row.style.transform='translateX(30px)';
@@ -7938,10 +7936,8 @@ function salvarLancamento() {
 
 function editarLancamento(idx, btn) {
   var d = txDados[idx]; if(!d) return;
+  window._editandoIdx = idx;
   abrirModal(idx);
-  // Set edit ID if Firebase ID available
-  var modalEl = document.getElementById('modal');
-  if (modalEl && d.fbId) { modalEl.dataset.editLancId = d.fbId; }
 }
 
 function duplicarLancamento(idx, btn) {
@@ -7976,7 +7972,7 @@ function excluirLancamento(idx, btn) {
   var d = txDados[idx]; if(!d) return;
   if (!confirm('Excluir "' + d.title + '"?\nEsta ação não pode ser desfeita.')) return;
   // Deleta do Firebase
-  if (d.fbId && window.excluirLancamentoFirebase) window.excluirLancamentoFirebase(d.fbId).catch(function(e){ console.warn(e); });
+  // Firebase deletion handled by the override below (uses d.id)
   var row = btn ? btn.closest('.tx-row') : null;
   if (row) {
     row.style.transition='all 0.25s ease'; row.style.opacity='0'; row.style.transform='translateX(30px)';
@@ -9477,10 +9473,27 @@ window.addEventListener('fbready', function() {
     if (window._currentUser) carregarTudo();
   }, 400);
 });
-// Fallback para quando já estava logado antes do script carregar
-setTimeout(function() {
-  if (window._currentUser && window._fbReady) carregarTudo();
-}, 1500);
+// Fallback robusto: tenta a cada 500ms por até 10s até o usuário estar logado
+(function() {
+  var tentativas = 0;
+  var intervalo = setInterval(function() {
+    tentativas++;
+    if (window._currentUser && window._fbReady) {
+      clearInterval(intervalo);
+      carregarTudo();
+    } else if (tentativas >= 20) {
+      clearInterval(intervalo);
+    }
+  }, 500);
+})();
+// Recarrega dados sempre que o usuário fizer login
+if (window.FBAUTH) {
+  window.FBAUTH.onAuthStateChanged(function(user) {
+    if (user && window._fbReady) {
+      setTimeout(carregarTudo, 300);
+    }
+  });
+}
 
 // ══════════════════════════════════════════════════════════════════════════════════
 // CONTAS — CRUD COMPLETO
@@ -9577,10 +9590,8 @@ window.salvarEdicaoConta = async function(id) {
 };
 
 // Hook the + Nova conta button to save to Firebase
-var _origSalvarConta = window.salvarConta;
 window.salvarConta = function() {
-  // Will be intercepted by salvarContaComFirebase if called from the modal btn
-  if(_origSalvarConta) _origSalvarConta();
+  window.salvarContaComFirebase();
 };
 
 // Override the btn inside modal — handled by unified listener above
@@ -9592,22 +9603,53 @@ window.salvarConta = function() {
 // Override salvarLancamento (usado em múltiplas telas)
 var _origSalvarLanc = window.salvarLancamento;
 window.salvarLancamento = async function() {
-  var tipo   = document.querySelector('.tipo-btn.active')?.textContent.trim() || 'Despesa';
-  var descEl = document.getElementById('tx-descricao');
-  var desc   = descEl ? descEl.value.trim() : '';
-  var valEl  = document.getElementById('tx-valor');
-  var val    = valEl ? valEl.value.replace(/[^\d,.]/g,'').replace(',','.') : '';
-  var dataEl = document.getElementById('tx-data');
-  var data   = dataEl ? dataEl.value : '';
-  var vencEl = document.getElementById('tx-vencimento');
-  var venc   = vencEl ? vencEl.value : data;
-  var catEl  = document.getElementById('tx-categoria');
-  var cat    = catEl ? catEl.options[catEl.selectedIndex]?.text : '';
-  var contaEl= document.getElementById('tx-conta');
-  var conta  = contaEl ? contaEl.options[contaEl.selectedIndex]?.text : '';
-  var status = document.querySelector('.status-btn.active')?.classList.contains('efetivado') ? 'Efetivado' : 'Pendente';
-  var obsEl  = document.getElementById('tx-obs');
-  var obs    = obsEl ? obsEl.value.trim() : '—';
+  // Busca o modal ativo corretamente (context-aware)
+  var modal = (function(){
+    var telas = ['tela-contas','tela-lancamentos','tela-categorias','tela-pessoas','tela-relatorios','tela-configuracoes','tela-dashboard'];
+    for (var i=0; i<telas.length; i++) {
+      var el = document.getElementById(telas[i]);
+      if (el && el.classList.contains('ativa')) {
+        var m = el.querySelector('.modal-overlay[id="modal"].open') || el.querySelector('#modal.open');
+        if (m) return m;
+      }
+    }
+    return document.querySelector('.modal-overlay[id="modal"].open') || document.getElementById('modal');
+  })();
+  if (!modal) { mostrarToast('Modal não encontrado.', 'error'); return; }
+
+  var tipo = (modal.querySelector('.tipo-btn.active') || {}).textContent || 'Despesa';
+  tipo = tipo.trim();
+
+  // Descrição: primeiro input[type=text] do modal
+  var inputs  = modal.querySelectorAll('input[type=text]');
+  var desc    = inputs[0] ? inputs[0].value.trim() : '';
+
+  // Valor: input[type=number] do modal
+  var numInput = modal.querySelector('input[type=number]');
+  var val      = numInput ? (numInput.value + '').replace(/[^\d,.]/g,'').replace(',','.') : '';
+
+  // Datas
+  var dateInputs = modal.querySelectorAll('input[type=date]');
+  var data  = dateInputs[0] ? dateInputs[0].value : '';
+  var venc  = dateInputs[1] ? dateInputs[1].value : data;
+
+  // Categoria e conta (selects)
+  var selects = modal.querySelectorAll('select');
+  var cat   = selects[0] ? (selects[0].options[selects[0].selectedIndex] ? selects[0].options[selects[0].selectedIndex].text : '') : '';
+  var conta = selects[1] ? (selects[1].options[selects[1].selectedIndex] ? selects[1].options[selects[1].selectedIndex].text : '') : '';
+  // Se só há 1 select, tenta identificar qual é pelo placeholder/options
+  if (selects.length === 1) {
+    var optTxt = (selects[0].options[0]||{}).text || '';
+    if (optTxt.toLowerCase().includes('conta') || optTxt.toLowerCase().includes('banco')) { conta = selects[0].options[selects[0].selectedIndex].text; cat = '—'; }
+    else { cat = selects[0].options[selects[0].selectedIndex].text; conta = '—'; }
+  }
+
+  var statusBtn = modal.querySelector('.status-btn.active');
+  var status = statusBtn && statusBtn.classList.contains('efetivado') ? 'Efetivado' : 'Pendente';
+
+  var obsEl = modal.querySelector('textarea');
+  var obs   = obsEl ? (obsEl.value.trim() || '—') : '—';
+
   if (!desc || !val) { mostrarToast('Preencha descrição e valor.', 'error'); return; }
   var valNum = parseFloat(val) || 0;
   var tipoMap = { 'Receita':'receita', 'Despesa':'despesa', 'Transferência':'transf', 'Transferencia':'transf' };
