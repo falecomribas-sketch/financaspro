@@ -9486,23 +9486,37 @@ setTimeout(function() {
 // CONTAS — CRUD COMPLETO
 // ══════════════════════════════════════════════════════════════════════════════════
 window.salvarContaComFirebase = async function() {
-  var modal = document.getElementById('modal');
+  // Busca o modal de contas que está aberto (evita pegar o primeiro #modal do documento,
+  // que pode ser o modal de lançamentos ou outro)
+  var modal = document.querySelector('#tela-contas .modal-overlay[id="modal"].open')
+           || document.querySelector('.modal-overlay[id="modal"].open')
+           || document.getElementById('modal');
   if (!modal) return;
-  var nomeEl  = modal.querySelector('#nova-conta-nome') || modal.querySelector('input[type=text]');
+  // O modal de contas tem 2 inputs[type=text]: 0=Nome da conta, 1=Observações
+  var inputs  = modal.querySelectorAll('input[type=text]');
+  var nomeEl  = modal.querySelector('#nova-conta-nome') || inputs[0];
   var nome    = nomeEl ? nomeEl.value.trim() : '';
   if (!nome) { mostrarToast('Informe o nome da conta.', 'error'); return; }
   var tipoEl  = modal.querySelector('.tipo-card.selected .tipo-card-name');
   var tipo    = tipoEl ? tipoEl.textContent.trim().toLowerCase() : 'corrente';
   var bancoEl = modal.querySelector('select');
   var banco   = bancoEl ? bancoEl.options[bancoEl.selectedIndex]?.text : '';
+  if (banco === 'Selecione ou cadastre') banco = '';
   var corEl   = modal.querySelector('.cor-item.selected');
   var cor     = corEl ? (corEl.dataset.cor || corEl.style.background || '#1B4B8A') : '#1B4B8A';
+  var saldoInicialEl = modal.querySelector('input[type=number]');
+  var saldoInicial   = saldoInicialEl ? (parseFloat(saldoInicialEl.value) || 0) : 0;
+  var obsEl  = inputs[1];
+  var obs    = obsEl ? obsEl.value.trim() : '';
+  var toggleEl    = modal.querySelector('input[type=checkbox]');
+  var consolidado = toggleEl ? toggleEl.checked : true;
   var editId  = modal.dataset.editContaId;
   var uid = _uid();
   if (!uid) { mostrarToast('Você precisa estar logado.', 'error'); return; }
+  var saldoFmt = 'R$ ' + saldoInicial.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
   try {
     if (editId) {
-      var dados = { nome, tipo, banco, cor };
+      var dados = { nome, tipo, banco, cor, obs, consolidado };
       await window.FBCRUD.update(uid, 'contas', editId, dados);
       var idx = window._appData.contas.findIndex(function(c){ return c.id === editId; });
       if (idx >= 0) Object.assign(window._appData.contas[idx], dados);
@@ -9510,7 +9524,7 @@ window.salvarContaComFirebase = async function() {
       delete modal.dataset.editContaId;
       mostrarToast('Conta atualizada!', 'success');
     } else {
-      var dados = { nome, tipo, banco, cor, saldo:'R$ 0,00', icone: _tipoIcone[tipo]||'🏦', ativo:true };
+      var dados = { nome, tipo, banco, cor, obs, consolidado, saldo: saldoFmt, saldoInicial, icone: _tipoIcone[tipo]||'🏦', ativo:true };
       var id = await window.FBCRUD.add(uid, 'contas', dados);
       dados.id = id;
       window._appData.contas.push(dados);
