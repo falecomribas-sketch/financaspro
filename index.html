@@ -10074,60 +10074,97 @@ window.salvarSubcategoriaComFirebase = async function() {
 console.log('✅ FinançasPRO — Firebase integrado com render completo!');
 
 // ══════════════════════════════════════════════════════════════════════════════════
-// FIX: abrirModal e abrirModalInstituicao globais — conscientes da tela ativa
-// Resolve o conflito de múltiplas redefinições de abrirModal por cada tela
+// FIX: abrirModal, fecharModal e abrirModalInstituicao globais — conscientes da tela ativa
+// Problema raiz: múltiplos elementos com id="modal" no DOM (um por tela).
+// getElementById retorna SEMPRE o primeiro, ignorando os das outras telas.
+// Solução: buscar o #modal DENTRO da tela ativa.
 // ══════════════════════════════════════════════════════════════════════════════════
 (function() {
-  function _telaAtiva() {
-    var telas = ['tela-contas','tela-lancamentos','tela-categorias','tela-pessoas','tela-relatorios','tela-configuracoes','tela-dashboard'];
-    for (var i = 0; i < telas.length; i++) {
-      var el = document.getElementById(telas[i]);
-      if (el && el.classList.contains('ativa')) return telas[i];
+  var _TELAS = ['tela-contas','tela-lancamentos','tela-categorias','tela-pessoas','tela-relatorios','tela-configuracoes','tela-dashboard'];
+
+  function _getTelaEl() {
+    for (var i = 0; i < _TELAS.length; i++) {
+      var el = document.getElementById(_TELAS[i]);
+      if (el && el.classList.contains('ativa')) return el;
     }
     return null;
   }
 
+  // Retorna o #modal dentro da tela ativa (não o primeiro do documento)
+  function _getModal() {
+    var telaEl = _getTelaEl();
+    if (telaEl) {
+      var m = telaEl.querySelector('#modal, .modal-overlay[id="modal"]');
+      if (m) return m;
+    }
+    // fallback: primeiro #modal do documento
+    return document.getElementById('modal');
+  }
+
+  // Retorna o #modal-inst dentro da tela ativa
+  function _getModalInst() {
+    var telaEl = _getTelaEl();
+    if (telaEl) {
+      var m = telaEl.querySelector('#modal-inst');
+      if (m) return m;
+    }
+    return document.getElementById('modal-inst');
+  }
+
   window.abrirModal = function(arg) {
-    var tela = _telaAtiva();
-    var modal = document.getElementById('modal');
+    var telaEl = _getTelaEl();
+    var telaId = telaEl ? telaEl.id : null;
+    var modal  = _getModal();
     if (!modal) return;
 
-    // Reseta título e dataset de edição conforme a tela
-    if (tela === 'tela-contas') {
+    // Reseta estado conforme a tela
+    if (telaId === 'tela-contas') {
       delete modal.dataset.editContaId;
       var titulo = modal.querySelector('.modal-title');
       if (titulo) titulo.textContent = 'Nova conta bancária';
-      // Reseta campos
-      modal.querySelectorAll('input[type=text], input[type=number], input[type=date]').forEach(function(el){ el.value = ''; });
+      modal.querySelectorAll('input[type=text], input[type=number]').forEach(function(el){ el.value = ''; });
       modal.querySelectorAll('.tipo-card').forEach(function(c,i){ c.classList.toggle('selected', i===0); });
       modal.querySelectorAll('.cor-item').forEach(function(c,i){ c.classList.toggle('selected', i===0); });
-    } else if (tela === 'tela-lancamentos') {
+    } else if (telaId === 'tela-lancamentos') {
       delete modal.dataset.editId;
-      var titulo = modal.querySelector('.modal-title');
-      if (titulo) titulo.textContent = 'Novo lançamento';
-    } else if (tela === 'tela-categorias') {
+    } else if (telaId === 'tela-categorias') {
       delete modal.dataset.editCatId;
-      var titulo = modal.querySelector('.modal-title');
-      // abrirModal pode receber tipo como argumento (ex: 'despesa','receita')
-      if (titulo) titulo.textContent = arg ? ('Nova categoria — ' + arg) : 'Nova categoria';
-    } else if (tela === 'tela-pessoas') {
+      // arg pode ser 'despesa' ou 'receita'
+      if (arg) {
+        var titulo = modal.querySelector('.modal-title');
+        if (titulo) titulo.textContent = 'Nova categoria — ' + arg;
+      }
+    } else if (telaId === 'tela-pessoas') {
       delete modal.dataset.editId;
-      var titulo = modal.querySelector('.modal-title');
-      if (titulo) titulo.textContent = 'Novo cadastro';
     }
 
     modal.classList.add('open');
   };
 
+  window.fecharModal = function() {
+    // Fecha todos os #modal abertos (seguro mesmo com IDs duplicados)
+    document.querySelectorAll('.modal-overlay[id="modal"].open').forEach(function(m){
+      m.classList.remove('open');
+    });
+  };
+
   window.abrirModalInstituicao = function() {
-    var modal = document.getElementById('modal-inst');
+    var modal = _getModalInst();
     if (modal) modal.classList.add('open');
   };
 
-  window.fecharModal = function() {
-    var modal = document.getElementById('modal');
-    if (modal) modal.classList.remove('open');
+  window.fecharModalInst = function() {
+    document.querySelectorAll('#modal-inst').forEach(function(m){ m.classList.remove('open'); });
   };
+
+  // fecharModalFora: fecha apenas se clicou no overlay, não no conteúdo
+  window.fecharModalFora = function(e) {
+    if (e.target && e.target.classList.contains('modal-overlay')) {
+      e.target.classList.remove('open');
+    }
+  };
+
+  console.log('✅ Fix abrirModal/fecharModal context-aware aplicado.');
 })();
 </script>
 </body>
