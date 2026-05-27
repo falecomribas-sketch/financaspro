@@ -4029,12 +4029,12 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(
 
     <!-- FILTROS -->
     <div class="filtros">
-      <button class="filtro-btn active" onclick="filtrar('todos',this)">Todos (6)</button>
-      <button class="filtro-btn" onclick="filtrar('corrente',this)">Correntes (2)</button>
-      <button class="filtro-btn" onclick="filtrar('poupanca',this)">Poupança (1)</button>
-      <button class="filtro-btn" onclick="filtrar('cartao',this)">Cartões (1)</button>
-      <button class="filtro-btn" onclick="filtrar('investimento',this)">Investimentos (1)</button>
-      <button class="filtro-btn" onclick="filtrar('digital',this)">Digital / Espécie (1)</button>
+      <button class="filtro-btn active" onclick="filtrar('todos',this)">Todos (0)</button>
+      <button class="filtro-btn" onclick="filtrar('corrente',this)">Correntes (0)</button>
+      <button class="filtro-btn" onclick="filtrar('poupanca',this)">Poupança (0)</button>
+      <button class="filtro-btn" onclick="filtrar('cartao',this)">Cartões (0)</button>
+      <button class="filtro-btn" onclick="filtrar('investimento',this)">Investimentos (0)</button>
+      <button class="filtro-btn" onclick="filtrar('digital',this)">Digital / Espécie (0)</button>
     </div>
 
     <!-- GRID CONTAS + DETALHE -->
@@ -9370,6 +9370,44 @@ function renderContas() {
   var grid = document.getElementById('contas-grid');
   if (!grid) return;
   var contas = window._appData.contas;
+
+  // ── Atualiza contagens nos botões de filtro ──────────────────────────────
+  var contagens = { todos: 0, corrente: 0, poupanca: 0, cartao: 0, investimento: 0, digital: 0 };
+  (contas || []).forEach(function(c) {
+    var t = (c.tipo || '').toLowerCase();
+    contagens.todos++;
+    if (t === 'corrente')      contagens.corrente++;
+    else if (t === 'poupanca') contagens.poupanca++;
+    else if (t === 'cartao')   contagens.cartao++;
+    else if (t === 'investimento') contagens.investimento++;
+    else if (t === 'digital')  contagens.digital++;
+  });
+  var filtroLabels = {
+    todos:        'Todos',
+    corrente:     'Correntes',
+    poupanca:     'Poupança',
+    cartao:       'Cartões',
+    investimento: 'Investimentos',
+    digital:      'Digital / Espécie'
+  };
+  document.querySelectorAll('.filtro-btn').forEach(function(btn) {
+    var onclick = btn.getAttribute('onclick') || '';
+    var match = onclick.match(/filtrar\('([^']+)'/);
+    if (match) {
+      var key = match[1];
+      if (contagens[key] !== undefined) {
+        btn.textContent = filtroLabels[key] + ' (' + contagens[key] + ')';
+      }
+    }
+  });
+
+  // ── Atualiza subtítulo "N contas ativas" ─────────────────────────────────
+  var sub = document.querySelector('#tela-contas .topbar-sub');
+  if (sub) {
+    var n = contagens.todos;
+    sub.textContent = n + (n === 1 ? ' conta ativa' : ' contas ativas');
+  }
+
   if (!contas || !contas.length) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);font-size:14px">Nenhuma conta cadastrada.<br><small>Clique em "+ Nova conta" para adicionar.</small></div>';
     return;
