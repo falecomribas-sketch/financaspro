@@ -5833,399 +5833,44 @@ document.addEventListener('keydown', e => {
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-label">Total de categorias</div>
-        <div class="stat-value">18</div>
-        <div class="stat-sub">10 despesas · 8 receitas</div>
+        <div class="stat-value" id="kpi-total-cats">0</div>
+        <div class="stat-sub" id="kpi-total-cats-sub">0 despesas · 0 receitas</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Subcategorias</div>
-        <div class="stat-value">42</div>
-        <div class="stat-sub">média de 2,3 por categoria</div>
+        <div class="stat-value" id="kpi-total-subcats">0</div>
+        <div class="stat-sub" id="kpi-total-subcats-sub">média de 0 por categoria</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Mais usada (maio)</div>
-        <div class="stat-value" style="font-size:15px">🏠 Moradia</div>
-        <div class="stat-sub">R$ 0,00 · 0% das despesas</div>
+        <div class="stat-label" id="kpi-mais-usada-label">Mais usada (mês atual)</div>
+        <div class="stat-value" id="kpi-mais-usada" style="font-size:15px">—</div>
+        <div class="stat-sub" id="kpi-mais-usada-sub">sem lançamentos este mês</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Sem categoria</div>
-        <div class="stat-value" style="color:var(--amber)">0</div>
-        <div class="stat-sub">todos os lançamentos categorizados</div>
+        <div class="stat-value" id="kpi-sem-cat" style="color:var(--amber)">0</div>
+        <div class="stat-sub" id="kpi-sem-cat-sub">calculando...</div>
       </div>
     </div>
 
     <!-- TABS -->
     <div class="tabs-bar">
       <button class="tab despesa active" onclick="trocarAba('despesa',this)">
-        💸 Despesas <span class="tab-count" id="count-despesa">10</span>
+        💸 Despesas <span class="tab-count" id="count-despesa">0</span>
       </button>
       <button class="tab receita" onclick="trocarAba('receita',this)">
-        💰 Receitas <span class="tab-count" id="count-receita">8</span>
+        💰 Receitas <span class="tab-count" id="count-receita">0</span>
       </button>
     </div>
 
     <!-- GRID DESPESAS -->
     <div class="cat-grid" id="grid-despesa">
-
-      <!-- MORADIA -->
-      <div class="cat-card" id="cat-moradia">
-        <div class="cat-card-header" onclick="toggleSubcats('moradia')">
-          <div class="cat-icon" style="background:#FFFBEB">🏠</div>
-          <div class="cat-info">
-            <div class="cat-name">Moradia</div>
-            <div class="cat-meta">
-              <span>5 subcategorias</span>
-              <span>·</span>
-              <span>8 lançamentos</span>
-            </div>
-          </div>
-          <div>
-            <div class="cat-total">R$ 0,00</div>
-            <div class="cat-pct">40,3% das despesas</div>
-          </div>
-          <div class="cat-actions">
-            <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('Moradia')" title="Nova subcategoria">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()" title="Editar">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation()" title="Arquivar">🗃️</button>
-          </div>
-          <button class="cat-toggle-btn" id="toggle-moradia">▾</button>
-        </div>
-        <div class="cat-progress"><div class="cat-progress-fill" style="width:40.3%;background:#D97706"></div></div>
-        <div class="subcats open" id="subcats-moradia">
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#D97706"></div>
-            <div class="subcat-name">Aluguel</div>
-            <div class="subcat-count">1 lanç.</div>
-            <div class="subcat-val">R$ 1.200</div>
-            <div class="subcat-actions">
-              <button class="cat-action-btn" title="Editar">✏️</button>
-              <button class="cat-action-btn" title="Excluir">🗑️</button>
-            </div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#D97706"></div>
-            <div class="subcat-name">Energia elétrica</div>
-            <div class="subcat-count">1 lanç.</div>
-            <div class="subcat-val">R$ 187</div>
-            <div class="subcat-actions">
-              <button class="cat-action-btn">✏️</button>
-              <button class="cat-action-btn">🗑️</button>
-            </div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#D97706"></div>
-            <div class="subcat-name">Internet</div>
-            <div class="subcat-count">1 lanç.</div>
-            <div class="subcat-val">R$ 120 <span style="font-size:10px;color:var(--amber)">(pendente)</span></div>
-            <div class="subcat-actions">
-              <button class="cat-action-btn">✏️</button>
-              <button class="cat-action-btn">🗑️</button>
-            </div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#D97706"></div>
-            <div class="subcat-name">Condomínio</div>
-            <div class="subcat-count">0 lanç.</div>
-            <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions">
-              <button class="cat-action-btn">✏️</button>
-              <button class="cat-action-btn">🗑️</button>
-            </div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#D97706"></div>
-            <div class="subcat-name">Água / Gás</div>
-            <div class="subcat-count">0 lanç.</div>
-            <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions">
-              <button class="cat-action-btn">✏️</button>
-              <button class="cat-action-btn">🗑️</button>
-            </div>
-          </div>
-          <div class="add-subcat" onclick="abrirModalSub('Moradia')">+ Adicionar subcategoria</div>
-        </div>
-      </div>
-
-      <!-- ALIMENTAÇÃO -->
-      <div class="cat-card" id="cat-alimentacao">
-        <div class="cat-card-header" onclick="toggleSubcats('alimentacao')">
-          <div class="cat-icon" style="background:#ECFDF5">🛒</div>
-          <div class="cat-info">
-            <div class="cat-name">Alimentação</div>
-            <div class="cat-meta"><span>3 subcategorias</span><span>·</span><span>3 lançamentos</span></div>
-          </div>
-          <div>
-            <div class="cat-total">R$ 0,00</div>
-            <div class="cat-pct">24,0% das despesas</div>
-          </div>
-          <div class="cat-actions">
-            <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('Alimentação')">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
-          </div>
-          <button class="cat-toggle-btn" id="toggle-alimentacao">▾</button>
-        </div>
-        <div class="cat-progress"><div class="cat-progress-fill" style="width:24%;background:#059669"></div></div>
-        <div class="subcats" id="subcats-alimentacao">
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#059669"></div>
-            <div class="subcat-name">Supermercado</div>
-            <div class="subcat-count">2 lanç.</div>
-            <div class="subcat-val">R$ 640</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#059669"></div>
-            <div class="subcat-name">Restaurante</div>
-            <div class="subcat-count">1 lanç.</div>
-            <div class="subcat-val">R$ 136</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#059669"></div>
-            <div class="subcat-name">Delivery</div>
-            <div class="subcat-count">0 lanç.</div>
-            <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="add-subcat" onclick="abrirModalSub('Alimentação')">+ Adicionar subcategoria</div>
-        </div>
-      </div>
-
-      <!-- TRANSPORTE -->
-      <div class="cat-card" id="cat-transporte">
-        <div class="cat-card-header" onclick="toggleSubcats('transporte')">
-          <div class="cat-icon" style="background:#EFF6FF">🚗</div>
-          <div class="cat-info">
-            <div class="cat-name">Transporte</div>
-            <div class="cat-meta"><span>3 subcategorias</span><span>·</span><span>2 lançamentos</span></div>
-          </div>
-          <div>
-            <div class="cat-total">R$ 0,00</div>
-            <div class="cat-pct">14,9% das despesas</div>
-          </div>
-          <div class="cat-actions">
-            <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('Transporte')">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
-          </div>
-          <button class="cat-toggle-btn" id="toggle-transporte">▾</button>
-        </div>
-        <div class="cat-progress"><div class="cat-progress-fill" style="width:14.9%;background:#1B4B8A"></div></div>
-        <div class="subcats" id="subcats-transporte">
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#1B4B8A"></div>
-            <div class="subcat-name">Combustível</div>
-            <div class="subcat-count">1 lanç.</div>
-            <div class="subcat-val">R$ 210</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#1B4B8A"></div>
-            <div class="subcat-name">Uber / Apps</div>
-            <div class="subcat-count">1 lanç.</div>
-            <div class="subcat-val">R$ 274</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#1B4B8A"></div>
-            <div class="subcat-name">Estacionamento</div>
-            <div class="subcat-count">0 lanç.</div>
-            <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="add-subcat" onclick="abrirModalSub('Transporte')">+ Adicionar subcategoria</div>
-        </div>
-      </div>
-
-      <!-- SAÚDE -->
-      <div class="cat-card" id="cat-saude">
-        <div class="cat-card-header" onclick="toggleSubcats('saude')">
-          <div class="cat-icon" style="background:#FEF2F2">❤️</div>
-          <div class="cat-info">
-            <div class="cat-name">Saúde</div>
-            <div class="cat-meta"><span>3 subcategorias</span><span>·</span><span>2 lançamentos</span></div>
-          </div>
-          <div>
-            <div class="cat-total">R$ 0,00</div>
-            <div class="cat-pct">14,4% das despesas</div>
-          </div>
-          <div class="cat-actions">
-            <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('Saúde')">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
-          </div>
-          <button class="cat-toggle-btn" id="toggle-saude">▾</button>
-        </div>
-        <div class="cat-progress"><div class="cat-progress-fill" style="width:14.4%;background:#DC2626"></div></div>
-        <div class="subcats" id="subcats-saude">
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#DC2626"></div>
-            <div class="subcat-name">Plano de saúde</div>
-            <div class="subcat-count">1 lanç.</div>
-            <div class="subcat-val">R$ 380 <span style="font-size:10px;color:var(--amber)">(pendente)</span></div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#DC2626"></div>
-            <div class="subcat-name">Farmácia</div>
-            <div class="subcat-count">1 lanç.</div>
-            <div class="subcat-val">R$ 87</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#DC2626"></div>
-            <div class="subcat-name">Consultas</div>
-            <div class="subcat-count">0 lanç.</div>
-            <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="add-subcat" onclick="abrirModalSub('Saúde')">+ Adicionar subcategoria</div>
-        </div>
-      </div>
-
-      <!-- ASSINATURAS -->
-      <div class="cat-card" id="cat-assinaturas">
-        <div class="cat-card-header" onclick="toggleSubcats('assinaturas')">
-          <div class="cat-icon" style="background:#F3E8FF">📱</div>
-          <div class="cat-info">
-            <div class="cat-name">Assinaturas</div>
-            <div class="cat-meta"><span>3 subcategorias</span><span>·</span><span>1 lançamento</span></div>
-          </div>
-          <div>
-            <div class="cat-total">R$ 0,00</div>
-            <div class="cat-pct">1,7% das despesas</div>
-          </div>
-          <div class="cat-actions">
-            <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('Assinaturas')">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
-          </div>
-          <button class="cat-toggle-btn" id="toggle-assinaturas">▾</button>
-        </div>
-        <div class="cat-progress"><div class="cat-progress-fill" style="width:1.7%;background:#7C3AED"></div></div>
-        <div class="subcats" id="subcats-assinaturas">
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#7C3AED"></div>
-            <div class="subcat-name">Streaming</div>
-            <div class="subcat-count">1 lanç.</div>
-            <div class="subcat-val">R$ 55,90</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#7C3AED"></div>
-            <div class="subcat-name">Software / Apps</div>
-            <div class="subcat-count">0 lanç.</div>
-            <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="add-subcat" onclick="abrirModalSub('Assinaturas')">+ Adicionar subcategoria</div>
-        </div>
-      </div>
-
-      <!-- CARD ADICIONAR CATEGORIA -->
-      <div class="card-add" onclick="abrirModal('despesa')">
-        <div class="card-add-icon">➕</div>
-        <div class="card-add-title">Nova categoria de despesa</div>
-        <div class="card-add-sub">Clique para criar uma nova categoria</div>
-      </div>
-
+      <!-- preenchido dinamicamente por renderTelaCategoriasCompleto() -->
     </div>
 
     <!-- GRID RECEITAS -->
     <div class="cat-grid" id="grid-receita" style="display:none">
-
-      <!-- SALÁRIO -->
-      <div class="cat-card">
-        <div class="cat-card-header" onclick="toggleSubcats('salario')">
-          <div class="cat-icon" style="background:#ECFDF5">💼</div>
-          <div class="cat-info">
-            <div class="cat-name">Salário</div>
-            <div class="cat-meta"><span>3 subcategorias</span><span>·</span><span>1 lançamento</span></div>
-          </div>
-          <div>
-            <div class="cat-total">R$ 0,00</div>
-            <div class="cat-pct">100% das receitas</div>
-          </div>
-          <div class="cat-actions">
-            <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('Salário')">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
-          </div>
-          <button class="cat-toggle-btn" id="toggle-salario">▾</button>
-        </div>
-        <div class="cat-progress"><div class="cat-progress-fill" style="width:100%;background:#059669"></div></div>
-        <div class="subcats open" id="subcats-salario">
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#059669"></div>
-            <div class="subcat-name">CLT</div>
-            <div class="subcat-count">1 lanç.</div>
-            <div class="subcat-val">R$ 0,00</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#059669"></div>
-            <div class="subcat-name">Freelance</div>
-            <div class="subcat-count">0 lanç.</div>
-            <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#059669"></div>
-            <div class="subcat-name">Autônomo</div>
-            <div class="subcat-count">0 lanç.</div>
-            <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="add-subcat" onclick="abrirModalSub('Salário')">+ Adicionar subcategoria</div>
-        </div>
-      </div>
-
-      <!-- INVESTIMENTOS -->
-      <div class="cat-card">
-        <div class="cat-card-header" onclick="toggleSubcats('investrec')">
-          <div class="cat-icon" style="background:#F3E8FF">📈</div>
-          <div class="cat-info">
-            <div class="cat-name">Investimentos</div>
-            <div class="cat-meta"><span>3 subcategorias</span><span>·</span><span>1 lançamento</span></div>
-          </div>
-          <div>
-            <div class="cat-total">R$ 0,00</div>
-            <div class="cat-pct">1,6% das receitas</div>
-          </div>
-          <div class="cat-actions">
-            <button class="cat-action-btn" onclick="event.stopPropagation()">+</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
-            <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
-          </div>
-          <button class="cat-toggle-btn" id="toggle-investrec">▾</button>
-        </div>
-        <div class="cat-progress"><div class="cat-progress-fill" style="width:1.6%;background:#7C3AED"></div></div>
-        <div class="subcats" id="subcats-investrec">
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#7C3AED"></div>
-            <div class="subcat-name">Rendimentos</div>
-            <div class="subcat-count">1 lanç.</div>
-            <div class="subcat-val">R$ 109</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="subcat-item">
-            <div class="subcat-dot" style="background:#7C3AED"></div>
-            <div class="subcat-name">Dividendos</div>
-            <div class="subcat-count">0 lanç.</div>
-            <div class="subcat-val" style="color:var(--text3)">R$ 0</div>
-            <div class="subcat-actions"><button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button><button class="cat-action-btn" onclick="this.closest('.subcat-item').remove();mostrarToast('Subcategoria removida.','error')">🗑️</button></div>
-          </div>
-          <div class="add-subcat">+ Adicionar subcategoria</div>
-        </div>
-      </div>
-
-      <!-- CARD ADICIONAR -->
-      <div class="card-add" onclick="abrirModal('receita')">
-        <div class="card-add-icon">➕</div>
-        <div class="card-add-title">Nova categoria de receita</div>
-        <div class="card-add-sub">Clique para criar uma nova categoria</div>
-      </div>
-
+      <!-- preenchido dinamicamente por renderTelaCategoriasCompleto() -->
     </div>
 
   </div>
@@ -9493,33 +9138,299 @@ function renderLancamentos() {
 
 // ── CATEGORIAS ───────────────────────────────────────────────────────────────────
 function renderCategorias() {
-  var grid = document.getElementById('cats-grid');
-  if (!grid) return;
-  var cats = window._appData.categorias;
-  var principais = (cats||[]).filter(function(c){ return c.tipo !== 'subcategoria'; });
-  if (!principais.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);font-size:14px">Nenhuma categoria cadastrada.<br><small>Clique em "+ Nova categoria" para adicionar.</small></div>';
-    return;
+  // Mantém compatibilidade com grid antigo (caso exista em outra tela)
+  var gridAntigo = document.getElementById('cats-grid');
+  if (gridAntigo) {
+    var cats0 = window._appData.categorias;
+    var principais0 = (cats0||[]).filter(function(c){ return c.tipo !== 'subcategoria'; });
+    if (!principais0.length) {
+      gridAntigo.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text3);font-size:14px">Nenhuma categoria cadastrada.<br><small>Clique em "+ Nova categoria" para adicionar.</small></div>';
+    } else {
+      gridAntigo.innerHTML = principais0.map(function(c) {
+        var bgCor = c.cor || '#1B4B8A';
+        var icone = c.icone || '🏷️';
+        var tipo  = c.tipo  || 'despesa';
+        var isRec = tipo.toLowerCase().includes('receita');
+        return `<div class="cat-card" data-fb-id="${c.id}">
+          <div class="cat-card-header">
+            <div class="cat-card-icon" style="background:${bgCor}">${icone}</div>
+            <div class="cat-card-actions">
+              <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
+              <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
+            </div>
+          </div>
+          <div class="cat-name">${c.nome}</div>
+          <div class="cat-type ${isRec?'receita':'despesa'}">${isRec?'Receita':'Despesa'}</div>
+          <div class="cat-sub">${c.descricao||'Sem descrição'}</div>
+        </div>`;
+      }).join('');
+    }
   }
-  grid.innerHTML = principais.map(function(c) {
-    var bgCor = c.cor || '#1B4B8A';
-    var icone = c.icone || '🏷️';
-    var tipo  = c.tipo  || 'despesa';
-    var isRec = tipo.toLowerCase().includes('receita');
-    return `<div class="cat-card" data-fb-id="${c.id}">
-      <div class="cat-card-header">
-        <div class="cat-card-icon" style="background:${bgCor}">${icone}</div>
-        <div class="cat-card-actions">
+  // Renderiza a tela-categorias completa (grids + KPIs)
+  renderTelaCategoriasCompleto();
+}
+
+// ── RENDER COMPLETO DA TELA CATEGORIAS ───────────────────────────────────────
+function renderTelaCategoriasCompleto() {
+  var gridDesp = document.getElementById('grid-despesa');
+  var gridRec  = document.getElementById('grid-receita');
+  if (!gridDesp && !gridRec) return; // tela não está ativa
+
+  var cats   = window._appData.categorias || [];
+  var lancs  = window._appData.lancamentos || [];
+
+  // Paleta de cores por índice (para categorias sem cor definida)
+  var paleta = ['#1B4B8A','#059669','#D97706','#DC2626','#7C3AED','#0F766E','#0369A1','#9333EA','#B45309','#065F46'];
+
+  // Separar principais e subcategorias
+  var principais  = cats.filter(function(c){ return c.tipo !== 'subcategoria'; });
+  var subcats     = cats.filter(function(c){ return c.tipo === 'subcategoria'; });
+
+  var despesas    = principais.filter(function(c){ return !(c.tipo||'').toLowerCase().includes('receita'); });
+  var receitas    = principais.filter(function(c){ return (c.tipo||'').toLowerCase().includes('receita'); });
+
+  // ── Calcular valor de cada categoria a partir dos lançamentos ─────────────
+  function parseLancVal(l) {
+    var s = (l.val||l.valor||'').toString().replace(/[^\d,.]/g,'').replace(',','.');
+    return parseFloat(s) || 0;
+  }
+
+  function calcTotalCat(catNome) {
+    return lancs.reduce(function(acc, l) {
+      var cat = (l.cat||l.categoria||'').toLowerCase().trim();
+      if (cat === catNome.toLowerCase().trim()) {
+        var isPend = (l.status||'').toLowerCase() === 'pendente';
+        if (!isPend) acc += parseLancVal(l);
+      }
+      return acc;
+    }, 0);
+  }
+
+  function countLancsCat(catNome) {
+    return lancs.filter(function(l){
+      return (l.cat||l.categoria||'').toLowerCase().trim() === catNome.toLowerCase().trim();
+    }).length;
+  }
+
+  function calcTotalSubcat(subcatNome, catPaiNome) {
+    return lancs.reduce(function(acc, l) {
+      var cat    = (l.cat||l.categoria||'').toLowerCase().trim();
+      var subcat = (l.subcat||l.subcategoria||'').toLowerCase().trim();
+      var catPai = catPaiNome ? catPaiNome.toLowerCase().trim() : '';
+      var match  = subcat === subcatNome.toLowerCase().trim() &&
+                   (!catPai || cat === catPai);
+      if (match) {
+        var isPend = (l.status||'').toLowerCase() === 'pendente';
+        if (!isPend) acc += parseLancVal(l);
+      }
+      return acc;
+    }, 0);
+  }
+
+  function countLancsSubcat(subcatNome, catPaiNome) {
+    return lancs.filter(function(l){
+      var cat    = (l.cat||l.categoria||'').toLowerCase().trim();
+      var subcat = (l.subcat||l.subcategoria||'').toLowerCase().trim();
+      var catPai = catPaiNome ? catPaiNome.toLowerCase().trim() : '';
+      return subcat === subcatNome.toLowerCase().trim() && (!catPai || cat === catPai);
+    }).length;
+  }
+
+  var fmt = function(v){
+    return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  };
+
+  // Totais globais para percentual
+  var totalDespesaGlobal = despesas.reduce(function(acc,c){ return acc + calcTotalCat(c.nome); }, 0);
+  var totalReceitaGlobal = receitas.reduce(function(acc,c){ return acc + calcTotalCat(c.nome); }, 0);
+
+  // ── Gerador de card ────────────────────────────────────────────────────────
+  function gerarCard(cat, idx, isRec) {
+    var cor        = cat.cor || paleta[idx % paleta.length];
+    var icone      = cat.icone || '🏷️';
+    var total      = calcTotalCat(cat.nome);
+    var nLancs     = countLancsCat(cat.nome);
+    var totalGlob  = isRec ? totalReceitaGlobal : totalDespesaGlobal;
+    var pct        = totalGlob > 0 ? ((total / totalGlob) * 100).toFixed(1) : 0;
+    var slug       = 'cat-' + cat.id;
+
+    // Subcategorias desta categoria
+    var meusSubcats = subcats.filter(function(s){
+      return (s.catPai||'').toLowerCase().trim() === cat.nome.toLowerCase().trim() ||
+             (s.catPai||'') === cat.id;
+    });
+
+    var subcatsHTML = meusSubcats.map(function(s) {
+      var sTotal = calcTotalSubcat(s.nome, cat.nome);
+      var sCount = countLancsSubcat(s.nome, cat.nome);
+      var sValHTML = sTotal > 0
+        ? `<div class="subcat-val">${fmt(sTotal)}</div>`
+        : `<div class="subcat-val" style="color:var(--text3)">R$ 0</div>`;
+      return `<div class="subcat-item">
+        <div class="subcat-dot" style="background:${cor}"></div>
+        <div class="subcat-name">${s.nome}</div>
+        <div class="subcat-count">${sCount} lanç.</div>
+        ${sValHTML}
+        <div class="subcat-actions">
+          <button class="cat-action-btn" onclick="mostrarToast('Edite a subcategoria no modal.','info')">✏️</button>
+          <button class="cat-action-btn" onclick="excluirSubcatFirebase('${s.id}')">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="cat-card" data-fb-id="${cat.id}" id="card-${slug}">
+      <div class="cat-card-header" onclick="toggleSubcats('${slug}')">
+        <div class="cat-icon" style="background:${cor}22">${icone}</div>
+        <div class="cat-info">
+          <div class="cat-name">${cat.nome}</div>
+          <div class="cat-meta">
+            <span>${meusSubcats.length} subcategoria${meusSubcats.length!==1?'s':''}</span>
+            <span>·</span>
+            <span>${nLancs} lançamento${nLancs!==1?'s':''}</span>
+          </div>
+        </div>
+        <div>
+          <div class="cat-total">${fmt(total)}</div>
+          <div class="cat-pct">${pct}% das ${isRec?'receitas':'despesas'}</div>
+        </div>
+        <div class="cat-actions">
+          <button class="cat-action-btn" onclick="event.stopPropagation();abrirModalSub('${cat.nome}')" title="Nova subcategoria">+</button>
           <button class="cat-action-btn" onclick="event.stopPropagation();editarCategoriaDOM(this.closest('.cat-card'))">✏️</button>
           <button class="cat-action-btn" onclick="event.stopPropagation();excluirCategoriaDOM(this.closest('.cat-card'))">🗑️</button>
         </div>
+        <button class="cat-toggle-btn" id="toggle-${slug}">▾</button>
       </div>
-      <div class="cat-name">${c.nome}</div>
-      <div class="cat-type ${isRec?'receita':'despesa'}">${isRec?'Receita':'Despesa'}</div>
-      <div class="cat-sub">${c.descricao||'Sem descrição'}</div>
+      <div class="cat-progress">
+        <div class="cat-progress-fill" style="width:${pct}%;background:${cor}"></div>
+      </div>
+      <div class="subcats" id="subcats-${slug}">
+        ${subcatsHTML}
+        <div class="add-subcat" onclick="abrirModalSub('${cat.nome}')">+ Adicionar subcategoria</div>
+      </div>
     </div>`;
-  }).join('');
+  }
+
+  // ── Renderizar grids ───────────────────────────────────────────────────────
+  if (gridDesp) {
+    var htmlDesp = despesas.map(function(c,i){ return gerarCard(c,i,false); }).join('');
+    htmlDesp += `<div class="card-add" onclick="abrirModal('despesa')">
+      <div class="card-add-icon">➕</div>
+      <div class="card-add-title">Nova categoria de despesa</div>
+      <div class="card-add-sub">Clique para criar uma nova categoria</div>
+    </div>`;
+    gridDesp.innerHTML = despesas.length ? htmlDesp :
+      `<div class="card-add" onclick="abrirModal('despesa')">
+        <div class="card-add-icon">➕</div>
+        <div class="card-add-title">Nova categoria de despesa</div>
+        <div class="card-add-sub">Clique para criar uma nova categoria</div>
+      </div>`;
+  }
+
+  if (gridRec) {
+    var htmlRec = receitas.map(function(c,i){ return gerarCard(c,i,true); }).join('');
+    htmlRec += `<div class="card-add" onclick="abrirModal('receita')">
+      <div class="card-add-icon">➕</div>
+      <div class="card-add-title">Nova categoria de receita</div>
+      <div class="card-add-sub">Clique para criar uma nova categoria</div>
+    </div>`;
+    gridRec.innerHTML = receitas.length ? htmlRec :
+      `<div class="card-add" onclick="abrirModal('receita')">
+        <div class="card-add-icon">➕</div>
+        <div class="card-add-title">Nova categoria de receita</div>
+        <div class="card-add-sub">Clique para criar uma nova categoria</div>
+      </div>`;
+  }
+
+  // ── Atualizar KPIs ─────────────────────────────────────────────────────────
+  var totalPrincipais = principais.length;
+  var totalSubcats    = subcats.length;
+  var media = totalPrincipais > 0 ? (totalSubcats / totalPrincipais).toFixed(1) : 0;
+
+  var elTotal     = document.getElementById('kpi-total-cats');
+  var elTotalSub  = document.getElementById('kpi-total-cats-sub');
+  var elSubcats   = document.getElementById('kpi-total-subcats');
+  var elSubSub    = document.getElementById('kpi-total-subcats-sub');
+  var elMaisUsada = document.getElementById('kpi-mais-usada');
+  var elMaisLabel = document.getElementById('kpi-mais-usada-label');
+  var elMaisSub   = document.getElementById('kpi-mais-usada-sub');
+  var elSemCat    = document.getElementById('kpi-sem-cat');
+  var elSemSub    = document.getElementById('kpi-sem-cat-sub');
+
+  if (elTotal)    elTotal.textContent    = totalPrincipais;
+  if (elTotalSub) elTotalSub.textContent = despesas.length + ' despesas · ' + receitas.length + ' receitas';
+  if (elSubcats)  elSubcats.textContent  = totalSubcats;
+  if (elSubSub)   elSubSub.textContent   = 'média de ' + media + ' por categoria';
+
+  // Mais usada no mês atual
+  var agora   = new Date();
+  var mesAtual= agora.getMonth();
+  var anoAtual= agora.getFullYear();
+  var meses   = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  var nomeMes = meses[mesAtual];
+
+  var gastosPorCat = {};
+  lancs.forEach(function(l) {
+    var dataStr = l.data || '';
+    var partes  = dataStr.split(/[-\/]/);
+    var lancMes, lancAno;
+    if (partes.length >= 3) {
+      // suporta YYYY-MM-DD e DD/MM/YYYY
+      if (partes[0].length === 4) { lancAno = parseInt(partes[0]); lancMes = parseInt(partes[1]) - 1; }
+      else { lancAno = parseInt(partes[2]); lancMes = parseInt(partes[1]) - 1; }
+    }
+    if (lancMes !== mesAtual || lancAno !== anoAtual) return;
+    var cat = (l.cat||l.categoria||'').trim();
+    if (!cat) return;
+    gastosPorCat[cat] = (gastosPorCat[cat] || 0) + parseLancVal(l);
+  });
+
+  var maisUsadaNome = null, maisUsadaVal = 0;
+  Object.keys(gastosPorCat).forEach(function(nome) {
+    if (gastosPorCat[nome] > maisUsadaVal) { maisUsadaVal = gastosPorCat[nome]; maisUsadaNome = nome; }
+  });
+
+  if (elMaisLabel) elMaisLabel.textContent = 'Mais usada (' + nomeMes + ')';
+  if (maisUsadaNome) {
+    var catObj = principais.find(function(c){ return c.nome.toLowerCase().trim() === maisUsadaNome.toLowerCase().trim(); });
+    var icMais = catObj ? (catObj.icone||'🏷️') : '🏷️';
+    if (elMaisUsada) elMaisUsada.textContent = icMais + ' ' + maisUsadaNome;
+    if (elMaisSub) {
+      var pctMais = totalDespesaGlobal > 0 ? ((maisUsadaVal/totalDespesaGlobal)*100).toFixed(0) : 0;
+      elMaisSub.textContent = fmt(maisUsadaVal) + ' · ' + pctMais + '% das despesas';
+    }
+  } else {
+    if (elMaisUsada) elMaisUsada.textContent = '—';
+    if (elMaisSub)   elMaisSub.textContent   = 'sem lançamentos este mês';
+  }
+
+  // Sem categoria
+  var semCat = lancs.filter(function(l){
+    return !(l.cat||l.categoria||'').trim();
+  }).length;
+  if (elSemCat) {
+    elSemCat.textContent = semCat;
+    elSemCat.style.color = semCat > 0 ? 'var(--amber)' : 'var(--green)';
+  }
+  if (elSemSub) elSemSub.textContent = semCat > 0
+    ? semCat + ' lançamento' + (semCat!==1?'s':'') + ' sem categoria'
+    : 'todos os lançamentos categorizados';
+
+  // Contadores das tabs
+  var elCD = document.getElementById('count-despesa');
+  var elCR = document.getElementById('count-receita');
+  if (elCD) elCD.textContent = despesas.length;
+  if (elCR) elCR.textContent = receitas.length;
 }
+
+// ── Excluir subcategoria com Firebase ────────────────────────────────────────
+window.excluirSubcatFirebase = function(id) {
+  if (!confirm('Excluir esta subcategoria?')) return;
+  var uid = window._currentUser ? window._currentUser.uid : null;
+  window._appData.categorias = (window._appData.categorias||[]).filter(function(c){ return c.id !== id; });
+  if (uid && window.FBCRUD) window.FBCRUD.del(uid,'categorias',id).catch(function(e){ console.warn(e); });
+  renderCategorias();
+  mostrarToast('Subcategoria removida.','error');
+};
 
 // ── PESSOAS ──────────────────────────────────────────────────────────────────────
 function renderPessoas() {
@@ -10097,9 +10008,13 @@ window.navegarPara = function(tela) {
     },
     'categorias': function(){
       var ts = Date.now();
-      window.FBCRUD.get(_uid(),'categorias').then(function(d){
+      Promise.all([
+        window.FBCRUD.get(_uid(),'categorias'),
+        window.FBCRUD.get(_uid(),'lancamentos')
+      ]).then(function(res){
         if (!window._ultimaModificacao['categorias'] || (ts - window._ultimaModificacao['categorias'] > 3000)) {
-          window._appData.categorias = d||[];
+          window._appData.categorias  = res[0]||[];
+          window._appData.lancamentos = res[1]||[];
           renderCategorias();
         }
       });
